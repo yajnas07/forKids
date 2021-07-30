@@ -176,12 +176,14 @@ bool work_sheet::populate_ques()
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(1, 20);
+	std::uniform_int_distribution<> lhs_gen(20, 200);
+	std::uniform_int_distribution<> rhs_gen(2, 50);
 
 
 	for (unsigned i = 0; i < m_noq; i++)
 	{
-		int lhs = dis(gen);
-		int rhs = dis(gen);
+		int lhs = lhs_gen(gen);
+		int rhs = rhs_gen(gen);
 		question::operation op = (question::operation)(dis(gen) & 3);
 
 		m_questions.insert(std::make_pair(i, question(lhs,rhs,op)));
