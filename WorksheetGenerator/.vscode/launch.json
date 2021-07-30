@@ -6,7 +6,18 @@
     "configurations": [
 
         {
+            //To Be used on iMac
             "name": "(lldb) Launch",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/a.out",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+        },
+        
+        {
+            //To Be used on macbook
+            "name": "(cppdbg) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/a.out",
@@ -17,7 +28,6 @@
             "externalConsole": false,
             "MIMode": "lldb"
         },
-        
 
     ]
 }

@@ -1,4 +1,6 @@
 all:
+	clang++ -std=c++11 -g Source.cpp
+gcc:
 	g++ -std=c++11 -g Source.cpp
 
 clean:
