@@ -11,10 +11,11 @@ class question
 public:
 	enum class operation{
 		add,
-		subtract,
+		subtract, 
 		multiply,
 		divide
 	} oper;
+
 
 	static string operation_str(operation op) {
 		switch (op)
