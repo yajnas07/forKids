@@ -140,7 +140,7 @@ bool work_sheet::generate_question(string filename)
 	if (!ofs.is_open()) cout << "Error: COuld not open file " << filename << "for writing!!" << endl;
 
 	ofs << "**************************************************************" << endl;
-	ofs << "******************* Work Sheet *******************************" << endl;
+	ofs << "*******************\t"<< filename << "\t**********************" << endl;
 	ofs << "**************************************************************\n" << endl;
 	for (auto itr = m_questions.begin(); itr != m_questions.end(); itr++) {
 		ofs << "  " << itr->first + 1 << ")\t" << itr->second;
@@ -158,9 +158,9 @@ bool work_sheet::generate_answers(string filename)
 	ofs.open(filename.c_str());
 	if (!ofs.is_open()) cout << "Error: COuld not open file " << filename << "for writing!!" << endl;
 
-	ofs << "*****************************************************************************" << endl;
-	ofs << "*************************** Work Sheet **************************************" << endl;
-	ofs << "*****************************************************************************\n" << endl;
+	ofs << "**************************************************************************" << endl;
+	ofs << "********************\t"<< filename << "\t*********************" << endl;
+	ofs << "**************************************************************************\n" << endl;
 	for (auto itr = m_questions.begin(); itr != m_questions.end(); itr++) {
 		ofs << "  " << itr->first + 1 << ")\t";
 		itr->second.print_answer(ofs);
