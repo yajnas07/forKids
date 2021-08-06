@@ -1,6 +1,7 @@
 make
 ./a.out 20 Worksheet-Hiya.txt -gen_neg
 ./a.out 20 Worksheet-Jiya.txt
+./a.out 10 Worksheet-expression.txt -gen_neg -expr
 
 cat Worksheet-Hiya.txt 
 cat Worksheet-Jiya.txt 
