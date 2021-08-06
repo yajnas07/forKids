@@ -3,6 +3,7 @@
 #include<map>
 #include<random>
 #include<cassert>
+#include<sstream>
 
 using namespace std;
 
@@ -79,10 +80,20 @@ public:
 	int rhs;
 
 };
+string with_sign(int value)
+{
+	stringstream ss;
+	if(value >= 0) {
+		ss << value;
+	} else {
+		ss << "(" << value << ")";
+	}	
+	return ss.str();
 
+}
 ostream& operator << (ostream & os, const question& q)
 {
-	os << q.lhs << "\t" << question::operation_str(q.oper) << "\t" << q.rhs << "\t = \t _________" <<  endl << endl;
+	os << with_sign(q.lhs) << "\t" << question::operation_str(q.oper) << "\t" << with_sign(q.rhs) << "\t = \t _________" <<  endl << endl;
 	return os;
 }
 
@@ -91,7 +102,7 @@ public:
 	work_sheet(unsigned noq):m_noq(noq) {
 
 	}
-	bool populate_ques();
+	bool populate_ques(bool gen_negatives = 0);
 	bool generate_question(string filename = "");
 	bool generate_answers(string filename);
 	void print();
@@ -115,13 +126,19 @@ int main(int argc, char *argv[])
 
 	work_sheet wks(noq);
 	cout << "Populating a work sheet with " << noq << " questions.." << endl;
-	wks.populate_ques();
 	string filename = "worksheet-1.txt";
 	if (argc > 2) {
 		filename = argv[2];
 	}
 	cout << "The name of o/p file is " << filename << endl;
 	cout << "Generating work sheet.." << endl;
+
+	bool gen_negatives = false;
+	if (argc > 3) {
+		if(string(argv[3]) == "-gen_neg") gen_negatives = true;
+	}
+	
+	wks.populate_ques(gen_negatives);
 	wks.generate_question(filename);
 	cout << "Worksheet generated!! Here is the content of work sheet.." << endl;
 	wks.generate_answers(filename.append(".key.txt"));
@@ -172,10 +189,11 @@ bool work_sheet::generate_answers(string filename)
 	return true;
 }
 
-bool work_sheet::populate_ques()
+bool work_sheet::populate_ques(bool gen_negatives)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis_sign(0, 1);
 	std::uniform_int_distribution<> dis(1, 20);
 	std::uniform_int_distribution<> lhs_gen(20, 200);
 	std::uniform_int_distribution<> rhs_gen(2, 50);
@@ -186,7 +204,10 @@ bool work_sheet::populate_ques()
 		int lhs = lhs_gen(gen);
 		int rhs = rhs_gen(gen);
 		question::operation op = (question::operation)(dis(gen) & 3);
-
+		if(gen_negatives &&  (op != question::operation::divide)) {
+			if(dis_sign(gen))lhs = lhs * -1;
+			if(dis_sign(gen))rhs = rhs * -1;
+		}
 		m_questions.insert(std::make_pair(i, question(lhs,rhs,op)));
 		
 	}
