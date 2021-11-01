@@ -9,8 +9,7 @@ int main(int argc, char *argv[])
 	unsigned noq = 0;
 	if (argc > 1) {
 		noq = atoi(argv[1]);
-	}
-	else {
+	} else {
 		cout << "How many questions do you want?" << endl;
 		cin >> noq;
 	}
