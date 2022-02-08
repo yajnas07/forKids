@@ -100,6 +100,14 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="basic_worksheet.h" />
+    <ClInclude Include="expression_worksheet.h" />
+    <ClInclude Include="worksheet_interface.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="RUNME" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
