@@ -1,8 +1,18 @@
-#ifndef WORKSHEET_INTF_H
-#define WORKSHEET_INTF_H
+#pragma once
+
 #include<iostream>
 #include<map>
 #include<sstream>
+
+using namespace std;
+
+class question_interface {
+	public:
+	virtual void create() = 0;
+	virtual void print_question(ostream& os) = 0; 
+	virtual void print_answer(ostream& os) = 0;
+	
+};
 
 
 static std::string str_with_sign(int value)
@@ -19,7 +29,7 @@ static std::string str_with_sign(int value)
 class wks_intf {
 public:
 	wks_intf(unsigned mno):m_noq(mno){}
-	virtual bool populate_ques(bool gen_negatives = 0) = 0;
+	virtual bool populate_ques() = 0;
 	virtual bool generate_question(std::string filename = "") = 0;
 	virtual bool generate_answers(std::string filename) = 0;
 	virtual void print() = 0;
@@ -27,4 +37,3 @@ public:
 protected:
 	unsigned m_noq = 0;
 };
-#endif

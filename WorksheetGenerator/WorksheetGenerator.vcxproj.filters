@@ -20,13 +20,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="basic_worksheet.h">
+    <ClInclude Include="basic_question.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="expression_worksheet.h">
+    <ClInclude Include="expression_question.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="worksheet_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="arithmetic_worksheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

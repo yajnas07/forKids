@@ -1,6 +1,6 @@
 #include<iostream>
-#include"basic_worksheet.h"
-#include"expression_worksheet.h"
+#include "arithmetic_worksheet.h"
+
 using namespace std;
 
 
@@ -23,27 +23,10 @@ int main(int argc, char *argv[])
 	cout << "The name of o/p file is " << filename << endl;
 	cout << "Generating work sheet.." << endl;
 
-	bool gen_negatives = false;
-	if (argc > 3) {
-		if(string(argv[3]) == "-gen_neg") gen_negatives = true;
-	}
+	auto wks = new arithmetic_worksheet(noq);
+
 	
-	wks_intf * wks = NULL;
-	if (argc > 4) {
-		if(string(argv[4]) == "-basic") {
-			wks = new basic_work_sheet(noq);
-		} else if(string(argv[4]) == "-expr") {
-			wks = new expression_worksheet(noq);
-		} else {
-			cout << "Invalid option argv[4]. Allowed values '-basic' & '-expr' " << endl;
-		}
-	}
-	
-	if(!wks) {
-		wks = new basic_work_sheet(noq);
-	}
-	
-	wks->populate_ques(gen_negatives);
+	wks->populate_ques();
 	wks->generate_question(filename);
 	cout << "Worksheet generated!! Here is the content of work sheet.." << endl;
 	//wks->generate_answers(filename.append(".key.txt"));
