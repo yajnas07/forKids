@@ -37,22 +37,6 @@ public:
 		}
 	}
 
-	basic_question(int l, int r, basic_question::operation op) 
-		:lhs(l), rhs(r), oper(op)
-	{
-		if (op == operation::subtract && (lhs < rhs)) {
-			std::swap<int>(lhs,rhs);
-		}
-		if (op == operation::divide ) {
-			if(lhs < rhs) std::swap<int>(lhs,rhs);
-			rhs = rhs % 10 + 1;
-			if (lhs % rhs) {
-				lhs = ((lhs*10) / rhs) * rhs;
-				if (!lhs) lhs++;
-			}
-			assert(rhs != 0 && "RHS cannot be 0 for Divide operation");
-		}
-	}
 	basic_question():lhs(0),rhs(0),oper(operation::add) {}
 
 	int answer()
@@ -79,13 +63,23 @@ public:
 		std::uniform_int_distribution<> lhs_gen(20, 200);
 		std::uniform_int_distribution<> rhs_gen(2, 50);
 		
-		int ls = lhs_gen(gen);
-		int rs = rhs_gen(gen);
+		
 		basic_question::operation op = (basic_question::operation)(dis(gen) & 3);
-		if (op != basic_question::operation::divide) {
-				if (dis_sign(gen))ls = ls * -1;
-				if (dis_sign(gen))rs = rs * -1;
+		int ls = 0;
+		int rs = 0;
+		if (op == operation::divide) {
+			std::uniform_int_distribution<> div_gen(2, 20);
+			std::uniform_int_distribution<> quo_gen(5, 500);
+			rs = div_gen(gen);
+			ls = rs * quo_gen(gen);
 		}
+		else {
+			ls = lhs_gen(gen);
+			rs = rhs_gen(gen);
+			if (dis_sign(gen))ls = ls * -1;
+			if (dis_sign(gen))rs = rs * -1;
+		}
+
 		this->lhs = ls;
 		this->rhs = rs;
 		this->oper = op;

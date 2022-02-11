@@ -34,9 +34,6 @@ public:
 		}
 	}
 	expression_question():oper_count(0) {}
-	expression_question(unsigned count):oper_count(count) {
-		create();
-	}
 	int answer()
 	{
 		return 0;
