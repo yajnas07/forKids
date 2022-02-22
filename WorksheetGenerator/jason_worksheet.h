@@ -36,6 +36,7 @@ bool jason_worksheet::populate_ques(string input_filename)
     ifstream infile; 
     infile.open(input_filename); 
     if(!infile.is_open()) {
+		cout << "ERROR:Could not open file " << input_filename << " for reading" <<endl;
         return false;
     }
 

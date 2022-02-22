@@ -1,6 +1,6 @@
 make
-./a.out 20 Worksheet-Hiya.txt
-./a.out 20 Worksheet-Jiya.txt
+./wks_gen.exe 20 ArithmeticWorksheet.txt arithmetic
+./wks_gen 20 PercentageWorksheet.txt percentage
+./wks_gen 20 AlgebricExpressionWorksheet.txt algebric_expression
+./wks_gen 20 LinearEquationWorksheet.txt linear_equation
 
-cat Worksheet-Hiya.txt 
-cat Worksheet-Jiya.txt 
