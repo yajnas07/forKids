@@ -32,6 +32,9 @@
     <ClInclude Include="arithmetic_worksheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="percentage_question.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="RUNME">

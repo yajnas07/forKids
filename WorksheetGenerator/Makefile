@@ -1,7 +1,7 @@
-all:
-	clang++ -std=c++11 -g Source.cpp
 gcc:
-	g++ -std=c++11 -g Source.cpp
+	g++ -std=c++11 -g -o wks_gen.exe -I../ -g Source.cpp
 
+run:
+	./wks_gen.exe
 clean:
-	rm -rf a.out* Worksheet*txt worksheet*txt
+	rm -rf wks_gen.exe  Worksheet*txt worksheet*txt

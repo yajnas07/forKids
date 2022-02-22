@@ -30,6 +30,7 @@ class wks_intf {
 public:
 	wks_intf(unsigned mno):m_noq(mno){}
 	virtual bool populate_ques() = 0;
+	virtual bool populate_ques(string input_filename) {return false;};
 	virtual bool generate_question(std::string filename = "") = 0;
 	virtual bool generate_answers(std::string filename) = 0;
 	virtual void print() = 0;

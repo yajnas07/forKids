@@ -1,17 +1,14 @@
 #include<iostream>
 #include "arithmetic_worksheet.h"
-
+#include "jason_worksheet.h"
 using namespace std;
 
 
 int main(int argc, char *argv[])
 {
-	unsigned noq = 0;
+	unsigned noq = 20;
 	if (argc > 1) {
 		noq = atoi(argv[1]);
-	} else {
-		cout << "How many questions do you want?" << endl;
-		cin >> noq;
 	}
 
 	//basic_work_sheet wks(noq);
@@ -22,11 +19,11 @@ int main(int argc, char *argv[])
 	}
 	cout << "The name of o/p file is " << filename << endl;
 	cout << "Generating work sheet.." << endl;
-
-	auto wks = new arithmetic_worksheet(noq);
-
 	
-	wks->populate_ques();
+	//auto wks = new arithmetic_worksheet(noq);
+	auto wks = new jason_worksheet(noq);
+	
+	wks->populate_ques("percent_question.json");
 	wks->generate_question(filename);
 	cout << "Worksheet generated!! Here is the content of work sheet.." << endl;
 	//wks->generate_answers(filename.append(".key.txt"));

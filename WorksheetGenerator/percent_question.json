@@ -1,0 +1,181 @@
+{
+    "questions":    [
+           {
+            "description": "What is <X>% of <Y>? _____",
+            "elem": [  
+                        {"<X>": 125, "<Y>": 50},
+                        {"<X>": 0.5, "<Y>": 200}, 
+                        {"<X>": 15, "<Y>": 22.5},
+                        {"<X>": 15,  "<Y>": 300}, 
+                        {"<X>": 35, "<Y>": 300}, 
+                        {"<X>": 0.33, "<Y>": 3000}
+                    ]
+           },
+           {
+            "description": "If <X> percent of number(N) is <Y>, what is N? ___________",
+            "elem": [  
+                        {"<X>": 15, "<Y>": 60},
+                        {"<X>": 35, "<Y>": 30}, 
+                        {"<X>": 25, "<Y>": 75},
+                        {"<X>": 120, "<Y>": 240}, 
+                        {"<X>": 8,   "<Y>": 320}, 
+                        {"<X>": 90, "<Y>": 181}
+                    ]
+           },
+           {
+            "description": "Express the ratio (<X>:<Y>) as percent. __________",
+            "elem": [  
+                        {"<X>": 1, "<Y>": 4},
+                        {"<X>": 8, "<Y>": 2}, 
+                        {"<X>": 16, "<Y>": 48},
+                        {"<X>": 4, "<Y>": 5}, 
+                        {"<X>": 8,   "<Y>": 128}, 
+                        {"<X>": 14, "<Y>": 35}
+                    ]
+           },
+           {
+            "description": "Express the fraction (<X>:<Y>) as percent. __________",
+            "elem": [  
+                        {"<X>": 3, "<Y>": 12},
+                        {"<X>": 16, "<Y>": 4}, 
+                        {"<X>": 64, "<Y>": 96},
+                        {"<X>": 20, "<Y>": 25}, 
+                        {"<X>": 56,   "<Y>": 42}, 
+                        {"<X>": 36, "<Y>": 48}
+                    ]
+           },
+           {
+            "description": "Express <X>% as fraction.____________",
+            "elem": [  
+                        {"<X>": 2},
+                        {"<X>": 160}, 
+                        {"<X>": 32},
+                        {"<X>": 1000}, 
+                        {"<X>": 45}, 
+                        {"<X>": 28}
+                    ]
+           },
+           {
+            "description": "Express <X>% as decimal.____________",
+            "elem": [  
+                        {"<X>": 12},
+                        {"<X>": 80}, 
+                        {"<X>": 132},
+                        {"<X>": 1100}, 
+                        {"<X>": 22}, 
+                        {"<X>": 0.28}
+                    ]
+           },
+           {
+            "description": "Amit scored <X> marks out of total <Y>. How much percentage did he get?______",
+            "elem": [  
+                        {"<X>": 30, "<Y>": 40},
+                        {"<X>": 540, "<Y>": 600}, 
+                        {"<X>": 81, "<Y>": 90},
+                        {"<X>": 16, "<Y>": 25}, 
+                        {"<X>": 28,   "<Y>": 70}, 
+                        {"<X>": 165, "<Y>": 200}
+                    ]
+           },
+           {
+            "description": "A box contains <X> eggs. Out of which <Y>% are rotten ones. How many eggs are good?",
+            "elem": [  
+                        {"<X>": 12, "<Y>": 50},
+                        {"<X>": 50, "<Y>": 30}, 
+                        {"<X>": 60, "<Y>": 20},
+                        {"<X>": 32, "<Y>": 25}, 
+                        {"<X>": 25, "<Y>": 40}, 
+                        {"<X>": 500, "<Y>": 15}
+                    ]
+           },
+           {
+            "description": "In a class Ram scored <X> marks out of total <Y>. How much percentage did he get?______",
+            "elem": [  
+                        {"<X>": 30, "<Y>": 40},
+                        {"<X>": 540, "<Y>": 600}, 
+                        {"<X>": 81, "<Y>": 90},
+                        {"<X>": 16, "<Y>": 25}, 
+                        {"<X>": 28,   "<Y>": 70}, 
+                        {"<X>": 165, "<Y>": 200}
+                    ]
+           },
+           {
+            "description": "If cost price is Rs.<X> and selling price is Rs.<Y>, what is the profit or loss percent?______",
+            "elem": [  
+                        {"<X>": 1200, "<Y>": 1250},
+                        {"<X>": 550, "<Y>": 550}, 
+                        {"<X>": 256, "<Y>": 240},
+                        {"<X>": 5000, "<Y>": 4900}, 
+                        {"<X>": 25,   "<Y>": 27}, 
+                        {"<X>": 30, "<Y>": 33}
+                    ]
+           },
+           {
+            "description": "If selling price is Rs.<X> and cost price was Rs.<Y>, what is the profit or loss percent?______",
+            "elem": [  
+                        {"<X>": 1500, "<Y>": 1550},
+                        {"<X>": 850, "<Y>": 850}, 
+                        {"<X>": 240, "<Y>": 256},
+                        {"<X>": 5000, "<Y>": 4900}, 
+                        {"<X>": 25,   "<Y>": 27}, 
+                        {"<X>": 130, "<Y>": 110}
+                    ]
+           },
+           {
+            "description": "If cost price is Rs.<X> and proft is <Y>%, what is the Selling price?______",
+            "elem": [  
+                        {"<X>": 1500, "<Y>": 10},
+                        {"<X>": 50, "<Y>": 20}, 
+                        {"<X>": 140, "<Y>": 30},
+                        {"<X>": 400, "<Y>": 45}, 
+                        {"<X>": 1200,   "<Y>": 50}, 
+                        {"<X>": 1000, "<Y>": 110}
+                    ]
+           },
+           {
+            "description": "If Cost price is Rs.<X> and loss is <Y>%, what is the Selling price?______",
+            "elem": [  
+                        {"<X>": 300, "<Y>": 10},
+                        {"<X>": 540, "<Y>": 20}, 
+                        {"<X>": 240, "<Y>": 25},
+                        {"<X>": 440, "<Y>": 35}, 
+                        {"<X>": 120, "<Y>": 45}, 
+                        {"<X>": 900, "<Y>": 5}
+                    ]
+           },
+           {
+            "description": "If Selling price is Rs.<X> and profit is <Y>%, what was the Cost price?______",
+            "elem": [  
+                        {"<X>": 330, "<Y>": 10},
+                        {"<X>": 660, "<Y>": 20}, 
+                        {"<X>": 300, "<Y>": 25},
+                        {"<X>": 594, "<Y>": 35}, 
+                        {"<X>": 174, "<Y>": 45}, 
+                        {"<X>": 940, "<Y>": 5}
+                    ]
+           },
+           {
+            "description": "If Selling price is Rs.<X> and loss is <Y>%, what was the Cost price?________",
+            "elem": [  
+                        {"<X>": 270, "<Y>": 10},
+                        {"<X>": 528, "<Y>": 20}, 
+                        {"<X>": 210, "<Y>": 25},
+                        {"<X>": 650, "<Y>": 35}, 
+                        {"<X>": 900, "<Y>": 45}, 
+                        {"<X>": 950, "<Y>": 5}
+                    ]
+           },
+           {
+            "description": "If Principal is Rs.<X>, find the total amout after <Y>years if the rate of simple interest is <Z>%. __________",
+            "elem": [  
+                        {"<X>": 100000, "<Y>": 3, "<Z>":10},
+                        {"<X>": 12000,  "<Y>": 4, "<Z>":7},
+                        {"<X>": 150000, "<Y>": 5, "<Z>":8},
+                        {"<X>": 100000, "<Y>": 6, "<Z>":9},
+                        {"<X>": 100000, "<Y>": 7, "<Z>":11},
+                        {"<X>": 100000, "<Y>": 8, "<Z>":4.5}
+                    ]
+           }
+
+        ]
+    }

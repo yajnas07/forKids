@@ -104,6 +104,7 @@
     <ClInclude Include="arithmetic_worksheet.h" />
     <ClInclude Include="basic_question.h" />
     <ClInclude Include="expression_question.h" />
+    <ClInclude Include="percentage_question.h" />
     <ClInclude Include="worksheet_interface.h" />
   </ItemGroup>
   <ItemGroup>
