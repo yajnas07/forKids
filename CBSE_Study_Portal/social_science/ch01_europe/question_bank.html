@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Rise of Nationalism in Europe</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0a04; --card:#1a1208; --card2:#221a0a;
+    --border:#3a2e1a; --text:#e8d8b0; --muted:#8a7a5a;
+    --gold:#f5c842; --orange:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+    --correct:#22c55e; --wrong:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(245,200,66,.04) 0%,transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:900; color:var(--gold); }
+  header p  { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .dash { display:flex; justify-content:center; gap:.9rem; flex-wrap:wrap; padding:.8rem 1rem 1.2rem; }
+  .dcard { background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.6rem 1.2rem; text-align:center; min-width:84px; }
+  .dval { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; }
+  .dlbl { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:0 1rem 1.2rem; }
+  nav button { font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  nav button:hover { color:var(--text); }
+  nav button.active { border-color:var(--gold); color:var(--gold); background:rgba(245,200,66,.08); }
+
+  main { max-width:800px; margin:0 auto; padding:0 1rem 4rem; }
+
+  .q-card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:1rem; overflow:hidden; transition:box-shadow .2s;
+    animation:slideIn .3s ease both; }
+  .q-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.5); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-header { display:flex; align-items:flex-start; gap:.7rem; padding:1rem 1.1rem .7rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:.68rem; min-width:28px; height:28px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.45; flex:1; }
+  .q-meta { display:flex; gap:.35rem; flex-wrap:wrap; padding:0 1.1rem .7rem 4rem; }
+
+  .badge { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .48rem; border-radius:2px; }
+  .b-mcq    { background:rgba(56,189,248,.12);  color:var(--blue); }
+  .b-short  { background:rgba(34,197,94,.12);   color:var(--green); }
+  .b-long   { background:rgba(245,200,66,.12);  color:var(--gold); }
+  .b-assert { background:rgba(129,140,248,.12); color:var(--indigo); }
+  .b-1m { background:rgba(148,163,184,.08); color:#94a3b8; }
+  .b-2m { background:rgba(245,200,66,.1);   color:#fde68a; }
+  .b-3m { background:rgba(249,115,22,.1);   color:#fed7aa; }
+  .b-5m { background:rgba(239,68,68,.12);   color:#fca5a5; }
+
+  .strip-fr  { border-left:4px solid var(--orange); }
+  .strip-uni { border-left:4px solid var(--blue); }
+  .strip-fig { border-left:4px solid var(--green); }
+  .strip-con { border-left:4px solid var(--indigo); }
+  .strip-bal { border-left:4px solid var(--red); }
+  .strip-gen { border-left:4px solid #64748b; }
+
+  .mcq-body { padding:0 1.1rem .6rem; }
+  .mcq-opts { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; }
+  @media(max-width:480px){ .mcq-opts { grid-template-columns:1fr; } }
+  .opt-btn { display:flex; align-items:center; gap:.55rem; background:var(--card2);
+    border:1.5px solid var(--border); border-radius:8px; padding:.55rem .75rem;
+    cursor:pointer; transition:all .16s; text-align:left; color:var(--text);
+    font-family:'Lato',sans-serif; font-size:.82rem; font-weight:600; }
+  .opt-btn:hover:not(:disabled) { border-color:#5a4a2a; background:#281f0d; }
+  .opt-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; }
+  .opt-btn.correct { border-color:var(--correct); background:rgba(34,197,94,.1); color:#4ade80; }
+  .opt-btn.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,.08); color:#fca5a5; }
+  .feedback { font-size:.76rem; font-family:'DM Mono',monospace; padding:.35rem .7rem;
+    border-radius:6px; margin:.25rem 0 .5rem; display:none; }
+  .feedback.correct { background:rgba(34,197,94,.08);  color:#4ade80; display:block; }
+  .feedback.wrong   { background:rgba(239,68,68,.08); color:#f87171; display:block; }
+
+  .ans-reveal { overflow:hidden; max-height:0; transition:max-height .38s ease; }
+  .ans-reveal.open { max-height:800px; }
+  .ans-body { padding:.75rem 1.1rem 1rem; border-top:1px solid var(--border); }
+  .ans-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--green); margin-bottom:.4rem; }
+  .ans-text { font-size:.84rem; color:var(--text); line-height:1.7; }
+  .ans-text strong { color:var(--gold); }
+  .ans-text em { color:#93c5fd; font-style:normal; }
+  .ans-date { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--orange);
+    background:rgba(249,115,22,.08); border:1px solid rgba(249,115,22,.15);
+    border-radius:3px; padding:.15rem .5rem; display:inline-block; margin-bottom:.4rem; }
+  .tip { font-size:.74rem; color:var(--gold); background:rgba(245,200,66,.06);
+    border-left:3px solid var(--gold); border-radius:0 6px 6px 0;
+    padding:.38rem .65rem; margin-top:.5rem; }
+
+  .show-btn { display:inline-flex; align-items:center; gap:.35rem; font-family:'Playfair Display',serif;
+    font-weight:700; font-size:.74rem; padding:.38rem .9rem; border-radius:3px;
+    border:1px solid var(--border); background:transparent; color:var(--muted);
+    cursor:pointer; transition:all .18s; margin:.15rem 0 .7rem 1.1rem; }
+  .show-btn:hover { color:var(--text); border-color:#5a4a2a; }
+  .show-btn.active { color:var(--green); border-color:var(--green); background:rgba(34,197,94,.06); }
+
+  .reset-bar { text-align:center; padding:1rem; }
+  .reset-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem;
+    padding:.55rem 1.6rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .reset-btn:hover { border-color:var(--red); color:var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Rise of Nationalism in Europe · History Ch.1 · Class X CBSE · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval">30</div><div class="dlbl">Total</div></div>
+  <div class="dcard"><div class="dval" id="d-att" style="color:var(--gold)">0</div><div class="dlbl">Attempted</div></div>
+  <div class="dcard"><div class="dval" id="d-cor" style="color:var(--correct)">0</div><div class="dlbl">Correct</div></div>
+  <div class="dcard"><div class="dval" id="d-sc" style="color:var(--indigo)">0%</div><div class="dlbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filter('all',this)">All (30)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All</button></div>
+
+<script>
+const Q = [
+  // MCQ
+  {id:1,type:'mcq',topic:'fr',marks:1,
+   q:'The term "nation-state" refers to:',
+   opts:['A state ruled by a military general','A state whose borders match a nation sharing common culture, language and history','A federation of many kingdoms','A state governed by a church'],
+   ans:1,
+   explain:'A nation-state is a state whose political boundaries coincide with a "nation" — a group of people sharing common culture, language, history and territory. The 19th century saw a shift from large multi-ethnic empires to nation-states.'},
+
+  {id:2,type:'mcq',topic:'fr',marks:1,
+   q:'Frédéric Sorrieu\'s famous 1848 paintings depicted:',
+   opts:['Napoleon\'s military conquests across Europe','A utopian vision of the world as democratic nation-states with people marching under their own flags','The French Revolution of 1789 in detail','The Congress of Vienna restoring old monarchies'],
+   ans:1,
+   explain:'French artist Frédéric Sorrieu painted a series of four prints in 1848 showing his utopian dream: people of Europe and America — men and women of all ages and classes — marching in a long procession as free nations, each under their own flag, past the Statue of Liberty. This is considered the first visual expression of the nation-state ideal.'},
+
+  {id:3,type:'mcq',topic:'fr',marks:1,
+   q:'The Napoleonic Code did NOT include which of the following?',
+   opts:['Abolition of feudal privileges','Uniform legal system for all','Right to vote for all citizens including women','Equal laws regardless of birth'],
+   ans:2,
+   explain:'The Napoleonic Code abolished feudal privileges, established a uniform legal system, and guaranteed equal laws for all citizens. However, it did NOT grant voting rights to all citizens or to women. Political rights were restricted. The Code was primarily a civil legal reform, not a democratic reform.'},
+
+  {id:4,type:'mcq',topic:'fr',marks:1,
+   q:'What were the two main principles of the Congress of Vienna (1815)?',
+   opts:['Democracy and Equality','Legitimacy and Balance of Power','Nationalism and Liberalism','Free Trade and Constitutionalism'],
+   ans:1,
+   explain:'The Congress of Vienna (1815) was based on two conservative principles: (1) Legitimacy — restore pre-Revolution monarchs to their thrones; (2) Balance of Power — redistribute territories so no single nation could dominate Europe. Both principles aimed to reverse the French Revolution\'s impact.'},
+
+  {id:5,type:'mcq',topic:'uni',marks:1,
+   q:'The Zollverein (1834) was significant for German unification because:',
+   opts:['It united German armies under one command','It created a customs union that economically integrated German states before political unity','It elected Bismarck as the first German leader','It declared Germany as an independent nation'],
+   ans:1,
+   explain:'The Zollverein (German Customs Union, 1834) removed tariff barriers between 39 German states, creating a single economic market. This is significant because economic unity came BEFORE political unity — the shared market created common interests that later made political unification easier under Bismarck.'},
+
+  {id:6,type:'mcq',topic:'uni',marks:1,
+   q:'Where was the German Empire officially proclaimed on January 18, 1871?',
+   opts:['Berlin, Germany','Frankfurt Parliament Hall','Hall of Mirrors, Palace of Versailles, France','Vienna, Austria'],
+   ans:2,
+   explain:'The German Empire was proclaimed in the Hall of Mirrors at the Palace of Versailles in France on January 18, 1871. The choice of France\'s royal palace was a deliberate humiliation of the defeated French. Wilhelm I (King of Prussia) became Kaiser (Emperor) and Bismarck became the first Chancellor.'},
+
+  {id:7,type:'mcq',topic:'uni',marks:1,
+   q:'Which of the following correctly describes Garibaldi\'s role in Italian unification?',
+   opts:['He provided the intellectual ideas and founded Young Italy','He used diplomatic alliances with France to fight Austria','He led the Red Shirts to conquer southern Italy and handed territories to Victor Emmanuel II','He presided over the Frankfurt Parliament and drafted the constitution'],
+   ans:2,
+   explain:'Giuseppe Garibaldi\'s role was military. He led an army of volunteer "Red Shirts" in the famous "Expedition of the Thousand" (1860), conquering Sicily and Naples. He then, in a remarkable act of national self-sacrifice, handed over all the conquered territories to King Victor Emmanuel II of Sardinia-Piedmont.'},
+
+  {id:8,type:'mcq',topic:'con',marks:1,
+   q:'"Volksgeist" is a concept developed by:',
+   opts:['Otto von Bismarck','Giuseppe Mazzini','Johann Gottfried Herder','Frédéric Sorrieu'],
+   ans:2,
+   explain:'Johann Gottfried Herder (1744–1803), the German Romantic philosopher, developed the concept of "volksgeist" — the unique spirit or soul of a people, expressed through their folk songs, language, poetry and customs. This idea hugely influenced Romantic nationalism across Europe.'},
+
+  {id:9,type:'mcq',topic:'bal',marks:1,
+   q:'The Balkans were called the "powder keg of Europe" because:',
+   opts:['The region had large coal and iron deposits','Multiple ethnic groups with conflicting nationalist ambitions competed in a region of declining Ottoman power, with Great Powers also competing for influence','It was the most industrialised region in Europe','All Balkan states were ruled by the same emperor'],
+   ans:1,
+   explain:'The Balkans was a "powder keg" (ready to explode at any moment) because: many different ethnic groups (Slavs, Greeks, Bulgarians, Albanians) all wanted their own nation-states; the Ottoman Empire was declining leaving a power vacuum; Great Powers (Russia, Austria-Hungary, Britain, Germany) competed for influence; overlapping territorial claims created constant tensions.'},
+
+  {id:10,type:'mcq',topic:'bal',marks:1,
+   q:'The immediate cause of the First World War was:',
+   opts:['The unification of Germany in 1871','The assassination of Archduke Franz Ferdinand in Sarajevo in 1914 by a Bosnian Serb nationalist','The Congress of Vienna failing to maintain peace','The British invasion of France'],
+   ans:1,
+   explain:'The immediate trigger of WWI was the assassination of Archduke Franz Ferdinand (heir to the Austro-Hungarian throne) and his wife by Gavrilo Princip, a Bosnian Serb nationalist, in Sarajevo on June 28, 1914. Austria-Hungary blamed Serbia; the alliance system drew in Russia, Germany, France, and Britain.'},
+
+  // ASSERTION-REASON
+  {id:11,type:'assert',topic:'fr',marks:1,
+   q:'Assertion (A): Napoleon is considered both a promoter and a trigger of European nationalism.\nReason (R): Napoleon spread revolutionary ideas through the Napoleonic Code AND caused nationalist resentment through his imperialism.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains A. Napoleon\'s armies spread the Napoleonic Code (abolishing feudalism, equal laws — inspiring nationalism). At the same time, his domination and exploitation of conquered peoples triggered a nationalist reaction — "we are a people, we deserve to govern ourselves, not be ruled by France."'},
+
+  {id:12,type:'assert',topic:'uni',marks:1,
+   q:'Assertion (A): Economic unity in Germany preceded political unity.\nReason (R): The Zollverein (1834) created a customs union among German states 37 years before the German Empire was proclaimed in 1871.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains A. The Zollverein was formed in 1834 — creating economic integration and shared interests among German states. The German Empire (political unity) was proclaimed only in 1871. The 37-year gap illustrates that economic unity can both precede and facilitate political unification.'},
+
+  {id:13,type:'assert',topic:'con',marks:1,
+   q:'Assertion (A): The 1848 revolutions across Europe all ultimately failed.\nReason (R): The failure of these revolutions proved that nationalism was not a significant political force.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','Both A and R false'],
+   ans:2,
+   explain:'A is true — the 1848 revolutions were all crushed by conservative reaction. But R is FALSE. The revolutions proved the OPPOSITE — that nationalism was an extremely powerful mass force that could not be permanently suppressed by conservative governments. The 1848 revolutions, though they failed short-term, showed that the old order could not ignore nationalist demands indefinitely.'},
+
+  {id:14,type:'assert',topic:'uni',marks:1,
+   q:'Assertion (A): Mazzini, Cavour and Garibaldi all played essential roles in Italian unification, but used different methods.\nReason (R): Mazzini provided ideology, Cavour used diplomacy, and Garibaldi used military force.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains A. Mazzini (Young Italy) provided the nationalist ideology and inspiration. Cavour (PM of Sardinia-Piedmont) used diplomatic alliances (with France against Austria). Garibaldi led the military "Expedition of the Thousand" to conquer southern Italy. Three different approaches working in sequence.'},
+
+  // SHORT ANSWER
+  {id:15,type:'short',topic:'fr',marks:3,
+   q:'Explain how the French Revolution of 1789 gave rise to the idea of nationalism in Europe.',
+   date:'1789',
+   ans:'The French Revolution (1789) was the <strong>first clear expression</strong> of nationalism because:\n\n<strong>1. Sovereignty shifted to the people:</strong> The French people declared themselves "the nation" with the right to rule. This replaced the idea that sovereignty belonged to the king — it now belonged to citizens.\n\n<strong>2. Shared identity:</strong> The Revolution created shared symbols — tricolour flag, La Marseillaise, Marianne — that gave French people a common national identity.\n\n<strong>3. Spread through Napoleonic conquests:</strong> Napoleon\'s armies carried the Napoleonic Code across Europe — abolishing feudalism, equal laws — inspiring people to want the same rights in their own states.\n\n<strong>4. Triggered nationalist reactions:</strong> People in occupied territories resented French domination and began to assert their own national identity — "we are Germans/Italians/Spaniards, not subjects of France."\n\nThus, the French Revolution both created and exported the nation-state idea.',
+   tip:'Cover: sovereignty shift, shared identity, Napoleonic spread, and nationalist reaction — all four for 3 marks.'},
+
+  {id:16,type:'short',topic:'uni',marks:3,
+   q:'Describe the role of Bismarck in the unification of Germany. What does "blood and iron" mean?',
+   ans:'<strong>Otto von Bismarck</strong> became Prime Minister of Prussia in 1862 and is credited with unifying Germany through his policy of <strong>Realpolitik</strong>.\n\n<strong>"Blood and Iron":</strong> Bismarck\'s famous phrase — German unity would be achieved not through speeches and parliamentary debates (as liberals had tried in 1848) but through military force ("blood") and industrial/military power ("iron"). It meant practical power, not idealistic talk.\n\n<strong>Three Wars of Unification:</strong>\n1. 1864 — War with Denmark → gained Schleswig-Holstein\n2. 1866 — Austro-Prussian War → expelled Austria from German affairs\n3. 1870–71 — Franco-Prussian War → defeated France; southern German states joined Prussia\n\n<strong>Result:</strong> German Empire proclaimed at Versailles, January 18, 1871. Wilhelm I = Kaiser; Bismarck = first Chancellor.',
+   tip:'"Blood and iron" + three wars + proclamation date/place = complete answer for 3 marks.'},
+
+  {id:17,type:'short',topic:'uni',marks:3,
+   q:'Who were Mazzini, Cavour and Garibaldi? How did each contribute to Italian unification?',
+   ans:'<strong>Giuseppe Mazzini (1807–1872) — The Ideologist:</strong>\nFounded Young Italy (1831) and Young Europe (1834). Romantic nationalist — believed nations were God\'s creation. Organised multiple uprisings that failed, but his ideas inspired generations of nationalists across Europe.\n\n<strong>Count Camillo di Cavour (1810–1861) — The Diplomat:</strong>\nPrime Minister of Sardinia-Piedmont. Pragmatic statesman. Allied with Napoleon III of France against Austria (1859) — won Lombardy. Masterminded the political unification of northern and central Italy.\n\n<strong>Giuseppe Garibaldi (1807–1882) — The Soldier:</strong>\nLed the "Expedition of the Thousand" (1860) — marched through Sicily and Naples with Red Shirts. Defeated the Bourbon kingdom. Handed conquered territories to Victor Emmanuel II — act of national self-sacrifice.\n\n<strong>Together:</strong> Mazzini\'s ideas + Cavour\'s diplomacy + Garibaldi\'s military = unified Italy.',
+   tip:'One sentence each on who they were, then one sentence on what they did. MCG = Ideas → Diplomacy → Military.'},
+
+  {id:18,type:'short',topic:'con',marks:2,
+   q:'What were the principles of Liberalism in 19th-century Europe? Who supported it?',
+   ans:'<strong>Political Liberalism:</strong>\n• Individual freedom and rights\n• Constitutional government — rule of law, not arbitrary kings\n• Equality before law — no hereditary privilege\n• Government by consent of the governed\n\n<strong>Economic Liberalism:</strong>\n• Free markets — removal of tariffs and trade restrictions\n• End of guild monopolies\n• Freedom of contract\n\n<strong>Supporters:</strong> The educated, property-owning <strong>middle class (bourgeoisie)</strong> — merchants, lawyers, professionals. They wanted both political rights AND free trade to expand their businesses.\n\nLiberal economics + liberal politics went hand in hand for the 19th-century middle class.',
+   tip:'Political AND economic liberalism — cover both. Middle class = main supporters.'},
+
+  {id:19,type:'short',topic:'con',marks:2,
+   q:'What is "Romanticism" and how did it contribute to nationalist movements in Europe?',
+   ans:'<strong>Romanticism</strong> was a cultural movement of the early 19th century that valued emotion, nature, folk culture, and the past — over Enlightenment reason and rationalism.\n\n<strong>Contribution to nationalism:</strong>\n• <strong>Herder\'s "volksgeist"</strong> — each nation has a unique soul expressed in its language, folk songs, and customs\n• <strong>Brothers Grimm</strong> collected German folk tales — preserving national culture\n• <strong>Karol Kurpinski</strong> composed Polish national music — cultural resistance under Russian rule\n• Language became a marker of national identity — learning/speaking one\'s language was nationalist act\n• Folk heroes, legends, and history were used to build shared national identity\n\nRomanticism gave nationalism its <strong>emotional and cultural foundation</strong>.',
+   tip:'Define Romanticism, then give 3–4 specific examples of how it connected to nationalism.'},
+
+  {id:20,type:'short',topic:'bal',marks:3,
+   q:'Why were the Balkans called the "powder keg of Europe"? How did Balkan nationalism lead to WWI?',
+   ans:'<strong>Why "powder keg":</strong>\n• The Ottoman Empire was declining ("Sick Man of Europe") — leaving a power vacuum\n• Multiple ethnic groups (Slavs, Bulgarians, Greeks, Albanians, Romanians) all claimed the same territories\n• Each wanted their own nation-state — conflicting claims\n• Great Powers (Russia, Austria-Hungary, Britain, Germany) competed for influence — adding to tension\n\n<strong>Path to WWI:</strong>\n• 1912–13: Balkan Wars divided Ottoman territories — but created new tensions between winners\n• <strong>June 28, 1914:</strong> Archduke Franz Ferdinand of Austria-Hungary was assassinated in Sarajevo by Gavrilo Princip (Bosnian Serb nationalist)\n• Austria-Hungary blamed Serbia\n• Russia supported Serbia (Pan-Slavism)\n• Alliance system drew in Germany (supporting Austria) and France/Britain (supporting Russia)\n• <strong>World War I began</strong> — nationalism in Balkans ignited a global war',
+   tip:'Two-part answer: why was it a powder keg (structural reasons) + how it actually triggered WWI (chain of events).'},
+
+  {id:21,type:'short',topic:'fr',marks:2,
+   q:'What was the Congress of Vienna (1815)? What did it try to achieve?',
+   date:'1815',
+   ans:'The <strong>Congress of Vienna (1815)</strong> was a meeting of European powers — Austria, Prussia, Russia, Britain, France — after Napoleon\'s final defeat at Waterloo.\n\nPresided by <strong>Klemens von Metternich</strong> (Austrian Chancellor).\n\n<strong>Goals:</strong>\n1. <strong>Restore conservative order</strong> — undo the changes of the French Revolution and Napoleon\n2. <strong>Principle of Legitimacy</strong> — restore pre-1789 monarchs to their thrones\n3. <strong>Balance of Power</strong> — redistribute territories so no nation could dominate Europe\n4. <strong>Suppress liberalism and nationalism</strong> — prevent further revolutions\n\nThe Congress succeeded temporarily — but nationalist revolutions erupted in 1830 and 1848, showing the conservative order could not permanently suppress nationalism.',
+   tip:'Metternich + two principles (Legitimacy + Balance of Power) + ultimate failure to suppress nationalism.'},
+
+  {id:22,type:'short',topic:'con',marks:2,
+   q:'What happened at the Frankfurt Parliament in 1848? Why did it fail?',
+   date:'1848',
+   ans:'In <strong>1848</strong>, liberal nationalists from across the German states gathered at <strong>Frankfurt Parliament</strong> to draft a constitution for a unified Germany and discuss German unification.\n\nThey debated and offered the crown of a unified Germany to <strong>King Frederick William IV of Prussia</strong> — but he refused. He said he would not accept a crown "from the gutter" — i.e., from the liberal middle class, not from fellow princes.\n\n<strong>Why it failed:</strong>\n• Liberals had no army to back their demands\n• The Prussian king preferred conservative nationalism to liberal parliamentarism\n• Middle class became frightened of working-class radicalism in 1848\n• Conservative governments regrouped and crushed the revolts\n\nThe lesson: German unification would not come from liberal idealism — it came later through Bismarck\'s "blood and iron."',
+   tip:'Frankfurt Parliament 1848 = liberals tried, failed. Bismarck 1871 = conservatives succeeded by different means.'},
+
+  {id:23,type:'short',topic:'uni',marks:3,
+   q:'Compare the methods of unification of Germany and Italy. What were the similarities and differences?',
+   ans:'<strong>Similarities:</strong>\n• Both were fragmented nations that unified in the 19th century\n• Both needed a leading state (Prussia for Germany; Sardinia-Piedmont for Italy)\n• Both used wars against Austria as a crucial step\n• Both resulted in constitutional monarchies under a king (Kaiser Wilhelm I / Victor Emmanuel II)\n\n<strong>Differences:</strong>\n\n<em>Germany</em>\n• Method: "Blood and iron" — Bismarck\'s three wars\n• Leader: Bismarck (conservative, realpolitik)\n• Role of people: Military conscription, not volunteering\n• Proclaimed: Versailles, France, January 18, 1871\n\n<em>Italy</em>\n• Method: Mix of ideas (Mazzini), diplomacy (Cavour), military volunteers (Garibaldi)\n• Leaders: Three men — Mazzini + Cavour + Garibaldi\n• Role of people: Garibaldi\'s thousand volunteers showed mass nationalist enthusiasm\n• Completed: Rome taken 1870\n\n<strong>Key difference:</strong> Germany = top-down, conservative. Italy = bottom-up romantic idealism + pragmatic diplomacy.',
+   tip:'Cover similarities AND differences for full marks. Use a structured comparison — board examiners prefer organised answers.'},
+
+  // LONG ANSWER
+  {id:24,type:'long',topic:'fr',marks:5,
+   q:'How did the French Revolution of 1789 and the Napoleonic era shape the development of nationalism in Europe? Discuss with examples.',
+   ans:'<strong>1. Birth of the Nation-State Idea (1789):</strong>\nThe French Revolution declared the people of France sovereign — they were "the nation." This replaced centuries of belief that sovereignty belonged to kings. The idea that a people with shared culture and history should govern themselves spread like wildfire.\n\n<strong>2. National Symbols:</strong>\nThe Revolution created the first modern national symbols — tricolour flag, La Marseillaise anthem, Marianne as the national personification. These became models for other nations building their own identities.\n\n<strong>3. Napoleonic Code:</strong>\nNapoleon carried French administrative and legal systems across Europe:\n• Abolished feudal privileges of aristocracy\n• Uniform laws for all citizens\n• Secured property rights\n• Standardised weights and measures\nThese reforms showed people what modern, efficient, equal governance looked like — inspiring them to want it for their own nations.\n\n<strong>4. Triggering Nationalist Reaction:</strong>\nNapoleon\'s domination also angered people. His heavy taxes, military conscription, and treatment of conquered peoples as inferior triggered a nationalist backlash: "We are Germans/Italians/Spanish — not French subjects." Nationalism arose as resistance to French imperialism.\n\n<strong>5. Spread of Liberal Ideas:</strong>\nThe Revolution\'s ideals of Liberty, Equality, Fraternity gave European liberals a political vocabulary and inspiration. Secret societies (Carbonari in Italy, Young Italy) were formed to spread these ideas underground when governments tried to suppress them.\n\n<strong>6. Frédéric Sorrieu\'s Vision (1848):</strong>\nThe artist Sorrieu\'s paintings captured the dream — a world of free nation-states where people marched under their own flags. This showed how far the French Revolution\'s ideas had spread by 1848.\n\n<strong>Conclusion:</strong>\nThe French Revolution was both the origin and the accelerator of European nationalism. Napoleon spread its ideals while simultaneously provoking nationalist reactions — making him both a servant and an enemy of nationalism.',
+   tip:'Structure: 1789 ideas → symbols → Napoleonic Code → nationalist reaction → liberal secret societies → Sorrieu. Cover at least 5 points for full marks.'},
+
+  {id:25,type:'long',topic:'uni',marks:5,
+   q:'Describe the process of German unification under Bismarck. Why was it called unification by "blood and iron"?',
+   ans:'<strong>Background:</strong>\nIn the early 19th century, the German-speaking world consisted of 39 separate states loosely organised in the German Confederation under Austrian influence. Liberal nationalists tried to unite Germany at the Frankfurt Parliament (1848) but failed when the Prussian king rejected their offer.\n\n<strong>Economic Foundation — Zollverein (1834):</strong>\nBefore political unity came economic unity. The Zollverein (German Customs Union, 1834), initiated by Prussia, united 39 states in a single market by removing tariff barriers. This created common economic interests that paved the way for political unification.\n\n<strong>Bismarck\'s Rise (1862):</strong>\nOtto von Bismarck became Prime Minister of Prussia in 1862. Unlike the 1848 liberals, he believed in Realpolitik — practical power, not idealism. His famous statement: "The great questions of the day will not be settled by speeches and majority votes... but by blood and iron."\n\n<strong>"Blood and Iron" = Three Wars:</strong>\n1. <em>War with Denmark (1864)</em> — Prussia and Austria jointly defeated Denmark. Prussia gained Schleswig-Holstein.\n2. <em>Austro-Prussian War (1866)</em> — Prussia defeated Austria. Austrian influence expelled from German affairs. Prussia dominated northern Germany.\n3. <em>Franco-Prussian War (1870–71)</em> — Prussia defeated France. The humiliation of France rallied the southern German states to join Prussia. German Empire proclaimed at Versailles.\n\n<strong>Proclamation of German Empire:</strong>\nJanuary 18, 1871 — in the Hall of Mirrors at the Palace of Versailles, France, Wilhelm I was declared Kaiser. Bismarck became first Chancellor. The proclamation at France\'s royal palace was a deliberate national humiliation of the defeated enemy.\n\n<strong>Why "Blood and Iron"?</strong>\nThe phrase captures Bismarck\'s method: "blood" = the military force of the three wars; "iron" = Prussia\'s industrial and military strength. Germany was unified not through liberal idealism or the will of the people, but through strategic military power wielded by a conservative Prussian state.',
+   tip:'Cover: Zollverein background → Bismarck\'s ideology → three wars (with years and results) → proclamation (date + place) → explain "blood and iron." Five-mark answer needs all five elements.'},
+
+  {id:26,type:'long',topic:'con',marks:5,
+   q:'Discuss the role of culture, language and romanticism in the development of nationalist movements in Europe.',
+   ans:'<strong>1. Herder\'s Volksgeist — The Foundation:</strong>\nGerman philosopher Johann Gottfried Herder (1744–1803) argued that each nation had a unique "volksgeist" — a spirit or soul — expressed through its folk songs, poetry, language, and customs. This Romantic idea made culture and language the primary markers of national identity.\n\n<strong>2. Language as National Identity:</strong>\nLanguage became the most powerful nationalist symbol:\n• In German states, French occupation made German speakers cling to their language as identity\n• In Poland, Russian rulers suppressed the Polish language — teaching Polish became an act of nationalist resistance\n• Czech, Hungarian, Finnish, Slovak languages were revived and standardised to create a national literary tradition\n• Dictionaries, grammars, and newspapers in national languages spread national consciousness among ordinary people\n\n<strong>3. Brothers Grimm — Folk Culture as Nationalism:</strong>\nJacob and Wilhelm Grimm collected German folk tales to preserve the unique German cultural soul. Their project was explicitly nationalist — before Germans had political unity, they had cultural unity in their shared folk traditions.\n\n<strong>4. Music and Art:</strong>\n• Polish composer Karol Kurpinski turned folk music into nationalist anthems — celebrating Polish national struggle against Russian rule\n• Folk dances, traditional costumes, and regional foods became symbols of national identity\n• Romantic painters created images of the "national landscape" — mountains, rivers, forests as the soul of a people\n\n<strong>5. Romantic Nationalism vs. Enlightenment Liberalism:</strong>\nRomantic nationalism focused on <em>culture and emotion</em> — what made a people unique. Enlightenment liberalism focused on <em>reason and rights</em> — what all people shared. Together, they gave nationalism both an emotional appeal (we are a unique people) and a political programme (we deserve our own state with rights and constitutions).\n\n<strong>6. Limitations:</strong>\nRomantic nationalism could also become exclusionary — defining the "nation" by ethnic or linguistic purity in ways that excluded minorities. The same romantic nationalism that liberated Italians and Germans could be used against Jews, Roma, or other minorities within nation-states.\n\n<strong>Conclusion:</strong>\nCulture, language, and Romanticism were essential to nationalism because they provided the emotional raw material — the sense of "us." Political nationalism then channelled this sense of identity into demands for self-governing nation-states.',
+   tip:'Cover: Herder\'s volksgeist, language revival (multiple examples), Brothers Grimm, music/art, Romantic vs. Liberal nationalism, and limitations. Six points for five marks.'},
+
+  {id:27,type:'short',topic:'fr',marks:2,
+   q:'What was Metternich\'s role in European history? Why did he oppose nationalism?',
+   ans:'<strong>Klemens von Metternich (1773–1859)</strong> was the Austrian Chancellor who dominated European diplomacy from 1815 to 1848.\n\n<strong>Role:</strong>\n• Presided over the <strong>Congress of Vienna (1815)</strong> — the great conservative settlement after Napoleon\n• Created the conservative order based on Legitimacy and Balance of Power\n• Built the "Concert of Europe" — cooperation among Great Powers to suppress revolutions\n\n<strong>Why he opposed nationalism:</strong>\n• Austria was a <strong>multi-ethnic empire</strong> — Germans, Hungarians, Czechs, Italians, Poles, Slovaks, Romanians all lived under Habsburg rule\n• If nationalism succeeded, every group would demand its own state — the Austrian Empire would <strong>collapse</strong>\n• He personally believed in tradition, hierarchy, monarchy, and church — liberalism and nationalism threatened all of these\n• Metternich said: "When France sneezes, all Europe catches a cold" — showing how seriously he took French revolutionary influence',
+   tip:'His personal ideology + his empire\'s survival need = two reasons for opposing nationalism.'},
+
+  {id:28,type:'short',topic:'bal',marks:2,
+   q:'What is Pan-Slavism? How did it contribute to tensions in Europe?',
+   ans:'<strong>Pan-Slavism</strong> was the ideology that all Slavic peoples — Russians, Serbs, Bulgarians, Czechs, Poles, Slovaks, Croats — shared a common identity and should stand together, potentially in a unified Slavic state or federation.\n\n<strong>Russia\'s role:</strong> Russia presented itself as the natural protector of all Slavic peoples — especially those under Ottoman or Austro-Hungarian rule.\n\n<strong>How it created tension:</strong>\n• Austria-Hungary had a large Slavic population — Hungary, Czechs, Slovaks, Croats, Slovenes all lived within its empire\n• Pan-Slavism threatened to break up the Austro-Hungarian Empire\n• Austria-Hungary therefore feared and opposed any Russian expansion of influence in the Balkans\n• This direct conflict of interest between Russia (Pan-Slavic protector) and Austria-Hungary (Slavic suppressor) was a major cause of WWI',
+   tip:'Define Pan-Slavism + explain Russia\'s role + show why it created Austria-Russia conflict.'},
+
+  {id:29,type:'short',topic:'gen',marks:2,
+   q:'Name any four national symbols that emerged from the French Revolution and explain their significance.',
+   ans:'<strong>1. Tricolour Flag (blue-white-red):</strong> Replaced the royal fleur-de-lis flag. Symbolised the revolutionary values — blue and red for Paris, white for the Bourbon monarchy combined with revolutionary colours.\n\n<strong>2. La Marseillaise:</strong> National anthem. A revolutionary war song that became the symbol of the French nation rising up. Became a model — every new nationalist movement created its own anthem.\n\n<strong>3. Marianne:</strong> Female allegorical figure representing the French Republic/nation. Named after a common name. She appeared on coins, stamps, public buildings — personalising the abstract idea of "the nation."\n\n<strong>4. "Liberty, Equality, Fraternity":</strong> The national motto. Captured the three core values of the Revolution. Became the most famous political slogan in European history — widely adopted as a nationalist ideal.',
+   tip:'Name 4 symbols + brief explanation each. A common 2–4 mark question.'},
+
+  {id:30,type:'short',topic:'gen',marks:2,
+   q:'Why is the year 1848 considered a turning point in the history of nationalism in Europe?',
+   date:'1848', 
+   ans:'<strong>1848 was a turning point because:</strong>\n\n1. <strong>Scale of revolutions:</strong> Revolutions broke out in almost every country in Europe simultaneously — France, German states, Italian states, Austria, Hungary. Never before had nationalism shown such reach.\n\n2. <strong>New demands:</strong> Revolutionaries demanded constitutions, national self-determination, liberal rights — combining nationalism with liberalism into a powerful political programme.\n\n3. <strong>Frankfurt Parliament:</strong> German liberals assembled and debated a constitution — showing that nationalism had become a mass political movement, not just an elite intellectual idea.\n\n4. <strong>Sorrieu\'s utopian paintings:</strong> French artist Sorrieu painted his vision of a world of free nations — capturing the idealism of 1848 and its global ambition.\n\n5. <strong>Conservative reaction:</strong> The crushing of the 1848 revolutions taught nationalists that idealism alone was not enough — strategy and power were needed. This lesson led directly to Bismarck\'s approach in 1866–71.',
+   tip:'Cover scale + demands + Frankfurt Parliament + Sorrieu + lesson learned — all five for full marks.'},
+];
+
+const state = {};
+let currentFilter = 'all';
+
+const topicStrip = {fr:'strip-fr',uni:'strip-uni',fig:'strip-fig',con:'strip-con',bal:'strip-bal',gen:'strip-gen'};
+const topicBg = {fr:'rgba(249,115,22,.12)',uni:'rgba(56,189,248,.12)',fig:'rgba(34,197,94,.12)',con:'rgba(129,140,248,.12)',bal:'rgba(244,63,94,.12)',gen:'rgba(100,116,139,.12)'};
+const topicCol = {fr:'#fb923c',uni:'#38bdf8',fig:'#4ade80',con:'#818cf8',bal:'#f43f5e',gen:'#94a3b8'};
+const typeBadge = {mcq:'b-mcq MCQ',short:'b-short Short Answer',long:'b-long Long Answer',assert:'b-assert Assertion–Reason'};
+const markBadge = m => { const c={1:'b-1m',2:'b-2m',3:'b-3m',5:'b-5m'}[m]||'b-1m'; return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`; };
+
+function getVisible() { return currentFilter==='all'?Q:Q.filter(q=>q.type===currentFilter); }
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function renderMCQ(q) {
+  const s = state[q.id]||{};
+  const done = s.chosen !== undefined;
+  return `<div class="mcq-body">
+    <div class="mcq-opts">
+      ${q.opts.map((o,i)=>{
+        let cls='';
+        if(done){ if(i===q.ans)cls='correct'; else if(i===s.chosen&&i!==q.ans)cls='wrong'; }
+        return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+          <span class="opt-lbl">${String.fromCharCode(65+i)}</span>${o}</button>`;
+      }).join('')}
+    </div>
+    ${done?`<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+      ${s.chosen===q.ans?'✓ Correct!':'✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}</div>
+      <div class="ans-body" style="border-top:1px solid var(--border);padding:.6rem 0 .3rem">
+        ${q.date?`<div class="ans-date">📅 ${q.date}</div>`:''}
+        <div class="ans-lbl">💡 Explanation</div>
+        <div class="ans-text">${q.explain}</div>
+      </div>`:''}
+  </div>`;
+}
+
+function renderShortLong(q) {
+  const s = state[q.id]||{};
+  const open = s.open;
+  let ansHtml = `${q.date?`<div class="ans-date">📅 ${q.date}</div>`:''}
+    <div class="ans-lbl">✅ Model Answer</div>
+    <div class="ans-text">${(q.ans||'').replace(/\n/g,'<br>')}</div>
+    ${q.tip?`<div class="tip">🎯 Exam tip: ${q.tip}</div>`:''}`;
+  return `<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+    ${open?'▲ Hide Answer':'▼ Show Model Answer'}
+  </button>
+  <div class="ans-reveal ${open?'open':''}">
+    <div class="ans-body">${ansHtml}</div>
+  </div>`;
+}
+
+function render() {
+  const list = getVisible();
+  const el = document.getElementById('qlist');
+  el.innerHTML = list.map((q,i)=>{
+    const tb = typeBadge[q.type].split(' ');
+    return `<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert'?renderMCQ(q):renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id,idx) {
+  const q=Q.find(x=>x.id===id); if(!q||state[id]?.chosen!==undefined)return;
+  if(!state[id])state[id]={};
+  state[id].chosen=idx;
+  updateDash();
+  const visible=getVisible(), i=visible.findIndex(x=>x.id===id);
+  const tb=typeBadge[q.type].split(' ');
+  const newHtml=`<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta"><span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>${markBadge(q.marks)}</div>
+    ${renderMCQ(q)}
+  </div>`;
+  const el=document.getElementById('qcard-'+id);
+  const tmp=document.createElement('div'); tmp.innerHTML=newHtml;
+  el.replaceWith(tmp.firstElementChild);
+}
+
+function toggleAns(id) {
+  if(!state[id])state[id]={};
+  state[id].open=!state[id].open;
+  if(!state[id].viewed){state[id].viewed=true;updateDash();}
+  const btn=document.querySelector(`#qcard-${id} .show-btn`);
+  const rev=document.querySelector(`#qcard-${id} .ans-reveal`);
+  if(btn&&rev){
+    const open=state[id].open;
+    btn.classList.toggle('active',open);
+    btn.textContent=open?'▲ Hide Answer':'▼ Show Model Answer';
+    rev.classList.toggle('open',open);
+  }
+}
+
+function updateDash() {
+  const att=Object.keys(state).length;
+  const cor=Q.filter(q=>state[q.id]?.chosen===q.ans).length;
+  const mcqTotal=Q.filter(q=>q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-att').textContent=att;
+  document.getElementById('d-cor').textContent=cor;
+  document.getElementById('d-sc').textContent=mcqTotal>0?Math.round((cor/mcqTotal)*100)+'%':'—';
+}
+
+function resetAll(){for(const k in state)delete state[k];updateDash();render();}
+render();
+</script>
+</body>
+</html>

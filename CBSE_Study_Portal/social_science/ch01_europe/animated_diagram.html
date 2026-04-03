@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rise of Nationalism in Europe — Animated Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0a04; --card:#1a1208; --card2:#221a0a;
+    --border:#3a2e1a; --text:#e8d8b0; --muted:#8a7a5a;
+    --gold:#f5c842; --orange:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(245,200,66,.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 85%, rgba(56,189,248,.03) 0%, transparent 55%);
+  }
+
+  header { text-align:center; padding:2rem 1rem 1.2rem; border-bottom:1px solid var(--border); }
+  header h1 {
+    font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.3rem); font-weight:900;
+    color:var(--gold); letter-spacing:.5px;
+  }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.75rem; margin-top:.3rem; }
+
+  /* ── nav tabs ── */
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem; padding:1.2rem 1rem .6rem; }
+  nav button {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.8rem;
+    padding:.45rem 1.1rem; border-radius:4px;
+    border:1px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .22s;
+  }
+  nav button:hover { color:var(--text); border-color:#5a4a2a; }
+  nav button.a-fr   { border-color:var(--orange); color:var(--orange); background:rgba(249,115,22,.08); }
+  nav button.a-uni  { border-color:var(--blue);   color:var(--blue);   background:rgba(56,189,248,.08); }
+  nav button.a-time { border-color:var(--gold);   color:var(--gold);   background:rgba(245,200,66,.08); }
+  nav button.a-fig  { border-color:var(--green);  color:var(--green);  background:rgba(34,197,94,.08); }
+  nav button.a-con  { border-color:var(--indigo); color:var(--indigo); background:rgba(129,140,248,.08); }
+
+  main { max-width:860px; margin:0 auto; padding:1rem 1rem 4rem; }
+  section { display:none; animation:fadeUp .35s ease; }
+  section.vis { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title {
+    font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:900;
+    margin-bottom:1.1rem; display:flex; align-items:center; gap:.5rem;
+  }
+
+  /* ── cards ── */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.9rem; margin-bottom:1.3rem; }
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; transition:transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  .card h3 { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; margin-bottom:.5rem; }
+  .card p, .card li { font-size:.83rem; color:var(--muted); line-height:1.65; }
+  .card ul { padding-left:1rem; }
+  .tag { display:inline-block; font-size:.65rem; font-family:'DM Mono',monospace;
+    padding:.12rem .5rem; border-radius:3px; margin-bottom:.45rem; }
+
+  /* ── timeline ── */
+  .timeline { position:relative; padding-left:2rem; }
+  .timeline::before {
+    content:''; position:absolute; left:.6rem; top:0; bottom:0;
+    width:2px; background:linear-gradient(to bottom, var(--orange), var(--gold), var(--blue), var(--red));
+    border-radius:2px;
+  }
+  .t-event {
+    position:relative; margin-bottom:1.1rem;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:.8rem 1rem;
+    cursor:pointer; transition:all .2s;
+    animation:slideIn .4s ease both;
+  }
+  .t-event:hover { border-color:#5a4a2a; transform:translateX(4px); }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+
+  .t-year { font-family:'DM Mono',monospace; font-size:.7rem; font-weight:500; margin-bottom:.3rem; }
+  .t-name { font-family:'Playfair Display',serif; font-weight:700; font-size:.95rem; margin-bottom:.3rem; }
+  .t-desc { font-size:.8rem; color:var(--muted); line-height:1.6; }
+  .t-detail {
+    max-height:0; overflow:hidden; transition:max-height .35s ease;
+    font-size:.8rem; color:var(--muted); line-height:1.65;
+  }
+  .t-event.open .t-detail { max-height:200px; margin-top:.5rem; padding-top:.5rem; border-top:1px solid var(--border); }
+  .t-toggle { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-top:.3rem; }
+
+  /* ── cause-effect ── */
+  .cause-effect {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.2rem; margin-bottom:1rem;
+  }
+  .cause-effect h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.8rem; }
+  .ce-row { display:flex; align-items:stretch; gap:.6rem; margin-bottom:.6rem; flex-wrap:wrap; }
+  .ce-box { flex:1; min-width:140px; border-radius:8px; padding:.6rem .8rem; font-size:.8rem; line-height:1.5; }
+  .ce-cause { background:rgba(249,115,22,.08); border:1px solid rgba(249,115,22,.2); }
+  .ce-cause h4 { color:var(--orange); font-size:.68rem; font-family:'DM Mono',monospace; margin-bottom:.3rem; }
+  .ce-arrow { display:flex; align-items:center; color:var(--gold); font-size:1.2rem; flex-shrink:0; padding-top:.2rem; }
+  .ce-effect { background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); }
+  .ce-effect h4 { color:var(--green); font-size:.68rem; font-family:'DM Mono',monospace; margin-bottom:.3rem; }
+
+  /* ── figures grid ── */
+  .fig-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.8rem; }
+  .fig-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem;
+    border-left:4px solid; transition:transform .2s;
+  }
+  .fig-card:hover { transform:translateY(-2px); }
+  .fig-card h3 { font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; margin-bottom:.2rem; }
+  .fig-card .fig-dates { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-bottom:.5rem; }
+  .fig-card p { font-size:.78rem; color:var(--muted); line-height:1.6; }
+  .fig-role { font-size:.7rem; font-family:'DM Mono',monospace; margin-top:.4rem; padding:.25rem .5rem; border-radius:4px; display:inline-block; }
+
+  /* ── concepts ── */
+  .con-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.8rem; margin-bottom:1.1rem; }
+  .con-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1rem; text-align:center; transition:all .2s;
+  }
+  .con-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .con-icon { font-size:1.8rem; margin-bottom:.5rem; }
+  .con-card h3 { font-family:'Playfair Display',serif; font-weight:700; font-size:.9rem; margin-bottom:.4rem; }
+  .con-card p { font-size:.75rem; color:var(--muted); line-height:1.6; text-align:left; }
+
+  /* ── concept bar ── */
+  .concept-bar { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.1rem; }
+  .cpill { font-size:.7rem; font-family:'DM Mono',monospace; padding:.2rem .65rem;
+    border-radius:3px; border:1px solid var(--border); color:var(--muted); background:var(--card); }
+
+  /* ── comparison table ── */
+  .tbl-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.1rem; margin-bottom:1rem; overflow-x:auto; }
+  .tbl-wrap h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.8rem; }
+  table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  th { font-family:'DM Mono',monospace; font-size:.68rem; padding:.5rem .7rem;
+    background:var(--card2); color:var(--muted); text-align:left; white-space:nowrap; }
+  td { padding:.45rem .7rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.015); }
+  .hl { color:var(--gold); font-family:'DM Mono',monospace; }
+
+  /* highlight box */
+  .hbox {
+    border-left:3px solid; border-radius:0 8px 8px 0;
+    padding:.6rem .9rem; margin:.5rem 0; font-size:.82rem; line-height:1.6;
+  }
+  .hbox strong { display:block; font-family:'Playfair Display',serif; margin-bottom:.2rem; }
+
+  /* unification flow */
+  .flow { display:flex; align-items:center; flex-wrap:wrap; gap:.4rem; margin-bottom:1rem; }
+  .flow-step {
+    background:var(--card2); border:1px solid var(--border); border-radius:8px;
+    padding:.5rem .8rem; font-size:.78rem; text-align:center; min-width:100px;
+  }
+  .flow-step strong { display:block; font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-bottom:.2rem; }
+  .flow-arrow { color:var(--gold); font-size:1.1rem; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Rise of Nationalism in Europe</h1>
+  <p>Class X · Social Science · History Chapter 1 · CBSE</p>
+</header>
+
+<nav>
+  <button onclick="show('fr')" id="btn-fr" class="a-fr">🏛️ French Revolution</button>
+  <button onclick="show('uni')" id="btn-uni">⚔️ Unifications</button>
+  <button onclick="show('time')" id="btn-time">📅 Timeline</button>
+  <button onclick="show('fig')" id="btn-fig">👤 Key Figures</button>
+  <button onclick="show('con')" id="btn-con">💡 Key Concepts</button>
+</nav>
+
+<main>
+
+<!-- ══════════ FRENCH REVOLUTION ══════════ -->
+<section id="fr" class="vis">
+  <div class="sec-title" style="color:var(--orange)">🏛️ French Revolution &amp; Spread of Nationalism</div>
+
+  <div class="concept-bar">
+    <span class="cpill">1789 — French Revolution</span>
+    <span class="cpill">Liberty · Equality · Fraternity</span>
+    <span class="cpill">Napoleonic Code</span>
+    <span class="cpill">Spread of ideas across Europe</span>
+  </div>
+
+  <div class="cause-effect">
+    <h3>How did the French Revolution create nationalism?</h3>
+    <div class="ce-row">
+      <div class="ce-box ce-cause"><h4>BEFORE 1789</h4>France ruled by a king. Hereditary aristocracy had privileges. Common people had no political rights. Nation = the king's domain.</div>
+      <div class="ce-arrow">→</div>
+      <div class="ce-box ce-effect"><h4>AFTER 1789</h4>People declared themselves "the nation" with sovereignty. The idea that ordinary people could govern themselves was revolutionary — and contagious.</div>
+    </div>
+    <div class="ce-row">
+      <div class="ce-box ce-cause"><h4>NAPOLEON'S CONQUESTS</h4>Napoleon conquered much of Europe. Carried the French legal and administrative system with him. Abolished feudalism in conquered territories.</div>
+      <div class="ce-arrow">→</div>
+      <div class="ce-box ce-effect"><h4>NATIONALIST REACTION</h4>People in conquered lands first welcomed, then resented French rule. This resentment itself became nationalist — "we are a people, we should rule ourselves."</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="tag" style="background:rgba(249,115,22,.12);color:var(--orange)">KEY IDEAS</span>
+      <h3>What did the Revolution give Europe?</h3>
+      <ul>
+        <li><strong style="color:var(--text)">Popular sovereignty</strong> — people = the nation</li>
+        <li><strong style="color:var(--text)">Constitutionalism</strong> — rule of law, not kings</li>
+        <li><strong style="color:var(--text)">Civic equality</strong> — no hereditary privileges</li>
+        <li><strong style="color:var(--text)">Secular state</strong> — church separated from government</li>
+        <li><strong style="color:var(--text)">Nation-state idea</strong> — territory + shared identity</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag" style="background:rgba(249,115,22,.12);color:var(--orange)">NAPOLEONIC CODE</span>
+      <h3>What Napoleon spread</h3>
+      <ul>
+        <li>Uniform legal system across territories</li>
+        <li>Abolished feudal privileges of nobility</li>
+        <li>Secured right to property for citizens</li>
+        <li>Equal laws — no birth-based discrimination</li>
+        <li>Standardised weights and measures</li>
+        <li>Abolished internal tariff barriers</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.75rem;color:#f43f5e">But also: heavy taxes, military conscription, censorship, treatment of France as superior</p>
+    </div>
+    <div class="card">
+      <span class="tag" style="background:rgba(249,115,22,.12);color:var(--orange)">SYMBOLS CREATED</span>
+      <h3>National Symbols</h3>
+      <ul>
+        <li>🇫🇷 Tricolour flag (blue-white-red)</li>
+        <li>🎵 La Marseillaise — national anthem</li>
+        <li>👩 Marianne — female allegory of France</li>
+        <li>📜 "Liberty, Equality, Fraternity"</li>
+      </ul>
+      <p style="margin-top:.5rem">Frédéric Sorrieu (1848) painted a utopian vision — people of the world marching together as free nations under their own flags.</p>
+    </div>
+  </div>
+
+  <div class="hbox" style="border-color:var(--orange);background:rgba(249,115,22,.06)">
+    <strong>Why did nationalism spread after the French Revolution?</strong>
+    Before 1789, states were ruled by monarchs or empires over multi-ethnic territories. People owed loyalty to the ruler, not a "nation." The Revolution showed that a people sharing culture, language, and history could form a sovereign state. This idea — the <em>nation-state</em> — became the most powerful political idea of the 19th century. Every group of people with a shared identity now wanted their own country.
+  </div>
+
+  <div class="hbox" style="border-color:var(--gold);background:rgba(245,200,66,.05)">
+    <strong>Frederic Sorrieu's Vision — CBSE Important</strong>
+    In 1848, French artist Frédéric Sorrieu painted two pictures showing his dream of a world made up of democratic and social Republics. He painted people of Europe and America — men and women of all ages and classes — marching in a long procession past the statue of Liberty. This is often cited in CBSE exams as the first visual expression of the idea of a world of nation-states.
+  </div>
+</section>
+
+<!-- ══════════ UNIFICATIONS ══════════ -->
+<section id="uni">
+  <div class="sec-title" style="color:var(--blue)">⚔️ Unification of Germany &amp; Italy</div>
+
+  <div class="concept-bar">
+    <span class="cpill">Germany unified 1871</span>
+    <span class="cpill">Italy unified 1870</span>
+    <span class="cpill">Bismarck — Blood &amp; Iron</span>
+    <span class="cpill">Mazzini · Cavour · Garibaldi</span>
+  </div>
+
+  <!-- Germany -->
+  <div style="margin-bottom:1.5rem">
+    <div class="sec-title" style="font-size:1.1rem;color:var(--blue);margin-bottom:.8rem">🦅 Germany — "Blood and Iron"</div>
+
+    <div class="flow">
+      <div class="flow-step"><strong>1834</strong>Zollverein Customs Union</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><strong>1848</strong>Frankfurt Parliament (failed)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><strong>1862</strong>Bismarck becomes PM of Prussia</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><strong>1864–71</strong>Three Wars of Unification</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--blue);color:var(--blue)"><strong>Jan 18, 1871</strong>German Empire Proclaimed</div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <span class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">ZOLLVEREIN 1834</span>
+        <h3>Economic Unity First</h3>
+        <p>The German Customs Union (Zollverein) was formed in 1834, initiated by Prussia. It brought 39 German states into a single economic market by removing trade barriers.</p>
+        <br><p>This is a key point: <strong style="color:var(--text)">economic unity came before political unity.</strong> A shared economy created a sense of common interest among Germans.</p>
+      </div>
+      <div class="card">
+        <span class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">BISMARCK</span>
+        <h3>"Not by speeches… but by blood and iron"</h3>
+        <p>Otto von Bismarck became Prussian PM in 1862. He believed the German question could only be solved by war, not parliamentary debate (unlike the failed 1848 liberals).</p>
+        <br>
+        <ul>
+          <li>1864 — War with Denmark</li>
+          <li>1866 — Austro-Prussian War</li>
+          <li>1870–71 — Franco-Prussian War</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">PROCLAMATION 1871</span>
+        <h3>Hall of Mirrors, Versailles</h3>
+        <p>January 18, 1871 — in the Hall of Mirrors at the Palace of Versailles in France (a deliberate humiliation), Wilhelm I (King of Prussia) was declared Kaiser (Emperor) of a unified Germany.</p>
+        <br><p>Bismarck became the first Chancellor. Germany was now the most powerful state on the continent.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Italy -->
+  <div style="margin-bottom:1.3rem">
+    <div class="sec-title" style="font-size:1.1rem;color:var(--green);margin-bottom:.8rem">🍃 Italy — Three Men, One Nation</div>
+
+    <div class="flow">
+      <div class="flow-step"><strong>Mazzini</strong>Young Italy (1831) — Ideas &amp; Uprisings</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><strong>Cavour</strong>Diplomacy — Sardinia-Piedmont leads</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><strong>Garibaldi</strong>Red Shirts — Military campaign South</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--green);color:var(--green)"><strong>1870</strong>Rome joins — Italy complete</div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <span class="tag" style="background:rgba(34,197,94,.12);color:var(--green)">MAZZINI — THE DREAMER</span>
+        <h3>Romantic Nationalism</h3>
+        <p>Giuseppe Mazzini founded <strong style="color:var(--text)">Young Italy (1831)</strong> and <strong style="color:var(--text)">Young Europe (1834)</strong>. Believed nations were God's creation and Italy must be a free, unified republic.</p>
+        <br><p>Multiple failed uprisings. Exiled repeatedly. His ideas inspired a generation even if he never achieved unification himself.</p>
+      </div>
+      <div class="card">
+        <span class="tag" style="background:rgba(34,197,94,.12);color:var(--green)">CAVOUR — THE DIPLOMAT</span>
+        <h3>Realpolitik for Italy</h3>
+        <p>Count Camillo di Cavour was PM of Sardinia-Piedmont — the most powerful Italian state. He was no romantic; he used diplomacy and alliances.</p>
+        <br>
+        <ul>
+          <li>Allied with France against Austria (1859)</li>
+          <li>Won Lombardy from Austria</li>
+          <li>Gradually drew Italian states toward Sardinia</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag" style="background:rgba(34,197,94,.12);color:var(--green)">GARIBALDI — THE SOLDIER</span>
+        <h3>Red Shirts &amp; the South</h3>
+        <p>Giuseppe Garibaldi led an army of volunteers called the <strong style="color:var(--text)">Red Shirts</strong>. In 1860, he marched through Sicily and Naples, defeating the Bourbon kingdom.</p>
+        <br><p>He then handed over the conquered territories to King Victor Emmanuel II — a remarkable act of self-sacrifice for the nation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <h3>Germany vs Italy — Comparison</h3>
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th style="color:var(--blue)">🦅 Germany</th>
+        <th style="color:var(--green)">🍃 Italy</th>
+      </tr>
+      <tr><td>Unification completed</td><td class="hl">1871</td><td class="hl">1870</td></tr>
+      <tr><td>Key leader</td><td>Bismarck (PM of Prussia)</td><td>Mazzini / Cavour / Garibaldi</td></tr>
+      <tr><td>Method</td><td class="hl">Wars ("blood and iron")</td><td>Diplomacy + military campaigns</td></tr>
+      <tr><td>Leading state</td><td>Prussia</td><td class="hl">Sardinia-Piedmont</td></tr>
+      <tr><td>Role of people</td><td>Military conscription</td><td class="hl">Mass movements (Garibaldi)</td></tr>
+      <tr><td>Foreign role</td><td>Defeated France, Austria</td><td class="hl">Allied with France against Austria</td></tr>
+      <tr><td>Ideology</td><td>Realpolitik — no idealism</td><td>Mixed: romantic + pragmatic</td></tr>
+      <tr><td>Final proclamation</td><td class="hl">Versailles, Jan 18, 1871</td><td>Rome taken, 1870</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ TIMELINE ══════════ -->
+<section id="time">
+  <div class="sec-title" style="color:var(--gold)">📅 Key Events Timeline (1789–1914)</div>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;font-family:'DM Mono',monospace">Click any event to expand details →</p>
+
+  <div class="timeline">
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--orange)">
+      <div class="t-year" style="color:var(--orange)">1789</div>
+      <div class="t-name">French Revolution</div>
+      <div class="t-desc">People of France overthrow the monarchy. Declare "Liberty, Equality, Fraternity." The concept of the nation-state is born.</div>
+      <div class="t-detail">The revolution destroyed the idea that sovereignty belonged to the king. The National Assembly declared the people of France to be the sovereign nation. This became the template for nationalist movements across Europe. The tricolour, La Marseillaise, and the figure of Marianne all emerged as national symbols.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--orange)">
+      <div class="t-year" style="color:var(--orange)">1799–1815</div>
+      <div class="t-name">Napoleonic Era</div>
+      <div class="t-desc">Napoleon conquers much of Europe. Spreads revolutionary ideas through the Napoleonic Code. But also triggers nationalist reactions.</div>
+      <div class="t-detail">Napoleon's armies carried French administrative and legal systems across Europe. He abolished feudalism in occupied territories, standardised laws, and removed internal trade barriers. However, his treatment of conquered peoples as inferiors led to fierce nationalist resentment — especially in Spain, Germany, and Italy. Nationalism was thus both caused by and a reaction to Napoleon.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--gold)">
+      <div class="t-year" style="color:var(--gold)">1815</div>
+      <div class="t-name">Congress of Vienna</div>
+      <div class="t-desc">After Napoleon's defeat. Metternich presides. Conservative powers try to restore the pre-1789 order. Principle of Legitimacy and Balance of Power established.</div>
+      <div class="t-detail">Metternich (Austrian Chancellor) was the dominant figure. The Congress restored old royal dynasties (Legitimacy Principle). It redrew the map of Europe to create a Balance of Power — preventing any one nation from dominating. Revolutionary and nationalist ideas were to be suppressed. But they could not be erased — secret societies like the Carbonari in Italy and Young Europe formed underground.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--green)">
+      <div class="t-year" style="color:var(--green)">1830–32</div>
+      <div class="t-name">First Wave of Revolutions — Greece Independent</div>
+      <div class="t-desc">Revolutions sweep Europe. Greece wins independence from the Ottoman Empire (1832) — the first successful nationalist movement in Europe.</div>
+      <div class="t-detail">Greece had been under Ottoman rule for centuries. Greek nationalists, inspired by the French Revolution and supported by poets like Lord Byron (who went to fight and die for Greek independence), rose in revolt. Britain, France, and Russia intervened in favour of Greece. In 1832, Greece was recognised as an independent nation — proving that nationalism could succeed. Belgium also separated from Holland in 1830.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--green)">
+      <div class="t-year" style="color:var(--green)">1831</div>
+      <div class="t-name">Mazzini founds Young Italy</div>
+      <div class="t-desc">Giuseppe Mazzini establishes Young Italy — a secret society for Italian unification. Later founds Young Europe to spread nationalist ideas across the continent.</div>
+      <div class="t-detail">Mazzini believed that God had created nations as the natural units of humanity. Italy, divided and oppressed by Austria, must become a unified republic through the will of the people. Young Italy had thousands of members. Several uprisings failed, but Mazzini's ideas circulated widely. Metternich called him "the most dangerous man in Europe."</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--gold)">
+      <div class="t-year" style="color:var(--gold)">1848</div>
+      <div class="t-name">"Springtime of Nations" — Revolutions Across Europe</div>
+      <div class="t-desc">Revolutions erupt across France, Germany, Italy, Austria-Hungary. Frankfurt Parliament attempts to unite Germany. All ultimately fail — but the message is clear.</div>
+      <div class="t-detail">1848 was the most dramatic year of revolutions. In France, the Second Republic was proclaimed. In Germany, liberal nationalists assembled at the Frankfurt Parliament and debated a constitution for a unified Germany — but the Prussian king rejected their offer of the crown and the parliament dissolved. In Hungary, Kossuth led a revolt against Habsburg rule. All were crushed — but they proved that nationalism was a mass force that could not be permanently suppressed by force.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--blue)">
+      <div class="t-year" style="color:var(--blue)">1859–71</div>
+      <div class="t-name">Unification of Italy (1861–1870)</div>
+      <div class="t-desc">Cavour's diplomacy, Garibaldi's military campaigns, and Mazzini's inspiration combine to unify Italy. Kingdom of Italy proclaimed 1861; Rome joins in 1870.</div>
+      <div class="t-detail">Cavour allied with Napoleon III of France; Sardinia-Piedmont won Lombardy from Austria in 1859. Garibaldi's famous "Expedition of the Thousand" captured southern Italy in 1860. He handed the territories to Victor Emmanuel II of Sardinia. In 1861, most of Italy was unified under Victor Emmanuel II as King. Venice was added in 1866 after the Austro-Prussian War. Rome was captured in 1870 when France withdrew its troops protecting the Pope.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--blue)">
+      <div class="t-year" style="color:var(--blue)">1866–71</div>
+      <div class="t-name">Unification of Germany</div>
+      <div class="t-desc">Bismarck's wars defeat Austria (1866) and France (1870). German Empire proclaimed at Versailles on January 18, 1871 — Wilhelm I becomes Kaiser.</div>
+      <div class="t-detail">Bismarck's three wars of unification were carefully planned. Each war served a strategic purpose: war with Denmark gained territory; war with Austria expelled Austria from German affairs; war with France united northern and southern German states. The proclamation in France's own royal palace was a statement of Prussian dominance. Germany became the most powerful nation in Europe — a fact that would reshape the entire balance of power and ultimately contribute to WWI.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--red)">
+      <div class="t-year" style="color:var(--red)">1912–14</div>
+      <div class="t-name">Balkan Crises → World War I</div>
+      <div class="t-desc">Balkan wars 1912–13. Ottoman territories divided. June 28, 1914: Archduke Franz Ferdinand assassinated. Nationalist tensions trigger the First World War.</div>
+      <div class="t-detail">The Balkan region was a "powder keg." Various ethnic groups (Serbs, Bulgarians, Romanians, Greeks, Albanians) all wanted their own nation-states, often claiming the same territory. Great Powers backed different groups. The assassination of Austro-Hungarian heir Franz Ferdinand by Bosnian Serb Gavrilo Princip in Sarajevo triggered a chain of alliances that led to WWI. Nationalism, which had liberated peoples in the 19th century, now threatened to destroy Europe.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ KEY FIGURES ══════════ -->
+<section id="fig">
+  <div class="sec-title" style="color:var(--green)">👤 Key Figures</div>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;font-family:'DM Mono',monospace">The people who shaped European nationalism — know their role, country, and key contribution.</p>
+
+  <div class="fig-grid">
+    <div class="fig-card" style="border-color:var(--orange)">
+      <h3 style="color:var(--orange)">Napoleon Bonaparte</h3>
+      <div class="fig-dates">1769–1821 · France</div>
+      <p>Spread revolutionary ideas across Europe through conquest. Introduced Napoleonic Code — uniform laws, abolishing feudal privileges. Also triggered nationalist reactions against French domination.</p>
+      <div class="fig-role" style="background:rgba(249,115,22,.1);color:var(--orange)">Spread & triggered nationalism</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--gold)">
+      <h3 style="color:var(--gold)">Klemens von Metternich</h3>
+      <div class="fig-dates">1773–1859 · Austria</div>
+      <p>Austrian Chancellor. Architect of the 1815 Congress of Vienna. Tried to restore and maintain the conservative order in Europe. Suppressed liberal and nationalist movements. Called himself "the rock against revolution."</p>
+      <div class="fig-role" style="background:rgba(245,200,66,.08);color:var(--gold)">Conservative reaction</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--green)">
+      <h3 style="color:var(--green)">Giuseppe Mazzini</h3>
+      <div class="fig-dates">1807–1872 · Italy</div>
+      <p>Founded Young Italy (1831) and Young Europe (1834). Romantic nationalist — believed nations were God's creation. Organised several uprisings, all failed. His ideas inspired generations of nationalists across Europe.</p>
+      <div class="fig-role" style="background:rgba(34,197,94,.1);color:var(--green)">Ideologist of Italian nationalism</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--green)">
+      <h3 style="color:var(--green)">Count Camillo di Cavour</h3>
+      <div class="fig-dates">1810–1861 · Sardinia-Piedmont, Italy</div>
+      <p>Prime Minister of Sardinia-Piedmont. Practical diplomat, not a romantic. Allied with France against Austria (1859). Masterminded the political unification of northern and central Italy.</p>
+      <div class="fig-role" style="background:rgba(34,197,94,.1);color:var(--green)">Diplomatic unifier of Italy</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--green)">
+      <h3 style="color:var(--green)">Giuseppe Garibaldi</h3>
+      <div class="fig-dates">1807–1882 · Italy</div>
+      <p>Military general and hero. Led the "Red Shirts" — 1,000 volunteers who conquered southern Italy in 1860. Handed over territories to King Victor Emmanuel II. Symbol of self-sacrifice and military heroism in the nationalist cause.</p>
+      <div class="fig-role" style="background:rgba(34,197,94,.1);color:var(--green)">Military hero — unified south Italy</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--blue)">
+      <h3 style="color:var(--blue)">Otto von Bismarck</h3>
+      <div class="fig-dates">1815–1898 · Prussia / Germany</div>
+      <p>Prussian Prime Minister from 1862. Unified Germany through "blood and iron" — three strategic wars. First Chancellor of the German Empire. Opposed liberal nationalism; used nationalism as a tool of power.</p>
+      <div class="fig-role" style="background:rgba(56,189,248,.1);color:var(--blue)">Unifier of Germany by war</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--indigo)">
+      <h3 style="color:var(--indigo)">Frédéric Sorrieu</h3>
+      <div class="fig-dates">1807–1887 · France</div>
+      <p>French artist who in 1848 painted a series of four prints showing his utopian vision: people of Europe and America marching in a long procession as free nations. Each group carrying its own flag. Often cited in CBSE as the first visual expression of nation-states as an ideal.</p>
+      <div class="fig-role" style="background:rgba(129,140,248,.1);color:var(--indigo)">Utopian vision of world of nations</div>
+    </div>
+
+    <div class="fig-card" style="border-color:var(--gold)">
+      <h3 style="color:var(--gold)">Johann Gottfried Herder</h3>
+      <div class="fig-dates">1744–1803 · Germany</div>
+      <p>German philosopher. Developed the concept of "volksgeist" — the spirit of the people expressed through their folk songs, poetry, and language. Argued that each nation had a unique identity rooted in its culture. Hugely influential on Romantic nationalism across Europe.</p>
+      <div class="fig-role" style="background:rgba(245,200,66,.08);color:var(--gold)">Philosopher of folk nationalism</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ KEY CONCEPTS ══════════ -->
+<section id="con">
+  <div class="sec-title" style="color:var(--indigo)">💡 Key Concepts &amp; Ideas</div>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;font-family:'DM Mono',monospace">Understand these terms — they appear in every CBSE exam on this chapter.</p>
+
+  <div class="con-grid">
+    <div class="con-card">
+      <div class="con-icon">⚖️</div>
+      <h3 style="color:var(--indigo)">Liberalism</h3>
+      <p>From Latin <em>liber</em> = free. Political: individual freedom, government by consent, rule of law, equal rights, no hereditary privilege. Economic: free markets, end of trade restrictions. Middle classes were the main supporters.</p>
+    </div>
+    <div class="con-card">
+      <div class="con-icon">👑</div>
+      <h3 style="color:var(--gold)">Conservatism</h3>
+      <p>Believed in preserving traditional institutions: monarchy, church, aristocracy. Change should be gradual. Represented by Metternich and the Congress of Vienna. Opposed revolutions and nationalist movements.</p>
+    </div>
+    <div class="con-card">
+      <div class="con-icon">🎨</div>
+      <h3 style="color:var(--orange)">Romanticism</h3>
+      <p>Cultural movement emphasising emotion, nature, folk traditions. Romantic nationalists celebrated local languages, folk songs, dances, and legends as expressions of a nation's unique soul (volksgeist). Counter to Enlightenment reason.</p>
+    </div>
+    <div class="con-card">
+      <div class="con-icon">🗺️</div>
+      <h3 style="color:var(--green)">Nation-State</h3>
+      <p>A state whose borders coincide with a nation — a group sharing common culture, language, history, and territory. The central political goal of 19th-century nationalism. Replace empires (multi-ethnic) with nation-states (single people, single government).</p>
+    </div>
+    <div class="con-card">
+      <div class="con-icon">🤝</div>
+      <h3 style="color:var(--blue)">Utopian Nationalism</h3>
+      <p>Mazzini's and Sorrieu's vision: a world of free, independent nation-states living in harmony. No empires, no oppression. Each nation expresses humanity's diversity. An idealist, romantic view that contrasted with Bismarck's "blood and iron" realism.</p>
+    </div>
+    <div class="con-card">
+      <div class="con-icon">💰</div>
+      <h3 style="color:var(--red)">Zollverein</h3>
+      <p>German Customs Union (1834). Abolished internal tariffs between German states. Created a single economic market. Key lesson: <strong style="color:var(--text)">economic integration precedes political unification.</strong> Prepared the ground for Bismarck's political unification.</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <h3>Liberalism vs Conservatism vs Romanticism — At a Glance</h3>
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th style="color:var(--indigo)">Liberalism</th>
+        <th style="color:var(--gold)">Conservatism</th>
+        <th style="color:var(--orange)">Romanticism</th>
+      </tr>
+      <tr><td>Core belief</td><td>Individual freedom &amp; rights</td><td>Tradition &amp; stable order</td><td>Emotion, nature, folk culture</td></tr>
+      <tr><td>Supported by</td><td class="hl">Middle class (bourgeoisie)</td><td>Aristocracy, monarchy, church</td><td>Artists, writers, poets</td></tr>
+      <tr><td>View of revolution</td><td>Welcomed (1789)</td><td class="hl">Opposed firmly</td><td>Romanticised struggle</td></tr>
+      <tr><td>View of nation</td><td>Civic nation (shared rights)</td><td>Existing kingdoms stay</td><td class="hl">Cultural nation (language, folk)</td></tr>
+      <tr><td>Key figures</td><td>Frankfurt Parliament liberals</td><td class="hl">Metternich</td><td>Herder, Brothers Grimm, Mazzini</td></tr>
+      <tr><td>View of change</td><td>Constitutions, reform</td><td>Gradual, controlled</td><td>Passionate, organic</td></tr>
+    </table>
+  </div>
+
+  <div class="hbox" style="border-color:var(--indigo);background:rgba(129,140,248,.05)">
+    <strong>The "Nation" — a Modern Concept</strong>
+    Before the 19th century, most people identified with their local community, religion, or ruler — not a "nation." Nationalism created a new kind of identity. It required people to imagine themselves as part of a large community of strangers who shared their language and history. This idea — the "imagined community" (Benedict Anderson's term) — required things like a common language, shared history, maps, census data, and mass media (newspapers) to take hold. The 19th century provided all of these.
+  </div>
+</section>
+
+</main>
+
+<script>
+const activeClass = { fr:'a-fr', uni:'a-uni', time:'a-time', fig:'a-fig', con:'a-con' };
+function show(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('vis'));
+  document.querySelectorAll('nav button').forEach(b => { b.className = ''; });
+  document.getElementById(id).classList.add('vis');
+  document.getElementById('btn-'+id).className = activeClass[id];
+}
+function toggleEvent(el) {
+  el.classList.toggle('open');
+  const tog = el.querySelector('.t-toggle');
+  if (tog) tog.textContent = el.classList.contains('open') ? '▲ less' : '▼ more';
+}
+// Add timeline dots dynamically
+document.querySelectorAll('.t-event').forEach(ev => {
+  const col = ev.style.borderLeftColor || '#f5c842';
+  const dot = document.createElement('div');
+  dot.style.cssText = `position:absolute;left:-1.75rem;top:1.05rem;width:11px;height:11px;border-radius:50%;border:2px solid ${col};background:#0e0a04;`;
+  ev.style.position = 'relative';
+  ev.prepend(dot);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Rise of Nationalism in Europe</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0a04; --card:#1a1208; --card2:#221a0a;
+    --border:#3a2e1a; --text:#e8d8b0; --muted:#8a7a5a;
+    --gold:#f5c842; --orange:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,200,66,.05) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem .8rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,4vw,2rem); font-weight:900;
+    color:var(--gold); letter-spacing:.3px; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem .8rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px;
+    background:linear-gradient(90deg,var(--orange),var(--gold));
+    transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); white-space:nowrap; }
+
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.2rem 1rem .8rem; }
+  .f-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.72rem;
+    padding:.3rem .9rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#0e0a04; border-color:transparent; }
+  .f-all.on  { background:var(--muted); }
+  .f-fr.on   { background:var(--orange); }
+  .f-uni.on  { background:var(--blue); }
+  .f-fig.on  { background:var(--green); }
+  .f-con.on  { background:var(--indigo); color:#fff !important; }
+  .f-evt.on  { background:var(--gold); color:#0e0a04 !important; }
+
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+
+  .fc-face { position:absolute; inset:0; border-radius:16px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.4rem; text-align:center; }
+  .fc-front { background:var(--card); border:1px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card);
+    border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:500;
+    padding:.18rem .65rem; border-radius:2px; margin-bottom:.7rem; }
+  .fc-q { font-family:'Playfair Display',serif; font-size:clamp(.88rem,2.4vw,1.1rem);
+    font-weight:700; line-height:1.45; }
+  .fc-hint { font-size:.68rem; color:var(--muted); margin-top:.5rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.75rem; font-size:.65rem;
+    font-family:'DM Mono',monospace; color:#3a2e1a; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  .fc-ans-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--green); margin-bottom:.5rem; }
+  .fc-ans { font-size:clamp(.78rem,2vw,.95rem); line-height:1.65; color:var(--text); }
+  .fc-ans strong { color:var(--gold); }
+  .fc-ans em { color:#93c5fd; font-style:normal; }
+  .fc-date { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--orange);
+    background:rgba(249,115,22,.1); border:1px solid rgba(249,115,22,.2);
+    border-radius:4px; padding:.2rem .6rem; margin-bottom:.5rem; }
+
+  .known-badge { position:absolute; top:.7rem; right:.7rem;
+    font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:2px; }
+  .known   { background:rgba(34,197,94,.15); color:#4ade80; }
+  .unknown { background:rgba(239,68,68,.1);  color:#f87171; }
+
+  .nav-row { display:flex; gap:.7rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.85rem;
+    padding:.5rem 1.3rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#5a4a2a; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-ctr { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted);
+    min-width:70px; text-align:center; }
+
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.75rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--gold); color:var(--gold); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Rise of Nationalism in Europe · History Ch.1 · 40 Cards · Tap to flip</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-fr"  onclick="setFilter('fr',this)">🏛️ French Revolution</button>
+  <button class="f-btn f-uni" onclick="setFilter('uni',this)">⚔️ Unifications</button>
+  <button class="f-btn f-fig" onclick="setFilter('fig',this)">👤 Key Figures</button>
+  <button class="f-btn f-con" onclick="setFilter('con',this)">💡 Concepts</button>
+  <button class="f-btn f-evt" onclick="setFilter('evt',this)">📅 Events &amp; Facts</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front">
+      <div class="fc-tag" id="fc-tag"></div>
+      <div class="fc-q" id="fc-q"></div>
+      <div class="fc-hint" id="fc-hint"></div>
+      <div class="fc-flip-hint">tap to reveal →</div>
+    </div>
+    <div class="fc-face fc-back">
+      <div class="fc-date" id="fc-date" style="display:none"></div>
+      <div class="fc-ans-lbl">✅ Answer</div>
+      <div class="fc-ans" id="fc-ans"></div>
+      <div class="known-badge" id="known-badge" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="move(-1)" disabled>← Prev</button>
+  <div class="card-ctr" id="ctr">1 / 40</div>
+  <button class="nav-btn" id="next-btn" onclick="move(1)">Next →</button>
+</div>
+
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown(true)">✓ Know it</button>
+  <button class="bot-btn" onclick="markKnown(false)">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const CARDS = [
+  // FRENCH REVOLUTION
+  {cat:'fr', q:'What were the three core ideals of the French Revolution (1789)?',
+   date:'1789', a:'<strong>Liberty, Equality, Fraternity.</strong>\nLiberty — freedom from tyranny\nEquality — no hereditary privileges\nFraternity — brotherhood of all citizens as a nation', hint:'The French national motto'},
+  {cat:'fr', q:'How did the French Revolution change the idea of "sovereignty"?',
+   a:'Before 1789, sovereignty (the right to rule) belonged to the <strong>king</strong>. The Revolution declared that sovereignty belonged to the <strong>people/the nation</strong>. This idea — that a people should govern themselves — became the foundation of the nation-state.', hint:'People = the nation, not the king'},
+  {cat:'fr', q:'What was the Napoleonic Code? What did it spread across Europe?',
+   a:'A uniform legal system Napoleon spread through conquered territories:\n• <strong>Abolished feudal privileges</strong> of aristocracy\n• Secured right to <strong>property</strong>\n• Equal laws for all citizens\n• Standardised weights, measures, and laws\nBut also: heavy taxes, military conscription, censorship', hint:'Good things AND bad things — remember both'},
+  {cat:'fr', q:'How did Napoleon\'s conquests both spread and trigger nationalism?',
+   a:'<strong>Spread nationalism:</strong> Napoleonic Code abolished feudalism, gave equal rights. French administrative efficiency showed what modern states could be.\n\n<strong>Triggered nationalism:</strong> People in occupied lands resented French domination and taxation. This resentment became nationalist — "we are a people, we deserve our own state."', hint:'Napoleon = paradox: spread nationalism AND caused nationalism'},
+  {cat:'fr', q:'What is Frédéric Sorrieu famous for? When did he create his famous work?',
+   date:'1848', a:'French artist <strong>Frédéric Sorrieu</strong> painted a series of four prints in <strong>1848</strong> showing his utopian vision: people of Europe and America marching in a long procession as free nations, each carrying their own flag, past the statue of Liberty. <strong>First visual expression</strong> of the idea of a world of nation-states.', hint:'1848 paintings — CBSE exam favourite'},
+  {cat:'fr', q:'What national symbols emerged from the French Revolution?',
+   a:'• 🇫🇷 <strong>Tricolour flag</strong> — blue, white, red\n• 🎵 <strong>La Marseillaise</strong> — national anthem\n• 👩 <strong>Marianne</strong> — female allegory/personification of the French nation\n• 📜 <strong>"Liberty, Equality, Fraternity"</strong> — national motto\nThese became models for nationalist symbols across Europe.', hint:'Each new nation needed its own flag, anthem, and symbol'},
+  {cat:'fr', q:'What was the Congress of Vienna (1815) and what were its two main principles?',
+   date:'1815', a:'A meeting of European powers after Napoleon\'s defeat to <strong>restore the conservative order</strong>. Presided by Austrian Chancellor <strong>Metternich</strong>.\n\nTwo principles:\n1. <strong>Legitimacy</strong> — restore pre-1789 monarchs to thrones\n2. <strong>Balance of Power</strong> — no one nation should dominate Europe; territories redistributed to maintain balance', hint:'Metternich\'s project to undo the French Revolution'},
+
+  // UNIFICATIONS
+  {cat:'uni', q:'What was the Zollverein (1834) and why was it important for German unification?',
+   date:'1834', a:'The German Customs Union formed in 1834, initiated by <strong>Prussia</strong>. Joined by 39 German states. <strong>Abolished internal tariff barriers</strong> and created a single economic market.\n\n<strong>Importance:</strong> Economic unity preceded political unity. A shared economy created common interests among Germans — preparing the ground for Bismarck\'s political unification.', hint:'Economic union came 37 years BEFORE political union'},
+  {cat:'uni', q:'Who was Bismarck and what does "blood and iron" mean?',
+   a:'<strong>Otto von Bismarck</strong> — Prime Minister of Prussia from 1862. First Chancellor of unified Germany.\n\n<strong>"Blood and iron":</strong> His famous phrase — German unification would be achieved not through speeches and votes (as liberals tried in 1848) but through military force (blood) and industrial power (iron). He used three strategic wars to unify Germany.', hint:'Realpolitik = practical power, not idealism'},
+  {cat:'uni', q:'Name Bismarck\'s three wars of German unification and their results.',
+   a:'1. <strong>War with Denmark (1864)</strong> → Prussia gains Schleswig-Holstein\n2. <strong>Austro-Prussian War (1866)</strong> → Austria expelled from German affairs; Prussia dominates north Germany\n3. <strong>Franco-Prussian War (1870–71)</strong> → France defeated; southern German states join Prussia; German Empire proclaimed', hint:'D-A-F: Denmark → Austria → France'},
+  {cat:'uni', q:'Where and when was the German Empire proclaimed? Who became Kaiser?',
+   date:'January 18, 1871', a:'Proclaimed at the <strong>Hall of Mirrors, Palace of Versailles, France</strong> on <strong>January 18, 1871</strong>.\n\n<strong>Wilhelm I</strong> (King of Prussia) became Kaiser (Emperor) of the German Empire.\n<strong>Bismarck</strong> became the first Chancellor.\n\nThe choice of Versailles was a deliberate humiliation of defeated France.', hint:'Hall of Mirrors = deliberate humiliation of France'},
+  {cat:'uni', q:'Who were the three key figures of Italian unification and what was each one\'s role?',
+   a:'1. <strong>Mazzini</strong> — The Dreamer. Provided ideology and inspiration. Founded Young Italy (1831). Multiple failed uprisings.\n2. <strong>Cavour</strong> — The Diplomat. PM of Sardinia-Piedmont. Allied with France against Austria. Political mastermind.\n3. <strong>Garibaldi</strong> — The Soldier. Led Red Shirts to conquer southern Italy (1860). Self-sacrifice for the nation.', hint:'M-C-G = Ideas → Diplomacy → Military'},
+  {cat:'uni', q:'Who was Mazzini and what did he found?',
+   a:'<strong>Giuseppe Mazzini (1807–1872)</strong> — Italian romantic nationalist.\n\nFounded <strong>Young Italy (1831)</strong> — secret society for Italian unification as a republic.\nFounded <strong>Young Europe (1834)</strong> — to spread nationalist ideas across Europe.\n\nBelieved nations were God\'s creation and Italy must be a <strong>free, unified republic</strong>. Multiple uprisings failed but his ideas inspired generations. Metternich called him "the most dangerous man in Europe."', hint:'Young Italy (1831), Young Europe (1834)'},
+  {cat:'uni', q:'What did Cavour do to advance Italian unification?',
+   a:'<strong>Count Camillo di Cavour</strong> — PM of Sardinia-Piedmont. Pragmatic diplomat, not a romantic nationalist.\n\n• Allied with <strong>Napoleon III of France</strong> against Austria (1859)\n• Won <strong>Lombardy</strong> from Austria\n• "Italy cannot make herself by herself" — needed foreign support\n• Masterminded northern and central Italian unification\n• Sardinia-Piedmont became the core of the new Italian state', hint:'Diplomacy + French alliance = his tools'},
+  {cat:'uni', q:'Who were the "Red Shirts"? What did Garibaldi achieve with them?',
+   date:'1860', a:'The <strong>Red Shirts</strong> were Garibaldi\'s volunteer army — about 1,000 men who marched with him through southern Italy in <strong>1860</strong>.\n\nGaribaldi\'s "Expedition of the Thousand" conquered <strong>Sicily and Naples</strong>, defeating the Bourbon kingdom. He then <strong>handed all territories to King Victor Emmanuel II</strong> of Sardinia — a remarkable act of self-sacrifice for the national cause.', hint:'"Expedition of the Thousand" — 1860 — Sicily and Naples'},
+  {cat:'uni', q:'When was the Kingdom of Italy proclaimed and when was the unification fully complete?',
+   a:'• <strong>1861</strong> — Kingdom of Italy proclaimed. Victor Emmanuel II as King. Most of Italy unified.\n• <strong>1866</strong> — Venice joins after Austro-Prussian War\n• <strong>1870</strong> — Rome joins when French troops withdraw. Italy <strong>fully unified</strong>.\n\nThe Pope refused to accept the loss of Rome — the "Roman Question" lasted until the Lateran Treaty of 1929.', hint:'1861 → 1866 → 1870: three stages'},
+  {cat:'uni', q:'How did the German and Italian unifications differ in method?',
+   a:'<strong>Germany:</strong>\n• Unified by <strong>wars ("blood and iron")</strong>\n• Led by <strong>Bismarck</strong>, a conservative\n• People had little say — military conscription, not volunteers\n• Proclaimed in France (Versailles)\n\n<strong>Italy:</strong>\n• Combined <strong>ideas (Mazzini) + diplomacy (Cavour) + military volunteers (Garibaldi)</strong>\n• Mix of romantic idealism and practical politics\n• Garibaldi\'s volunteers showed popular enthusiasm', hint:'Germany = top-down by war. Italy = mixed approach.'},
+
+  // KEY FIGURES
+  {cat:'fig', q:'What was Metternich\'s ideology and what was his role in European history?',
+   a:'<strong>Klemens von Metternich (1773–1859)</strong> — Austrian Chancellor.\n\n<strong>Ideology:</strong> Hardcore conservatism. Believed the 1789 Revolution was a catastrophe. Tradition, monarchy, church, and aristocracy must be preserved.\n\n<strong>Role:</strong> Architected the Congress of Vienna (1815). Suppressed liberal and nationalist movements across Europe for 30+ years. Called himself "the rock against revolution." Finally fell during the 1848 revolutions.', hint:'The man who tried to stop nationalism — and failed'},
+  {cat:'fig', q:'What was Johann Gottfried Herder\'s contribution to nationalism?',
+   a:'<strong>Johann Gottfried Herder (1744–1803)</strong> — German Romantic philosopher.\n\nDeveloped the concept of <strong>volksgeist</strong> (spirit/soul of the people). Argued that each nation has a unique identity expressed through its:\n• <strong>Folk songs and poetry</strong>\n• <strong>Language</strong>\n• <strong>Customs and traditions</strong>\n\nInfluenced Romantic nationalists across Europe — Mazzini, the Brothers Grimm, Polish nationalists. Language became the key marker of national identity.', hint:'Volksgeist = people\'s unique national soul'},
+  {cat:'fig', q:'Who were the Brothers Grimm and how did they contribute to nationalism?',
+   a:'<strong>Jacob and Wilhelm Grimm</strong> — German scholars (early 19th century).\n\nCollected German folk tales and fairy tales (<em>Grimm\'s Fairy Tales</em>). Their project was nationalist: to preserve and celebrate the unique <strong>German folk culture and language</strong>.\n\nFollowing Herder\'s volksgeist idea, collecting folk tales was a way of showing that Germans shared a common cultural soul — before they had political unity.', hint:'Folk tales as nationalist project — culture before politics'},
+  {cat:'fig', q:'What is Lord Byron\'s connection to European nationalism?',
+   a:'<strong>Lord Byron</strong> was a famous British Romantic poet. He was deeply inspired by the <strong>Greek struggle for independence</strong> from Ottoman rule.\n\nHe not only wrote poems celebrating Greek freedom but <strong>went to Greece to fight</strong> in the uprising. He died there in 1824.\n\nHis example showed how nationalism was a pan-European cultural movement — artists and intellectuals from across Europe rallied to support national liberation struggles.', hint:'Romantic poet who died fighting for Greek independence'},
+
+  // KEY CONCEPTS
+  {cat:'con', q:'What is "liberalism" in the context of 19th-century Europe?',
+   a:'From Latin <em>liber</em> = free.\n\n<strong>Political liberalism:</strong> Individual freedom, government by consent (constitution), rule of law, equality before law, no hereditary privilege.\n\n<strong>Economic liberalism:</strong> Free markets, removal of trade restrictions (laissez-faire). Opposed guilds and tariff barriers.\n\nMain supporters: the <strong>middle class (educated, property-owning)</strong>. Middle-class liberalism = both political rights AND free trade.', hint:'Middle class championed liberalism — political + economic freedom'},
+  {cat:'con', q:'What is conservatism and who were its main supporters in 19th-century Europe?',
+   a:'Conservatism believed in <strong>preserving traditional institutions</strong>: monarchy, church, aristocracy.\n\n• Change should be <strong>gradual and controlled</strong>, not revolutionary\n• Social order and hierarchy were natural and necessary\n• Represented by <strong>Metternich</strong> and the Congress of Vienna (1815)\n\nMainly supported by: <strong>monarchy, aristocracy, church</strong>. The old ruling classes who had most to lose from revolution.', hint:'Metternich = the face of conservatism'},
+  {cat:'con', q:'What is Romanticism and how did it relate to nationalism?',
+   a:'Romanticism was a cultural movement that <strong>rejected pure Enlightenment reason</strong> in favour of emotion, nature, and folk culture.\n\n<strong>Link to nationalism:</strong>\n• Romantic nationalists believed each nation had a unique <strong>volksgeist</strong> (Herder)\n• Folk songs, dances, legends, and language expressed this national soul\n• Brothers Grimm collected German folk tales; Karol Kurpinski composed Polish music\n• Language became the key marker of national identity — especially important in Germany and Poland', hint:'Emotion + folk culture + language = Romantic nationalism'},
+  {cat:'con', q:'What is the difference between a "state" and a "nation-state"?',
+   a:'<strong>State:</strong> A political/administrative unit with a government and defined territory. Can contain many peoples (e.g., Ottoman Empire, Habsburg Empire).\n\n<strong>Nation:</strong> A group sharing common culture, language, history, and often territory.\n\n<strong>Nation-state:</strong> A state whose <strong>borders coincide with a nation</strong> — one people, one government, one territory. The 19th century was about breaking old empires into nation-states.', hint:'The 19th century\'s central political project was creating nation-states'},
+  {cat:'con', q:'What is "Realpolitik" and who is associated with it?',
+   a:'<strong>Realpolitik</strong> — German word meaning "politics of realities/practicalities."\n\nAssociated with <strong>Bismarck</strong>. Means:\n• Politics based on <strong>practical power</strong>, not moral principles or ideals\n• Use whatever works — war, alliances, manipulation\n• Opposed to romantic/idealist nationalism (like Mazzini\'s)\n• "Not by speeches and majority votes are great questions decided, but by <strong>blood and iron</strong>"', hint:'Practical power vs. romantic ideals — Bismarck chose power'},
+  {cat:'con', q:'What was the "Springtime of Nations" (1848)? Why did it fail?',
+   date:'1848', a:'The <strong>1848 revolutions</strong> swept almost every country in Europe — France, German states, Italian states, Austria-Hungary, Hungary.\n\nDemands: constitutions, national self-determination, liberal rights.\n\n<strong>Why failed:</strong>\n• Conservative armies crushed the uprisings\n• Frankfurt Parliament: Prussian king rejected the German crown offered by liberals\n• Nationalists and liberals could not agree among themselves\n• Middle class became afraid of working-class radicalism\n\nBut the revolutions proved nationalism was an unstoppable mass force.', hint:'Failed short-term, succeeded long-term — nationalism couldn\'t be crushed'},
+  {cat:'con', q:'What were the two main principles of the Congress of Vienna (1815)?',
+   date:'1815', a:'1. <strong>Principle of Legitimacy</strong> — "Legitimate" rulers (the old monarchies removed by Napoleon) should be restored to their thrones. Pre-1789 borders should be re-established.\n\n2. <strong>Balance of Power</strong> — No one nation should dominate Europe. Territories were redistributed to ensure that no single power could become overwhelmingly strong.\n\nPurpose: prevent another French Revolution-style upheaval and maintain conservative order.', hint:'Legitimacy + Balance of Power = two key terms for board exams'},
+
+  // EVENTS & FACTS
+  {cat:'evt', q:'When and where did the Greek independence movement succeed? Who helped?',
+   date:'1832', a:'Greece rose against Ottoman rule from <strong>1821</strong>. Achieved independence recognised in <strong>1832</strong>.\n\n<strong>Who helped:</strong> Britain, France, and Russia intervened militarily in favour of Greece. Western European sympathy was strong — Greece was seen as the cradle of European civilisation.\n\n<strong>Significance:</strong> Greece was the <strong>first successful nationalist movement</strong> in Europe — proving that nationalism could succeed against established empires.', hint:'First successful nationalist movement in Europe'},
+  {cat:'evt', q:'What happened at the Frankfurt Parliament (1848) and why did it fail?',
+   date:'1848', a:'Liberal nationalists from across the German states gathered at <strong>Frankfurt Parliament</strong> in 1848 to debate and draft a constitution for a unified Germany.\n\nThey offered the crown of a unified Germany to the Prussian king, <strong>Frederick William IV</strong>, who rejected it — saying he would not accept a crown "from the gutter" (from the people, not from princes).\n\n<strong>Why failed:</strong> Liberals had no army; conservative reaction regrouped; middle class turned cautious. The Parliament dissolved. German unification would have to wait for Bismarck.', hint:'Liberals tried in 1848; Bismarck succeeded in 1871 by different means'},
+  {cat:'evt', q:'What was Pan-Slavism and how did it contribute to WWI?',
+   a:'<strong>Pan-Slavism</strong> — the idea that all Slavic peoples (Russians, Serbs, Bulgarians, Poles, Czechs etc.) share a common identity and should unite.\n\n<strong>Russia\'s role:</strong> Russia positioned itself as the protector of all Slavic peoples, especially in the Balkans. This brought Russia into conflict with Austria-Hungary (which also had large Slavic populations).\n\n<strong>WWI link:</strong> After Austria-Hungary blamed Serbia for the 1914 assassination, Russia supported Serbia — the alliance system drew everyone in. Pan-Slavism made the Balkan conflict a European war.', hint:'Russia = Slavic protector; Austria = Slavic suppressor → WWI collision'},
+  {cat:'evt', q:'Who was Gavrilo Princip and what did he do?',
+   date:'June 28, 1914', a:'<strong>Gavrilo Princip</strong> — a <strong>Bosnian Serb nationalist</strong> member of the secret society "Black Hand."\n\nOn <strong>June 28, 1914</strong>, he assassinated <strong>Archduke Franz Ferdinand</strong> (heir to the Austro-Hungarian throne) and his wife Sophie in <strong>Sarajevo, Bosnia</strong>.\n\nAustria-Hungary blamed Serbia for the assassination. The alliance system drew in Russia, Germany, France, and Britain. <strong>World War I began.</strong>', hint:'One assassination → World War I — nationalism\'s darkest consequence'},
+  {cat:'evt', q:'Why were the Balkans called the "powder keg" of Europe?',
+   a:'The Balkans region of southeastern Europe was called a "powder keg" (ready to explode) because:\n\n• Many different ethnic groups (Slavs, Greeks, Bulgarians, Albanians) all wanted their own nation-states\n• The <strong>Ottoman Empire was declining</strong> — leaving a power vacuum\n• <strong>Great Powers</strong> (Russia, Austria-Hungary, Britain, Germany) all competed for influence in the region\n• Multiple Balkan wars (1912–13) created new tensions\n• <strong>Overlapping territorial claims</strong> + Great Power rivalry = constant risk of explosion', hint:'Mix of ethnic nationalism + Great Power rivalry = powder keg'},
+  {cat:'evt', q:'What role did language play in 19th-century European nationalism?',
+   a:'Language became the <strong>primary marker of national identity</strong>, especially after Napoleon\'s conquests.\n\n• In occupied territories, using one\'s own language (not French) became an act of nationalist resistance\n• <strong>Herder</strong> argued that language expressed the volksgeist (national soul)\n• <strong>Brothers Grimm</strong> collected German folk tales — preserving German language and culture\n• Polish language was suppressed by Russia — teaching/publishing in Polish became nationalist acts\n• Czech, Hungarian, Slovak, Finnish languages were revived as nationalist symbols\n• Language → shared identity → national consciousness → political demands', hint:'Language = culture = national soul → political nationalism'},
+  {cat:'evt', q:'How was the French Revolution\'s promise both fulfilled and betrayed by Napoleon?',
+   a:'<strong>Fulfilled:</strong>\n• Napoleonic Code spread revolutionary ideas (equality, rule of law, abolition of feudalism)\n• Removed old aristocratic privileges across Europe\n• Showed that efficient, modern government was possible\n\n<strong>Betrayed:</strong>\n• Napoleon became Emperor — betrayed the Republican ideal of popular sovereignty\n• Treated conquered peoples as inferior — French culture imposed\n• Taxed heavily, conscripted men forcibly\n• Censored press in occupied territories\n\nThe contradiction: Napoleon both liberated and oppressed — creating nationalism through both inspiration and resentment.', hint:'He spread the ideals he then violated — classic paradox'},
+  {cat:'evt', q:'What was the significance of 1848 for nationalism even though revolutions failed?',
+   date:'1848', a:'The 1848 revolutions all ultimately failed — crushed by conservative armies. But they were historically significant because:\n\n1. They showed nationalism was a <strong>mass movement</strong>, not just an elite idea\n2. They proved that the old conservative order could not permanently suppress nationalist feeling\n3. They taught future nationalists (like Bismarck) that <strong>idealism alone would not work</strong> — power and strategy were needed\n4. The Frankfurt Parliament showed both the potential and the limitations of liberal nationalism\n5. After 1848, the centre of gravity shifted from liberals to conservatives like Bismarck who used nationalism strategically', hint:'Failed revolutions that changed the strategy of unification'},
+  {cat:'evt', q:'What were "secret societies" and why were they important in early 19th-century nationalism?',
+   a:'After the Congress of Vienna (1815) suppressed public nationalist activity, nationalists organised in <strong>secret societies</strong>:\n\n• <strong>Carbonari (Italy)</strong> — worked for constitutional government and Italian unity\n• <strong>Young Italy (Mazzini)</strong> — worked for Italian republic\n• <strong>Young Europe (Mazzini)</strong> — coordinated nationalist networks across Europe\n• <strong>Black Hand (Serbia)</strong> — militant Serbian nationalist group\n\nSecret societies were necessary because governments banned nationalist activity. They kept nationalism alive underground until public movements became possible after 1848.', hint:'Banned above ground → went underground — secret societies bridged the gap'},
+];
+
+let deck=[...CARDS], idx=0, filter='all', known={}, isFlipped=false;
+
+const TAG_STYLE={
+  fr:'background:rgba(249,115,22,.15);color:#fb923c',
+  uni:'background:rgba(56,189,248,.15);color:#38bdf8',
+  fig:'background:rgba(34,197,94,.15);color:#4ade80',
+  con:'background:rgba(129,140,248,.15);color:#818cf8',
+  evt:'background:rgba(245,200,66,.15);color:#f5c842',
+};
+const TAG_LBL={fr:'🏛️ French Revolution',uni:'⚔️ Unification',fig:'👤 Key Figure',con:'💡 Concept',evt:'📅 Event/Fact'};
+
+function filtered(){return filter==='all'?deck:deck.filter(c=>c.cat===filter);}
+
+function setFilter(f,btn){
+  filter=f; idx=0; isFlipped=false;
+  document.getElementById('fc').classList.remove('flipped');
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  updateCard();
+}
+
+function updateCard(){
+  const cards=filtered(); if(!cards.length)return;
+  const c=cards[idx%cards.length], total=cards.length, cur=(idx%total)+1;
+  document.getElementById('fc-tag').style.cssText=TAG_STYLE[c.cat];
+  document.getElementById('fc-tag').textContent=TAG_LBL[c.cat];
+  document.getElementById('fc-q').textContent=c.q;
+  document.getElementById('fc-hint').textContent=c.hint?'💡 '+c.hint:'';
+  document.getElementById('fc-ans').innerHTML=(c.a||'').replace(/\n/g,'<br>');
+  const dateEl=document.getElementById('fc-date');
+  if(c.date){dateEl.style.display='block';dateEl.textContent='📅 '+c.date;}
+  else dateEl.style.display='none';
+  const kb=document.getElementById('known-badge');
+  const id=deck.indexOf(c);
+  if(known[id]===true){kb.style.display='block';kb.className='known-badge known';kb.textContent='✓ Known';}
+  else if(known[id]===false){kb.style.display='block';kb.className='known-badge unknown';kb.textContent='Still learning';}
+  else kb.style.display='none';
+  document.getElementById('ctr').textContent=`${cur} / ${total}`;
+  document.getElementById('prog-text').textContent=`${cur} / ${total}`;
+  document.getElementById('prog-fill').style.width=`${(cur/total)*100}%`;
+  document.getElementById('prev-btn').disabled=idx===0;
+  document.getElementById('next-btn').disabled=idx>=total-1;
+}
+
+function flip(){isFlipped=!isFlipped;document.getElementById('fc').classList.toggle('flipped',isFlipped);}
+function move(dir){const t=filtered().length;idx=Math.max(0,Math.min(t-1,idx+dir));isFlipped=false;document.getElementById('fc').classList.remove('flipped');updateCard();}
+function markKnown(val){const cards=filtered();const c=cards[idx%cards.length];const id=deck.indexOf(c);known[id]=val;updateCard();if(val)setTimeout(()=>move(1),400);}
+function shuffle(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}idx=0;isFlipped=false;document.getElementById('fc').classList.remove('flipped');updateCard();}
+function resetDeck(){deck=[...CARDS];known={};idx=0;isFlipped=false;document.getElementById('fc').classList.remove('flipped');updateCard();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')move(1);else if(e.key==='ArrowLeft')move(-1);else if(e.key===' '){e.preventDefault();flip();}});
+updateCard();
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Rise of Nationalism in Europe</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#0e0a04; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(14,10,4,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f5c842; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#7a6a4a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #3a2e1a; background:rgba(20,15,5,.85);
+  color:#8a7a5a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f5c842; color:#f5c842; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#1a1208; border:1px solid #3a2e1a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:270px; font-size:.8rem; color:#d4c4a0;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#f5c842; font-size:.9rem; }
+</style>
+</head>
+<body>
+
+<div id="ui">
+  <div>
+    <h1>Rise of Nationalism in Europe</h1>
+    <p>Class X · Social Science · History Ch.1 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Rise of\nNationalism\nin Europe',
+  x:0, y:0, r:65, color:'#3d2800', stroke:'#f5c842', textColor:'#f5c842', fontSize:13
+};
+
+const BRANCHES = [
+  // ── French Revolution ──
+  {
+    id:'fr', label:'French\nRevolution', x:-320, y:-200, r:46,
+    color:'#2a1a00', stroke:'#f97316', textColor:'#fed7aa',
+    info:'1789. First clear expression of nationalism. French people declared themselves "the nation" with sovereignty. Spread the ideals of Liberty, Equality, Fraternity across Europe.',
+    children:[
+      { id:'fr1', label:'Key Ideas', x:-510, y:-325, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Liberty: freedom from tyranny\nEquality: no hereditary privileges\nFraternity: brotherhood of citizens\nPopular sovereignty: people = the nation\nRepublic replaces monarchy' },
+      { id:'fr2', label:'Napoleonic\nCode', x:-535, y:-190, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Napoleon spread French laws across conquered territories:\n• Uniform legal system\n• Abolished feudal privileges\n• Secured property rights\n• Equal laws for all\nBut also: heavy taxation, military conscription, censorship' },
+      { id:'fr3', label:'Spread to\nEurope', x:-450, y:-65, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'French armies carried ideas of revolution across Europe.\nOccupied territories: Italian states, German states, Spain, Switzerland.\nLocal people initially welcomed French as liberators.\nBut French imperialism caused resentment — fuelled nationalist reactions.' },
+      { id:'fr4', label:'Symbols', x:-295, y:-365, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Tricolour flag (blue-white-red)\nLa Marseillaise — national anthem\nMarianne — female allegory of France\n"Liberty, Equality, Fraternity" — national motto\nFrédéric Sorrieu: painted utopian vision of a world of free nations (1848)' },
+    ]
+  },
+  // ── Unification of Germany ──
+  {
+    id:'ger', label:'Germany\nUnified', x:320, y:-200, r:46,
+    color:'#001520', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'Many German-speaking states existed in early 19th century. Unified under Prussia\'s leadership through Bismarck\'s "blood and iron" policy. Proclaimed as German Empire at Versailles, January 18, 1871.',
+    children:[
+      { id:'g1', label:'Zollverein\n1834', x:490, y:-335, r:34, color:'#001520', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'1834 — German Customs Union (Zollverein).\nCreated by Prussia. 39 German states joined.\nRemoved tariff barriers between German states.\nCreated a single economic market.\nEconomic unity preceded political unity — key lesson!' },
+      { id:'g2', label:'Bismarck\n"Blood & Iron"', x:-0+530, y:-195, r:34, color:'#001520', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Otto von Bismarck — Prussian Prime Minister from 1862.\n"Not by speeches and majority votes are the great questions decided, but by blood and iron."\nRealpolitik: practical politics over ideology.\nUsed wars strategically to unite German states under Prussia.' },
+      { id:'g3', label:'Three Wars', x:480, y:-65, r:34, color:'#001520', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'1864: War with Denmark → Prussia gains Schleswig-Holstein\n1866: Austro-Prussian War → Prussia dominates northern Germany\n1870–71: Franco-Prussian War → France defeated; southern German states join Prussia\nResult: German Empire proclaimed 1871' },
+      { id:'g4', label:'1871\nProclamation', x:315, y:-375, r:34, color:'#001520', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'January 18, 1871.\nHall of Mirrors, Palace of Versailles, France.\nWilhelm I (King of Prussia) proclaimed Kaiser (Emperor) of Germany.\nBismarck becomes first Chancellor.\nGermany becomes the strongest continental power in Europe.' },
+    ]
+  },
+  // ── Unification of Italy ──
+  {
+    id:'ita', label:'Italy\nUnified', x:-320, y:200, r:46,
+    color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:'Italy was fragmented into many states, most under Austrian domination. Unified through a combination of Mazzini\'s romantic nationalism, Cavour\'s diplomacy, and Garibaldi\'s military campaigns. Completed in 1870.',
+    children:[
+      { id:'i1', label:'Mazzini\n& Young Italy', x:-510, y:115, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Giuseppe Mazzini (1807–1872).\nFounded Young Italy (1831) and Young Europe (1834).\nRomantic nationalist: believed nation = God\'s creation.\n"Italy must be a free republic, not a kingdom."\nMultiple failed uprisings. Exiled repeatedly.\nInspired a generation but did not achieve unification himself.' },
+      { id:'i2', label:'Cavour &\nDiplomacy', x:-535, y:240, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Count Camillo di Cavour — Prime Minister of Sardinia-Piedmont.\nPragmatic diplomat, not a romantic nationalist.\nAllied with France against Austria (1859).\nWon Lombardy from Austria.\n"Italy cannot make herself by herself" — needed French support.' },
+      { id:'i3', label:'Garibaldi\n& Red Shirts', x:-445, y:365, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Giuseppe Garibaldi (1807–1882).\nMilitary general. Led army of "Red Shirts" volunteers.\n1860: Marched through southern Italy (Sicily and Naples).\nDefeated Bourbon kingdom. Handed over territories to Victor Emmanuel II.\n"I offer neither pay, nor quarters, nor provisions; I offer hunger, thirst, forced marches, battles and death." — inspirational leader.' },
+      { id:'i4', label:'1870\nComplete', x:-285, y:390, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'1861: Kingdom of Italy proclaimed under Victor Emmanuel II.\n1866: Venice joined after Austro-Prussian War.\n1870: Rome — the last piece — joined when French troops withdrew.\nPope refused to accept loss of Rome — "Roman Question".\nItaly finally fully unified with Rome as capital.' },
+    ]
+  },
+  // ── Age of Revolutions ──
+  {
+    id:'rev', label:'Age of\nRevolutions', x:0, y:-295, r:46,
+    color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'1815–1848: Conservative reaction after Napoleon\'s defeat, followed by waves of liberal and nationalist revolutions across Europe.',
+    children:[
+      { id:'r1', label:'Congress of\nVienna 1815', x:-185, y:-420, r:32, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'1815 — After Napoleon\'s defeat.\nMetternich (Austrian Chancellor) presided.\nGoal: restore old conservative order in Europe.\nPrinciple of Legitimacy: restore old monarchies.\nBalance of Power: prevent any one nation dominating.\nConservatism defended: tradition, monarchy, church against liberalism.' },
+      { id:'r2', label:'1830\nRevolts', x:0, y:-455, r:32, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'1830: First wave of liberal-nationalist revolutions.\nGreece independence (1832) — first success, helped by Britain, France, Russia.\n1830 Revolution in France — Charles X overthrown.\nBelgium separates from Holland.\nPoland rises against Russian rule (crushed).\nRevolutions showed nationalism could not be suppressed.' },
+      { id:'r3', label:'1848\n"Spring of Nations"', x:185, y:-420, r:32, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'1848 — Revolutions across almost all of Europe.\nFrankfurt Parliament (Germany): liberal nationalists tried to unite Germany; failed.\nHungarians rose against Habsburgs.\nItaly rose against Austria.\nFrance: 2nd Republic proclaimed.\nAll ultimately crushed by conservative reaction — but showed immense nationalist sentiment.' },
+    ]
+  },
+  // ── Balkans ──
+  {
+    id:'bal', label:'Balkans &\nNationalism', x:320, y:200, r:46,
+    color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:'The Balkan region of southeastern Europe became the "powder keg" of Europe due to conflicting nationalist ambitions and the declining Ottoman Empire.',
+    children:[
+      { id:'b1', label:'Ottoman\nDecline', x:500, y:115, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'"Sick Man of Europe" — Ottoman Empire declining through 19th century.\nBalkans: mix of Slavs, Greeks, Bulgarians, Romanians, Albanians — diverse religions and ethnicities.\nAs Ottomans weakened, Balkan peoples sought independence.\nEach group identified with their own language and culture.' },
+      { id:'b2', label:'Ethnic\nTensions', x:535, y:240, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Great Powers (Russia, Britain, France, Austria-Hungary, Germany) competed for influence in Balkans.\nRussia supported Slavic peoples — "Pan-Slavism".\nAustria-Hungary feared Slavic nationalism threatening its own empire.\nBalkan states competed with each other for territories.\nHatred, suspicion, and rivalry dominated.' },
+      { id:'b3', label:'Road to\nWWI', x:460, y:365, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'1912–13: Balkan Wars. Ottoman territories divided.\nJune 28, 1914: Archduke Franz Ferdinand of Austria assassinated in Sarajevo by Gavrilo Princip (Bosnian Serb nationalist).\nAustria-Hungary blamed Serbia.\nAlliances triggered: WWI began.\nNationalism in Balkans lit the fuse of the first World War.' },
+    ]
+  },
+  // ── Key Concepts ──
+  {
+    id:'con', label:'Key\nConcepts', x:0, y:295, r:46,
+    color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'The intellectual and cultural ideas that shaped the nationalist movements across Europe in the 19th century.',
+    children:[
+      { id:'c1', label:'Liberalism', x:-185, y:410, r:32, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'From Latin "liber" = free.\nPolitical liberalism: individual freedom, government by consent, rule of law, equality before law.\nEconomic liberalism: free markets, end of restrictions on trade (favoured by middle class).\nOpposed: divine right of kings, hereditary aristocracy, church control of state.' },
+      { id:'c2', label:'Romanticism\n& Folk Culture', x:0, y:450, r:32, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Cultural movement emphasising emotion, nature, folk traditions.\nJohann Gottfried Herder: "volksgeist" (spirit of the people) expressed through folk songs, poetry, language.\nBrothers Grimm: collected German folk tales.\nPolish composer Karol Kurpinski: celebrated national struggle through music.\nLanguage became key marker of national identity — esp. after French conquest.' },
+      { id:'c3', label:'Conservatism', x:185, y:410, r:32, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'After French Revolution, conservatives wanted to preserve the old order.\nBelieved: tradition, established institutions, monarchy, church should be respected.\nGradual change acceptable; revolution not.\nMetternich: arch-conservative, tried to suppress liberalism and nationalism.\nConservative order of 1815 survived until 1830 and 1848 revolutions weakened it.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+// pan/zoom
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found && found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10, window.innerHeight-220)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none'; canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.25,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // warm parchment grid
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(245,200,66,.03)';
+  ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+  ctx.restore();
+
+  ctx.save(); ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2+(b.y-a.y)*.15, cy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?35:18;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    // inner ring for center node
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>
