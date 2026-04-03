@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Real Numbers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#040810; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,8,16,.92) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f59e0b; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#3a5a78; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a2d45; background:rgba(4,10,20,.85);
+  color:#3a5a78; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f59e0b; color:#f59e0b; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#0a1422; border:1px solid #1e3550;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#9cc0e0;
+  line-height:1.65; display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.85);
+}
+#tooltip strong {
+  font-family:'Playfair Display',serif; display:block;
+  margin-bottom:.3rem; color:#f59e0b; font-size:.9rem;
+}
+</style>
+</head>
+<body>
+
+<div id="ui">
+  <div>
+    <h1>Real Numbers</h1>
+    <p>Class X · Mathematics Ch.1 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Real\nNumbers',
+  x:0, y:0, r:62, color:'#050e1c', stroke:'#f59e0b', textColor:'#f59e0b', fontSize:14
+};
+
+const BRANCHES = [
+  // ── Euclid's Division Lemma ──
+  {
+    id:'edl', label:"Euclid's\nDivision\nLemma", x:-310, y:-205, r:46,
+    color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:"For any two positive integers a and b:\na = bq + r   where 0 ≤ r < b\n(a=dividend, b=divisor, q=quotient, r=remainder)\nUsed to compute HCF efficiently. Basis for Euclid's Algorithm. Named after Euclid (~300 BC).",
+    children:[
+      { id:'e1', label:'Division\nAlgorithm', x:-500, y:-330, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'a = bq + r   (0 ≤ r < b)\nSteps:\n1. Divide a by b → get q and r\n2. Write: a = b × q + r\nExample: 867 ÷ 255\n867 = 255 × 3 + 102\nIf r = 0, then b divides a exactly\nq and r are always unique for a given (a, b)' },
+      { id:'e2', label:'HCF by\nEuclid', x:-545, y:-192, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Finding HCF(a, b) step by step:\n1. Apply a = bq + r\n2. Replace: a ← b, b ← r\n3. Repeat until r = 0\n4. Last non-zero b = HCF\n\nExample — HCF(225, 135):\n225 = 135×1 + 90\n135 = 90×1 + 45\n90 = 45×2 + 0\n∴ HCF(225, 135) = 45' },
+      { id:'e3', label:'Three\nNumbers', x:-455, y:-62, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'HCF of three numbers a, b, c:\nHCF(a, b, c) = HCF(HCF(a, b), c)\nLCM(a, b, c) = LCM(LCM(a, b), c)\nApply algorithm twice in sequence.\nExample: HCF(12, 16, 24)\nHCF(12,16) = 4, then HCF(4,24) = 4\n∴ HCF = 4' },
+      { id:'e4', label:'Word\nProblems', x:-298, y:-370, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Use HCF when:\n• Arranging items into equal groups\n• Cutting rope/wire into equal lengths\n• Finding max tile size for a floor\n"Largest number that divides both" → HCF\nExample: Two ropes 500 cm and 700 cm.\nMax equal piece length = HCF(500,700) = 100 cm\n→ 5 pieces and 7 pieces' },
+    ]
+  },
+  // ── Fundamental Theorem of Arithmetic ──
+  {
+    id:'fta', label:'Fundamental\nTheorem of\nArithmetic', x:310, y:-205, r:46,
+    color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'Every composite number can be expressed as a product of primes in exactly one way (ignoring order).\n360 = 2³ × 3² × 5\nThis factorisation is UNIQUE — primes are the "atoms" of arithmetic.\nProved by Euclid. Foundation of all number theory.',
+    children:[
+      { id:'f1', label:'Factor\nTree', x:500, y:-330, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Factor Tree for 360:\n360 = 2 × 180 = 2 × 2 × 90\n= 4 × 2 × 45 = 8 × 9 × 5\n= 2³ × 3² × 5\nAlways the same result no matter which factor you split first!\nAnother example: 420 = 2² × 3 × 5 × 7' },
+      { id:'f2', label:'Uniqueness\nof Factors', x:540, y:-192, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'The prime factorisation of any n > 1 is unique.\nThis is the FUNDAMENTAL theorem — not obvious at all!\nWithout uniqueness: HCF and LCM calculations would be unreliable\nProof: assume two different factorisations exist → lead to contradiction.\nPrimes are truly "indivisible building blocks."' },
+      { id:'f3', label:'HCF via\nFTA', x:485, y:-58, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'HCF = product of LOWEST powers of COMMON prime factors\nExample: HCF(12, 18)\n12 = 2² × 3¹\n18 = 2¹ × 3²\nCommon primes: 2 and 3\nLowest powers: 2¹, 3¹\nHCF = 2¹ × 3¹ = 6 ✓' },
+      { id:'f4', label:'LCM via\nFTA', x:312, y:-372, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'LCM = product of HIGHEST powers of ALL prime factors\nExample: LCM(12, 18)\n12 = 2² × 3¹\n18 = 2¹ × 3²\nAll primes: 2 and 3\nHighest powers: 2², 3²\nLCM = 4 × 9 = 36\nVerify: HCF × LCM = 6 × 36 = 216 = 12 × 18 ✓' },
+    ]
+  },
+  // ── HCF & LCM ──
+  {
+    id:'hl', label:'HCF &\nLCM', x:-310, y:205, r:46,
+    color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'HCF(a,b): largest number dividing both a and b.\nLCM(a,b): smallest number divisible by both a and b.\nGolden Formula: HCF(a,b) × LCM(a,b) = a × b\n(Valid for exactly TWO numbers only!)',
+    children:[
+      { id:'h1', label:'HCF×LCM\n= a×b', x:-508, y:118, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'For any two positive integers a and b:\nHCF(a,b) × LCM(a,b) = a × b\nProof: uses min+max powers of each prime = sum of powers (= product)\nUseful shortcut:\nIf HCF is known → LCM = a×b ÷ HCF\nIf LCM is known → HCF = a×b ÷ LCM\nCAUTION: NOT valid for three numbers!' },
+      { id:'h2', label:'Co-prime\nNumbers', x:-537, y:245, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Two numbers are co-prime if HCF = 1\nExample: HCF(4, 9) = 1 → co-prime\nNote: co-prime ≠ both are prime\n4 and 9 are NOT prime, but ARE co-prime.\nIf a and b are co-prime:\nLCM(a, b) = a × b\nMany exam questions involve co-primes!' },
+      { id:'h3', label:'Applications\nof LCM', x:-445, y:378, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Use LCM when:\n• Bells ringing together again\n• Events repeating simultaneously\n• Traffic lights synchronising\n"Smallest number divisible by both" → LCM\nExample: Bells ring every 18 min and 24 min.\nLCM(18, 24) = 72\n→ They ring together again after 72 minutes' },
+      { id:'h4', label:'HCF ≤ a,b\n≤ LCM', x:-290, y:393, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Always true: HCF(a,b) ≤ min(a,b) ≤ max(a,b) ≤ LCM(a,b)\nSpecial cases:\n• HCF = a means a | b (a divides b)\n• LCM = b means a | b\n• HCF = LCM = a means a = b\nIf one number is a multiple of the other:\nHCF = smaller, LCM = larger number' },
+    ]
+  },
+  // ── Irrational Numbers ──
+  {
+    id:'irr', label:'Irrational\nNumbers', x:0, y:-295, r:46,
+    color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:"Numbers that CANNOT be expressed as p/q (p,q integers, q≠0).\nDecimal expansion: non-terminating AND non-recurring.\nExamples: √2, √3, √5, π, e\nOn the number line: fill the 'gaps' between rational numbers.",
+    children:[
+      { id:'ir1', label:'Proof:\n√2 irrational', x:-182, y:-423, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Proof by Contradiction:\n1. Assume √2 = p/q (p,q coprime, q≠0)\n2. Then 2q² = p² → p² is even → p is even\n3. Let p = 2m. Then 2q² = 4m² → q² = 2m² → q is even\n4. Both p & q are even: contradicts "coprime"!\n∴ Our assumption was wrong → √2 is irrational ■' },
+      { id:'ir2', label:'√p is\nirrational', x:0, y:-458, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'For any prime p, √p is irrational.\nSame contradiction proof works for √3, √5, √7, √11...\nKey lemma used: "If prime p divides a², then p divides a"\nThis means: √6 = √(2×3) is also irrational\nBut √4 = 2 is rational (4 is not prime, it is a perfect square)' },
+      { id:'ir3', label:'Sum &\nProduct Rules', x:182, y:-423, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'If r is rational and x is irrational:\n• r + x is irrational\n• r − x is irrational\n• r × x is irrational (r ≠ 0)\n• r ÷ x is irrational (r ≠ 0)\nProof: If r + x = q (rational), then x = q − r = rational. Contradiction!\nNote: √2 + (−√2) = 0 is rational (sum of two irrationals CAN be rational)' },
+    ]
+  },
+  // ── Decimal Expansions ──
+  {
+    id:'dec', label:'Decimal\nExpansions', x:0, y:295, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:'Every rational number p/q has a decimal that either:\n(a) Terminates: 3/8 = 0.375\n(b) Non-terminates but recurs: 1/3 = 0.333...\nEvery irrational has a non-terminating, non-recurring decimal.\nThe type of decimal reveals whether a number is rational or irrational!',
+    children:[
+      { id:'d1', label:'Terminating\nDecimals', x:-182, y:418, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'p/q terminates ⟺ q (in lowest terms) = 2ⁿ × 5ᵐ\n(q has only 2s and 5s as prime factors)\nExamples:\n3/8 = 3/2³ → terminates: 0.375\n7/20 = 7/(2²×5) → terminates: 0.35\nNon-examples:\n7/12 = 7/(2²×3) → has factor 3 → does NOT terminate\nQuick test: factorise denominator!' },
+      { id:'d2', label:'Non-term.\nRecurring', x:0, y:458, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'q has prime factors other than 2 and 5:\np/q is non-terminating recurring\nThe repeating block length ≤ (q−1) digits\nExamples:\n1/3 = 0.3̄ (recurs after 1 digit)\n1/7 = 0.142857̄ (recurs after 6 digits)\n5/6 = 0.83̄\nThese are STILL rational — they equal some p/q' },
+      { id:'d3', label:'Non-term.\nNon-recurring', x:182, y:418, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Non-terminating AND non-recurring → always irrational\nNo pattern ever repeats\nExamples:\n√2 = 1.41421356237309...\nπ = 3.14159265358979...\ne = 2.71828182845904...\nAlso: 0.1001000100001... (deliberate pattern but NOT recurring)\nCannot be written as p/q' },
+    ]
+  },
+  // ── Real Number System ──
+  {
+    id:'rns', label:'Number\nSystem', x:310, y:205, r:46,
+    color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'The Real Number System:\nReal Numbers (R) = Rational (Q) ∪ Irrational (Q′)\nQ and Q′ are disjoint (no overlap)\nEvery point on the number line = exactly one real number\nThe line has no "gaps".',
+    children:[
+      { id:'r1', label:'N⊂W⊂Z\n⊂Q⊂R', x:508, y:118, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Natural (N): {1, 2, 3, ...}\nWhole (W): {0, 1, 2, 3, ...} = N ∪ {0}\nIntegers (Z): {...−2,−1,0,1,2,...}\nRational (Q): all p/q, p,q∈Z, q≠0\nIrrational (Q′): cannot be p/q\nReal (R): Q ∪ Q′ = complete number line\nN ⊂ W ⊂ Z ⊂ Q ⊂ R (each set contains the previous)' },
+      { id:'r2', label:'Rational\nvs Irrational', x:540, y:245, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Rational numbers: terminating OR recurring decimals\nIrrational numbers: non-terminating non-recurring decimals\nEvery integer is rational (n = n/1)\nEvery terminating decimal is rational\nπ ≈ 3.14159... is irrational (often confused with 22/7)\n22/7 ≈ 3.14285... is rational but NOT equal to π!' },
+      { id:'r3', label:'Number\nLine', x:462, y:372, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Locating irrationals on the number line:\nConstruct right triangle: legs = 1,1 → hypotenuse = √2\nUse compass to mark √2 on number line.\nFor √3: legs = √2 and 1 → hypotenuse = √3\nFor √n: successive constructions\nThis shows irrationals exist as geometric lengths even before algebra!' },
+      { id:'r4', label:'Density\nProperty', x:298, y:388, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Between any two distinct real numbers:\n→ Infinitely many rationals exist\n→ Infinitely many irrationals exist\nBetween 0 and 1 alone:\n→ Uncountably many irrationals\n→ Countably many rationals\nSurprising fact: there are "more" irrational numbers than rational numbers! (Cantor, 1874)' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id) { return allNodes.find(n => n.id===id); }
+
+// ── pan / zoom ──
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; canvas.style.cursor='grabbing'; });
+canvas.addEventListener('mousemove', e => {
+  if(dragging){ ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x, dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10, window.innerHeight-230)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', () => { dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', () => { dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY); }, {passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart', e => {
+  if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2, cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', () => { dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.2,Math.min(3,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2; draw(); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // faint blue-grid background
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(56,189,248,.035)';
+  ctx.lineWidth=1;
+  for(let x=-1500;x<1500;x+=70){ ctx.beginPath(); ctx.moveTo(x,-1500); ctx.lineTo(x,1500); ctx.stroke(); }
+  for(let y=-1500;y<1500;y+=70){ ctx.beginPath(); ctx.moveTo(-1500,y); ctx.lineTo(1500,y); ctx.stroke(); }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  // edges
+  allEdges.forEach(e => {
+    const a=getNode(e.from), b=getNode(e.to);
+    if(!a||!b) return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0, a.stroke+'55');
+    grd.addColorStop(1, b.stroke+'22');
+    const cx=(a.x+b.x)/2+(b.y-a.y)*.15, cy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n => {
+    // glow
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?40:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    // border
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    // inner ring for center
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'33'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    // label
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=n.id==='c'?14:12;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

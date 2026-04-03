@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Real Numbers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+    --correct:#22c55e; --wrong:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,158,11,.04) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .dash { display:flex; justify-content:center; gap:.9rem; flex-wrap:wrap; padding:.8rem 1rem 1.2rem; }
+  .dcard { background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.6rem 1.2rem; text-align:center; min-width:84px; }
+  .dval { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; }
+  .dlbl { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:0 1rem 1.2rem; }
+  nav button { font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  nav button:hover { color:var(--text); }
+  nav button.active { border-color:var(--amber); color:var(--amber); background:rgba(245,158,11,.08); }
+
+  main { max-width:800px; margin:0 auto; padding:0 1rem 4rem; }
+
+  .q-card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:1rem; overflow:hidden; transition:box-shadow .2s;
+    animation:slideIn .3s ease both; }
+  .q-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.5); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-header { display:flex; align-items:flex-start; gap:.7rem; padding:1rem 1.1rem .7rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:.68rem; min-width:28px; height:28px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.45; flex:1; }
+  .q-meta { display:flex; gap:.35rem; flex-wrap:wrap; padding:0 1.1rem .7rem 4rem; }
+
+  .badge { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .48rem; border-radius:2px; }
+  .b-mcq    { background:rgba(56,189,248,.12);  color:var(--blue); }
+  .b-short  { background:rgba(34,197,94,.12);   color:var(--green); }
+  .b-long   { background:rgba(245,158,11,.12);  color:var(--amber); }
+  .b-assert { background:rgba(129,140,248,.12); color:var(--indigo); }
+  .b-1m { background:rgba(148,163,184,.08); color:#94a3b8; }
+  .b-2m { background:rgba(245,158,11,.1);   color:#fde68a; }
+  .b-3m { background:rgba(249,115,22,.1);   color:#fed7aa; }
+  .b-5m { background:rgba(239,68,68,.12);   color:#fca5a5; }
+
+  .strip-edl { border-left:4px solid var(--teal); }
+  .strip-fta { border-left:4px solid var(--amber); }
+  .strip-hl  { border-left:4px solid var(--blue); }
+  .strip-irr { border-left:4px solid var(--red); }
+  .strip-dec { border-left:4px solid var(--green); }
+  .strip-gen { border-left:4px solid #64748b; }
+
+  .mcq-body { padding:0 1.1rem .6rem; }
+  .mcq-opts { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; }
+  @media(max-width:480px){ .mcq-opts { grid-template-columns:1fr; } }
+  .opt-btn { display:flex; align-items:center; gap:.55rem; background:var(--card2);
+    border:1.5px solid var(--border); border-radius:8px; padding:.55rem .75rem;
+    cursor:pointer; transition:all .16s; text-align:left; color:var(--text);
+    font-family:'Lato',sans-serif; font-size:.82rem; font-weight:600; }
+  .opt-btn:hover:not(:disabled) { border-color:#2a4a6a; background:#0f2035; }
+  .opt-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; }
+  .opt-btn.correct { border-color:var(--correct); background:rgba(34,197,94,.1); color:#4ade80; }
+  .opt-btn.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,.08); color:#fca5a5; }
+  .feedback { font-size:.76rem; font-family:'DM Mono',monospace; padding:.35rem .7rem;
+    border-radius:6px; margin:.25rem 0 .5rem; display:none; }
+  .feedback.correct { background:rgba(34,197,94,.08);  color:#4ade80; display:block; }
+  .feedback.wrong   { background:rgba(239,68,68,.08); color:#f87171; display:block; }
+
+  .ans-reveal { overflow:hidden; max-height:0; transition:max-height .38s ease; }
+  .ans-reveal.open { max-height:900px; }
+  .ans-body { padding:.75rem 1.1rem 1rem; border-top:1px solid var(--border); }
+  .ans-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--green); margin-bottom:.4rem; }
+  .ans-text { font-size:.84rem; color:var(--text); line-height:1.75; }
+  .ans-text strong { color:var(--amber); }
+  .ans-text em { color:var(--teal); font-style:normal; }
+  .ans-mono { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--teal);
+    background:rgba(45,212,191,.06); border:1px solid rgba(45,212,191,.12);
+    border-radius:6px; padding:.5rem .75rem; margin:.4rem 0; line-height:1.8; }
+  .tip { font-size:.74rem; color:var(--amber); background:rgba(245,158,11,.06);
+    border-left:3px solid var(--amber); border-radius:0 6px 6px 0;
+    padding:.38rem .65rem; margin-top:.5rem; }
+
+  .show-btn { display:inline-flex; align-items:center; gap:.35rem; font-family:'Playfair Display',serif;
+    font-weight:700; font-size:.74rem; padding:.38rem .9rem; border-radius:3px;
+    border:1px solid var(--border); background:transparent; color:var(--muted);
+    cursor:pointer; transition:all .18s; margin:.15rem 0 .7rem 1.1rem; }
+  .show-btn:hover { color:var(--text); border-color:#2a4a6a; }
+  .show-btn.active { color:var(--green); border-color:var(--green); background:rgba(34,197,94,.06); }
+
+  .reset-bar { text-align:center; padding:1rem; }
+  .reset-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem;
+    padding:.55rem 1.6rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .reset-btn:hover { border-color:var(--red); color:var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Real Numbers · Mathematics Ch.1 · Class X CBSE · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval">30</div><div class="dlbl">Total</div></div>
+  <div class="dcard"><div class="dval" id="d-att" style="color:var(--amber)">0</div><div class="dlbl">Attempted</div></div>
+  <div class="dcard"><div class="dval" id="d-cor" style="color:var(--correct)">0</div><div class="dlbl">Correct</div></div>
+  <div class="dcard"><div class="dval" id="d-sc" style="color:var(--indigo)">0%</div><div class="dlbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filter('all',this)">All (30)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All</button></div>
+
+<script>
+const Q = [
+  // ── MCQ ──
+  {id:1,type:'mcq',topic:'edl',marks:1,
+   q:'Euclid\'s Division Lemma states that for positive integers a and b, there exist unique integers q and r such that a = bq + r. The constraint on r is:',
+   opts:['r > 0','0 < r < b','0 ≤ r < b','0 ≤ r ≤ b'],
+   ans:2,
+   explain:'The correct constraint is 0 ≤ r < b. The remainder r can be 0 (when b divides a exactly) but must be strictly less than b (the divisor). This is what makes q and r unique.'},
+
+  {id:2,type:'mcq',topic:'fta',marks:1,
+   q:'The prime factorisation of 360 is:',
+   opts:['2² × 3² × 5','2³ × 3 × 5 × 7','2³ × 3² × 5','2² × 3³ × 5'],
+   ans:2,
+   explain:'360 = 2 × 180 = 2 × 2 × 90 = 4 × 2 × 45 = 8 × 9 × 5 = 2³ × 3² × 5. Verify: 8 × 9 × 5 = 360 ✓'},
+
+  {id:3,type:'mcq',topic:'hl',marks:1,
+   q:'HCF(a, b) × LCM(a, b) = a × b. This formula holds for:',
+   opts:['Any number of integers','Exactly two positive integers only','All prime numbers','Three or more integers'],
+   ans:1,
+   explain:'The product formula HCF × LCM = a × b holds ONLY for exactly two positive integers. For three or more numbers, you must use prime factorisation separately — the analogous product formula does not hold.'},
+
+  {id:4,type:'mcq',topic:'edl',marks:1,
+   q:'Using Euclid\'s Algorithm, what is HCF(225, 135)?',
+   opts:['15','25','45','9'],
+   ans:2,
+   explain:'225 = 135×1 + 90 → 135 = 90×1 + 45 → 90 = 45×2 + 0. When remainder = 0, the last divisor (45) is the HCF. HCF(225,135) = 45.'},
+
+  {id:5,type:'mcq',topic:'irr',marks:1,
+   q:'Which of the following is irrational?',
+   opts:['√4','√9/√4','√(25/16)','√2 + √3'],
+   ans:3,
+   explain:'√4=2 (rational), √9/√4 = 3/2 (rational), √(25/16)=5/4 (rational). √2+√3 ≈ 1.414+1.732 = 3.146... — this cannot be expressed as p/q and is irrational.'},
+
+  {id:6,type:'mcq',topic:'dec',marks:1,
+   q:'Which of the following fractions has a terminating decimal?',
+   opts:['5/12','2/15','7/20','4/9'],
+   ans:2,
+   explain:'7/20: 20 = 2² × 5. Only factors 2 and 5 → terminating! 7/20 = 0.35. Check others: 12=2²×3 ✗, 15=3×5 ✗, 9=3² ✗.'},
+
+  {id:7,type:'mcq',topic:'hl',marks:1,
+   q:'Three bells ring every 6, 8 and 12 minutes. If they all ring together at 8:00 am, when will they next ring together?',
+   opts:['8:24 am','8:18 am','8:12 am','8:48 am'],
+   ans:0,
+   explain:'LCM(6,8,12): 6=2×3, 8=2³, 12=2²×3. LCM = 2³×3 = 24 minutes. They next ring together at 8:00 + 24 min = 8:24 am.'},
+
+  {id:8,type:'mcq',topic:'irr',marks:1,
+   q:'If p is a prime number and p divides a², then p divides:',
+   opts:['a² only','a also','√a','a and a² both'],
+   ans:1,
+   explain:'This is the key lemma used in proving √2 is irrational: "If prime p divides a², then p divides a." This follows from the uniqueness of prime factorisation (FTA). If p|a², then p appears in the prime factorisation of a², so it appears in the factorisation of a.'},
+
+  {id:9,type:'mcq',topic:'hl',marks:1,
+   q:'HCF of two numbers is 18 and their product is 3024. Their LCM is:',
+   opts:['168','252','336','126'],
+   ans:0,
+   explain:'HCF × LCM = product of numbers = 3024. LCM = 3024 ÷ 18 = 168.'},
+
+  {id:10,type:'mcq',topic:'dec',marks:1,
+   q:'The decimal expansion of 17/8 is:',
+   opts:['Non-terminating recurring','Terminating with 2 decimal places','Terminating with 3 decimal places','Non-terminating non-recurring'],
+   ans:2,
+   explain:'8 = 2³ (only factor 2, no 5). q = 2ⁿ × 5ᵐ form with m=0, n=3. So it terminates. 17/8 = 17÷8 = 2.125. Exactly 3 decimal places.'},
+
+  // ── ASSERTION-REASON ──
+  {id:11,type:'assert',topic:'fta',marks:1,
+   q:'Assertion (A): The prime factorisation of any natural number n > 1 is unique.\nReason (R): Every prime can be factorised further into smaller factors.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:2,
+   explain:'A is TRUE — this is exactly the Fundamental Theorem of Arithmetic. R is FALSE — primes CANNOT be factorised further (that is the definition of a prime number). So A is true but R is false.'},
+
+  {id:12,type:'assert',topic:'hl',marks:1,
+   q:'Assertion (A): HCF(a,b) × LCM(a,b) = a × b.\nReason (R): In prime factorisation, for each prime, the minimum power (for HCF) + maximum power (for LCM) = sum of powers in both numbers.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains A. For each prime pᵢ: min(aᵢ, bᵢ) + max(aᵢ, bᵢ) = aᵢ + bᵢ (a basic property of min/max). Multiplying over all primes gives HCF × LCM = a × b.'},
+
+  {id:13,type:'assert',topic:'irr',marks:1,
+   q:'Assertion (A): √2 is irrational.\nReason (R): The decimal expansion of √2 is non-terminating and non-recurring.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R is the correct explanation. A number is irrational if and only if its decimal expansion is non-terminating and non-recurring. √2 = 1.41421356… satisfies this. Additionally, there is a formal algebraic proof by contradiction that √2 cannot equal any p/q.'},
+
+  {id:14,type:'assert',topic:'dec',marks:1,
+   q:'Assertion (A): 1/7 has a non-terminating decimal expansion.\nReason (R): The denominator 7 has prime factors other than 2 and 5.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains A. The denominator 7 is a prime other than 2 or 5. By the rule for terminating decimals, 1/7 must be non-terminating (and actually recurring: 0.142857142857…). R directly causes A.'},
+
+  // ── SHORT ANSWER ──
+  {id:15,type:'short',topic:'edl',marks:3,
+   q:'Use Euclid\'s Division Algorithm to find HCF(870, 225). Verify your answer using prime factorisation.',
+   ans:'<strong>Using Euclid\'s Algorithm:</strong>\n870 = 225×3 + 195\n225 = 195×1 + 30\n195 = 30×6 + 15\n30 = 15×2 + 0\n∴ HCF(870, 225) = <strong>15</strong>\n\n<strong>Verification using FTA:</strong>\n870 = 2 × 3 × 5 × 29\n225 = 3² × 5²\nCommon primes: 3¹, 5¹ → HCF = 3×5 = <strong>15</strong> ✓',
+   tip:'Euclid: show each step clearly. Verify: write both prime factorisations and pick lowest common powers.'},
+
+  {id:16,type:'short',topic:'fta',marks:3,
+   q:'Find HCF and LCM of 12, 15 and 21 using prime factorisation.',
+   ans:'<strong>Prime Factorisations:</strong>\n12 = 2² × 3\n15 = 3 × 5\n21 = 3 × 7\n\n<strong>HCF</strong> = lowest power of common primes\nOnly common prime: 3¹\n∴ HCF = <strong>3</strong>\n\n<strong>LCM</strong> = highest power of all primes\nPrimes: 2, 3, 5, 7\n∴ LCM = 2² × 3 × 5 × 7 = <strong>420</strong>',
+   tip:'For three numbers: collect all prime factors, then HCF=lowest shared, LCM=highest all.'},
+
+  {id:17,type:'short',topic:'irr',marks:3,
+   q:'Prove that √3 is irrational.',
+   ans:'<strong>Proof by contradiction:</strong>\nAssume √3 = p/q where p, q are integers, q ≠ 0, and HCF(p, q) = 1.\n\n→ 3q² = p²\n→ 3 divides p² → 3 divides p (prime lemma)\n→ Let p = 3m\n→ 3q² = 9m² → q² = 3m²\n→ 3 divides q² → 3 divides q\n\nBoth p and q are divisible by 3 → HCF(p,q) ≥ 3.\n<strong>This contradicts HCF(p,q) = 1.</strong>\n∴ Our assumption was wrong → √3 is irrational ■',
+   tip:'Clearly state the assumption, do the algebra, find the contradiction, write the conclusion. 3 marks = all 4 steps needed.'},
+
+  {id:18,type:'short',topic:'hl',marks:2,
+   q:'Given HCF(306, 657) = 9. Find LCM(306, 657).',
+   ans:'Using the formula:\nHCF(a,b) × LCM(a,b) = a × b\n\n9 × LCM = 306 × 657\n9 × LCM = 201,042\nLCM = 201,042 ÷ 9\n∴ LCM(306, 657) = <strong>22,338</strong>',
+   tip:'Direct formula application. Compute 306×657 carefully: 300×657 + 6×657 = 197100+3942=201042.'},
+
+  {id:19,type:'short',topic:'dec',marks:2,
+   q:'Without performing division, determine whether 17/8 and 15/35 are terminating or non-terminating decimals.',
+   ans:'<strong>17/8:</strong>\n8 = 2³\nDenominator = 2³ × 5⁰ → only 2s and 5s ✓\n→ <strong>Terminating</strong> (17/8 = 2.125)\n\n<strong>15/35:</strong>\nSimplify: HCF(15,35)=5 → 15/35 = 3/7\n7 is prime (not 2 or 5) ✗\n→ <strong>Non-terminating recurring</strong>',
+   tip:'Always simplify the fraction first! 15/35 → 3/7. Then test denominator.'},
+
+  {id:20,type:'short',topic:'irr',marks:2,
+   q:'Show that 5 − √3 is irrational, given that √3 is irrational.',
+   ans:'Suppose 5 − √3 = r, where r is rational.\n\nThen √3 = 5 − r\n\nSince 5 is rational and r is rational, 5−r is rational.\n\nSo √3 = (rational number).\n\nBut this <strong>contradicts</strong> the fact that √3 is irrational.\n\n∴ Our assumption was wrong → <strong>5 − √3 is irrational</strong> ■',
+   tip:'Standard method: assume it\'s rational → show √3 would have to be rational → contradiction.'},
+
+  {id:21,type:'short',topic:'hl',marks:3,
+   q:'The HCF of two numbers is 23 and their LCM is 1449. If one number is 161, find the other number.',
+   ans:'Using HCF × LCM = a × b:\n23 × 1449 = 161 × b\n\n33,327 = 161 × b\nb = 33,327 ÷ 161\nb = <strong>207</strong>\n\n<strong>Verification:</strong>\n161 = 7 × 23\n207 = 9 × 23\nHCF = 23 ✓\nLCM = 7 × 9 × 23 = 1449 ✓',
+   tip:'Compute 23×1449 first. Then divide by 161. Always verify by checking HCF and LCM of your answer.'},
+
+  {id:22,type:'short',topic:'edl',marks:2,
+   q:'Use Euclid\'s Division Lemma to show that the square of any positive integer is of the form 3m or 3m+1 but never 3m+2.',
+   ans:'Any positive integer n can be written as:\nn = 3q, 3q+1, or 3q+2 (by Euclid\'s Lemma with b=3)\n\n<strong>Case 1: n=3q</strong>\nn² = 9q² = 3(3q²) = <em>3m</em>\n\n<strong>Case 2: n=3q+1</strong>\nn² = 9q²+6q+1 = 3(3q²+2q)+1 = <em>3m+1</em>\n\n<strong>Case 3: n=3q+2</strong>\nn² = 9q²+12q+4 = 3(3q²+4q+1)+1 = <em>3m+1</em>\n\n∴ n² is always 3m or 3m+1 — never 3m+2 ■',
+   tip:'Classic "form proof." Split into all possible remainders when dividing by 3. Show n² in each case.'},
+
+  {id:23,type:'short',topic:'fta',marks:2,
+   q:'Can two numbers have HCF 18 and LCM 380? Justify your answer.',
+   ans:'For any two numbers a and b, the <strong>HCF always divides the LCM</strong>.\n\nCheck: Does 18 divide 380?\n380 ÷ 18 = 21.11… — not an integer.\n∴ 18 does <strong>not</strong> divide 380.\n\nTherefore, <strong>no two numbers can have HCF 18 and LCM 380</strong>.',
+   tip:'Key property: HCF must divide LCM. Always check this first in "can it exist?" questions.'},
+
+  {id:24,type:'short',topic:'dec',marks:2,
+   q:'Express 0.6̄ (= 0.6666…) as a rational number p/q.',
+   ans:'Let x = 0.6̄ = 0.6666…\n\nThen 10x = 6.6666…\n\n10x − x = 6.6̄ − 0.6̄ = 6\n\n9x = 6\n\nx = 6/9 = <strong>2/3</strong>\n\nVerify: 2÷3 = 0.6666… ✓',
+   tip:'Multiply by 10 to shift the decimal one place. Subtract original. Solve for x.'},
+
+  // ── LONG ANSWER ──
+  {id:25,type:'long',topic:'fta',marks:5,
+   q:'State and prove the Fundamental Theorem of Arithmetic. Use it to find the HCF and LCM of 96 and 404. Also verify HCF × LCM = product of the two numbers.',
+   ans:'<strong>Statement:</strong>\nEvery composite number can be expressed (factorised) as a product of primes, and this factorisation is unique, ignoring the order of factors.\n\n<strong>Proof outline:</strong>\nExistence: Any n > 1 is either prime (trivially factorised) or has a factor, and each factor can be split further. Since factors decrease, the process ends at primes.\nUniqueness: Assume n = p₁×p₂×…×pₖ = q₁×q₂×…×qⱼ. Then p₁ | (q₁×…×qⱼ). Since p₁ is prime, p₁ | some qᵢ. Since qᵢ is prime, p₁ = qᵢ. Cancelling and repeating shows both factorisations are the same.\n\n<strong>Application — HCF and LCM of 96 and 404:</strong>\n96 = 2⁵ × 3\n404 = 2² × 101\n\nCommon prime: 2. Lowest power: 2²\nHCF = 2² = <strong>4</strong>\n\nAll primes: 2, 3, 101. Highest powers: 2⁵, 3, 101\nLCM = 2⁵ × 3 × 101 = 32 × 303 = <strong>9696</strong>\n\n<strong>Verification:</strong>\nHCF × LCM = 4 × 9696 = 38,784\na × b = 96 × 404 = 38,784 ✓',
+   tip:'5-mark answer: state theorem + outline proof (existence + uniqueness) + full computation + verification. All four parts needed.'},
+
+  {id:26,type:'long',topic:'irr',marks:5,
+   q:'Prove that √2 is irrational. Hence prove that (3 + 5√2) is also irrational.',
+   ans:'<strong>Part 1: Prove √2 is irrational</strong>\n\nAssume (for contradiction) that √2 = p/q where p, q are integers, q ≠ 0, and HCF(p,q) = 1.\n\nSquaring: 2 = p²/q² → p² = 2q²\n\nSince 2 | p², and 2 is prime → 2 | p (by the prime lemma).\nLet p = 2m. Then:\n(2m)² = 2q² → 4m² = 2q² → q² = 2m²\n\nSo 2 | q² → 2 | q.\n\nBoth p and q are divisible by 2 → HCF(p,q) ≥ 2.\nThis contradicts HCF(p,q) = 1.\n∴ √2 is irrational ■\n\n<strong>Part 2: Prove 3 + 5√2 is irrational</strong>\n\nSuppose 3 + 5√2 = r, where r is rational.\n\nThen: 5√2 = r − 3\n→ √2 = (r−3)/5\n\nSince r is rational, r−3 is rational, and (r−3)/5 is rational.\nSo √2 = rational.\n\nBut we just proved √2 is irrational. Contradiction!\n∴ 3 + 5√2 is irrational ■',
+   tip:'Part 1 = standard proof (5 clear steps). Part 2 = use Part 1 — assume rational, isolate √2, show it would be rational. Contradiction.'},
+
+  {id:27,type:'long',topic:'edl',marks:5,
+   q:'An army contingent of 616 members is to march behind an army band of 32 members. The two groups are to march in the same number of columns. What is the maximum number of columns? Also show the Euclid\'s Division steps fully.',
+   ans:'We need the maximum number of columns such that both 616 and 32 form complete rows. This means the number of columns must divide both 616 and 32 exactly.\n\n∴ Required: <strong>HCF(616, 32)</strong>\n\n<strong>Euclid\'s Division Algorithm:</strong>\n616 = 32 × 19 + 8\n  (32 × 19 = 608; 616−608=8)\n32 = 8 × 4 + 0\n\nRemainder = 0 → HCF = last divisor = <strong>8</strong>\n\n<strong>Maximum number of columns = 8</strong>\n\nVerification: 616 ÷ 8 = 77 rows for contingent ✓\n32 ÷ 8 = 4 rows for band ✓\n\n<strong>Prime factorisation check:</strong>\n616 = 2³ × 7 × 11\n32 = 2⁵\nHCF = 2³ = 8 ✓',
+   tip:'Identify what is being asked (HCF or LCM), apply algorithm, verify, and cross-check with FTA.'},
+
+  {id:28,type:'long',topic:'dec',marks:5,
+   q:'Explain with proof why the decimal expansion of a rational number p/q (in lowest terms) terminates if and only if q is of the form 2ⁿ × 5ᵐ. Give two examples each of terminating and non-terminating rational decimals.',
+   ans:'<strong>Theorem:</strong> p/q (in lowest terms) has a terminating decimal ⟺ q = 2ⁿ × 5ᵐ.\n\n<strong>Proof (⟹): If q = 2ⁿ × 5ᵐ, then p/q terminates</strong>\nMultiply numerator and denominator by 5ⁿ or 2ᵐ to make denominator = 10^max(n,m):\np/q = p × 5ⁿ⁻ᵐ / (2ⁿ × 5ⁿ) = [integer] / 10ⁿ\nThis is a finite decimal expression. ✓\n\n<strong>Proof (⟸): If p/q terminates, then q = 2ⁿ × 5ᵐ</strong>\nIf p/q = k/10ᴺ for some integer k and N, then q | 10ᴺ = 2ᴺ × 5ᴺ.\nSince HCF(p,q)=1 and p/q is in lowest terms, q divides 2ᴺ × 5ᴺ.\n∴ q = 2ⁿ × 5ᵐ where n ≤ N, m ≤ N. ✓\n\n<strong>Examples — Terminating:</strong>\n• 3/8: 8=2³ → 0.375\n• 7/20: 20=2²×5 → 0.35\n\n<strong>Examples — Non-terminating Recurring:</strong>\n• 1/3: 3 has factor 3 → 0.333…\n• 7/12: 12=2²×3 → 0.5833…',
+   tip:'Both directions of the proof needed. Show "if → then" AND "only if → then" directions. Plus examples.'},
+
+  {id:29,type:'short',topic:'edl',marks:3,
+   q:'Show that any positive odd integer is of the form 4q+1 or 4q+3 where q is some integer.',
+   ans:'Let n be any positive integer. By Euclid\'s Lemma (with b=4):\nn = 4q + r, where 0 ≤ r < 4.\nSo r ∈ {0, 1, 2, 3}.\n\n<strong>Case r=0:</strong> n = 4q → even (divisible by 4)\n<strong>Case r=1:</strong> n = 4q+1 → <em>odd</em> ✓\n<strong>Case r=2:</strong> n = 4q+2 = 2(2q+1) → even\n<strong>Case r=3:</strong> n = 4q+3 → <em>odd</em> ✓\n\nThe odd cases are r=1 and r=3 only.\n∴ Every positive odd integer is of the form <strong>4q+1 or 4q+3</strong> ■',
+   tip:'Classic form problem. Apply Euclid\'s Lemma with b=4, list all 4 cases, identify which are odd.'},
+
+  {id:30,type:'short',topic:'fta',marks:3,
+   q:'Find the largest number that will divide 2053 and 967 leaving remainders 5 and 7 respectively.',
+   ans:'The required number divides (2053−5) and (967−7) exactly.\n\n= Divides 2048 and 960\n\n∴ Required number = <strong>HCF(2048, 960)</strong>\n\n<strong>Using Euclid\'s Algorithm:</strong>\n2048 = 960×2 + 128\n960 = 128×7 + 64\n128 = 64×2 + 0\n\n∴ HCF = <strong>64</strong>\n\n<strong>Verification:</strong>\n2053 ÷ 64 = 32 remainder 5 ✓\n967 ÷ 64 = 15 remainder 7 ✓',
+   tip:'Subtract the remainders first. HCF of (2053−5) and (967−7) gives the largest divisor.'},
+];
+
+const state = {};
+let currentFilter = 'all';
+
+const topicStrip = {edl:'strip-edl',fta:'strip-fta',hl:'strip-hl',irr:'strip-irr',dec:'strip-dec',gen:'strip-gen'};
+const topicBg    = {edl:'rgba(45,212,191,.1)',fta:'rgba(245,158,11,.1)',hl:'rgba(56,189,248,.1)',irr:'rgba(244,63,94,.1)',dec:'rgba(34,197,94,.1)',gen:'rgba(100,116,139,.1)'};
+const topicCol   = {edl:'#2dd4bf',fta:'#f59e0b',hl:'#38bdf8',irr:'#f43f5e',dec:'#22c55e',gen:'#94a3b8'};
+const typeBadge  = {mcq:'b-mcq MCQ',short:'b-short Short Answer',long:'b-long Long Answer',assert:'b-assert Assertion–Reason'};
+const markBadge  = m => { const c={1:'b-1m',2:'b-2m',3:'b-3m',5:'b-5m'}[m]||'b-1m'; return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`; };
+
+function getVisible() { return currentFilter==='all'?Q:Q.filter(q=>q.type===currentFilter); }
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function renderMCQ(q) {
+  const s=state[q.id]||{}; const done=s.chosen!==undefined;
+  return `<div class="mcq-body">
+    <div class="mcq-opts">
+      ${q.opts.map((o,i)=>{
+        let cls='';
+        if(done){ if(i===q.ans)cls='correct'; else if(i===s.chosen&&i!==q.ans)cls='wrong'; }
+        return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+          <span class="opt-lbl">${String.fromCharCode(65+i)}</span>${o}</button>`;
+      }).join('')}
+    </div>
+    ${done?`<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+      ${s.chosen===q.ans?'✓ Correct!':'✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}</div>
+      <div class="ans-body" style="border-top:1px solid var(--border);padding:.6rem 0 .3rem">
+        <div class="ans-lbl">💡 Explanation</div>
+        <div class="ans-text">${q.explain}</div>
+      </div>`:''}
+  </div>`;
+}
+
+function renderShortLong(q) {
+  const s=state[q.id]||{}; const open=s.open;
+  const ansHtml=`<div class="ans-lbl">✅ Model Answer</div>
+    <div class="ans-mono">${(q.ans||'').replace(/\n/g,'<br>')}</div>
+    ${q.tip?`<div class="tip">🎯 Exam tip: ${q.tip}</div>`:''}`;
+  return `<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+    ${open?'▲ Hide Answer':'▼ Show Model Answer'}
+  </button>
+  <div class="ans-reveal ${open?'open':''}">
+    <div class="ans-body">${ansHtml}</div>
+  </div>`;
+}
+
+function render() {
+  const list=getVisible(); const el=document.getElementById('qlist');
+  el.innerHTML=list.map((q,i)=>{
+    const tb=typeBadge[q.type].split(' ');
+    return `<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert'?renderMCQ(q):renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id,idx) {
+  const q=Q.find(x=>x.id===id); if(!q||state[id]?.chosen!==undefined)return;
+  if(!state[id])state[id]={};
+  state[id].chosen=idx;
+  updateDash();
+  const visible=getVisible(), i=visible.findIndex(x=>x.id===id);
+  const tb=typeBadge[q.type].split(' ');
+  const newHtml=`<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta"><span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>${markBadge(q.marks)}</div>
+    ${renderMCQ(q)}
+  </div>`;
+  const el=document.getElementById('qcard-'+id);
+  const tmp=document.createElement('div'); tmp.innerHTML=newHtml;
+  el.replaceWith(tmp.firstElementChild);
+}
+
+function toggleAns(id) {
+  if(!state[id])state[id]={};
+  state[id].open=!state[id].open;
+  if(!state[id].viewed){state[id].viewed=true;updateDash();}
+  const btn=document.querySelector(`#qcard-${id} .show-btn`);
+  const rev=document.querySelector(`#qcard-${id} .ans-reveal`);
+  if(btn&&rev){
+    const open=state[id].open;
+    btn.classList.toggle('active',open);
+    btn.textContent=open?'▲ Hide Answer':'▼ Show Model Answer';
+    rev.classList.toggle('open',open);
+  }
+}
+
+function updateDash() {
+  const att=Object.keys(state).length;
+  const cor=Q.filter(q=>state[q.id]?.chosen===q.ans).length;
+  const mcqTotal=Q.filter(q=>q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-att').textContent=att;
+  document.getElementById('d-cor').textContent=cor;
+  document.getElementById('d-sc').textContent=mcqTotal>0?Math.round((cor/mcqTotal)*100)+'%':'—';
+}
+
+function resetAll(){for(const k in state)delete state[k];updateDash();render();}
+render();
+</script>
+</body>
+</html>

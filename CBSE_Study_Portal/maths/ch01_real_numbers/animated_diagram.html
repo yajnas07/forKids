@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Numbers — Animated Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 55% 40% at 20% 10%, rgba(245,158,11,.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 85%, rgba(56,189,248,.03) 0%, transparent 55%);
+  }
+
+  header { text-align:center; padding:1.8rem 1rem 1.2rem; border-bottom:1px solid var(--border); }
+  header h1 {
+    font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900;
+    color:var(--amber);
+  }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.73rem; margin-top:.3rem; }
+
+  /* ── nav tabs ── */
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:1.1rem 1rem .5rem; }
+  nav button {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.78rem;
+    padding:.42rem 1.05rem; border-radius:4px;
+    border:1px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .22s;
+  }
+  nav button:hover { color:var(--text); border-color:#2a3f5a; }
+  nav button.a-num  { border-color:var(--indigo); color:var(--indigo); background:rgba(129,140,248,.08); }
+  nav button.a-euc  { border-color:var(--teal);   color:var(--teal);   background:rgba(45,212,191,.08); }
+  nav button.a-fta  { border-color:var(--amber);  color:var(--amber);  background:rgba(245,158,11,.08); }
+  nav button.a-hl   { border-color:var(--blue);   color:var(--blue);   background:rgba(56,189,248,.08); }
+  nav button.a-dec  { border-color:var(--green);  color:var(--green);  background:rgba(34,197,94,.08); }
+
+  main { max-width:860px; margin:0 auto; padding:1rem 1rem 4rem; }
+  section { display:none; animation:fadeUp .35s ease; }
+  section.vis { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title {
+    font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:900;
+    margin-bottom:1.1rem; display:flex; align-items:center; gap:.5rem;
+  }
+
+  /* ── cards ── */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:.85rem; margin-bottom:1.2rem; }
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; transition:transform .18s, box-shadow .18s;
+  }
+  .card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.55); }
+  .card h3 { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; margin-bottom:.5rem; }
+  .card p, .card li { font-size:.82rem; color:var(--muted); line-height:1.7; }
+  .card ul { padding-left:1.1rem; }
+  .tag { display:inline-block; font-size:.63rem; font-family:'DM Mono',monospace;
+    padding:.1rem .48rem; border-radius:3px; margin-bottom:.45rem; }
+
+  /* ── math box ── */
+  .mbox {
+    background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    padding:.85rem 1.1rem; margin-bottom:.9rem;
+    font-family:'DM Mono',monospace; font-size:.83rem; line-height:1.8;
+  }
+  .mbox .label { font-family:'Playfair Display',serif; font-size:.75rem; color:var(--muted); margin-bottom:.35rem; }
+  .mbox .formula { font-size:1.05rem; color:var(--amber); font-weight:500; }
+  .mbox .sub { font-size:.76rem; color:var(--muted); margin-top:.3rem; }
+
+  /* ── number hierarchy ── */
+  .hierarchy { display:flex; flex-direction:column; gap:.6rem; margin-bottom:1rem; }
+  .h-level {
+    border-radius:10px; padding:.7rem 1.1rem;
+    display:flex; align-items:center; gap:.8rem;
+    border:1px solid; position:relative; cursor:default;
+  }
+  .h-sym { font-family:'DM Mono',monospace; font-size:1.1rem; font-weight:500; min-width:28px; }
+  .h-name { font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .h-desc { font-size:.78rem; color:var(--muted); margin-top:.15rem; }
+  .h-ex { font-family:'DM Mono',monospace; font-size:.7rem; }
+
+  /* ── euclid stepper ── */
+  .stepper-box {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.2rem; margin-bottom:1rem;
+  }
+  .stepper-box h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.8rem; }
+  .step-input { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:.9rem; }
+  .step-input input {
+    flex:1; min-width:80px; max-width:140px;
+    background:var(--card2); border:1px solid var(--border); border-radius:6px;
+    padding:.45rem .7rem; color:var(--text); font-family:'DM Mono',monospace; font-size:.88rem;
+    outline:none; transition:border-color .2s;
+  }
+  .step-input input:focus { border-color:var(--teal); }
+  .calc-btn {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.8rem;
+    padding:.45rem 1.1rem; border-radius:4px; border:1px solid var(--teal);
+    background:rgba(45,212,191,.1); color:var(--teal); cursor:pointer; transition:all .2s;
+  }
+  .calc-btn:hover { background:rgba(45,212,191,.2); }
+  .steps-list { display:flex; flex-direction:column; gap:.4rem; }
+  .step-row {
+    font-family:'DM Mono',monospace; font-size:.83rem;
+    background:var(--card2); border:1px solid var(--border); border-radius:7px;
+    padding:.5rem .85rem; animation:fadeUp .3s ease;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .step-row .s-num { color:var(--muted); min-width:22px; font-size:.7rem; }
+  .step-row .s-eq { color:var(--text); flex:1; }
+  .step-row .s-note { font-size:.7rem; color:var(--teal); }
+  .step-row.final { border-color:var(--teal); background:rgba(45,212,191,.06); }
+  .step-row.final .s-note { color:var(--green); font-weight:700; }
+
+  /* ── factor tree ── */
+  .ftree {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; margin-bottom:.9rem;
+  }
+  .ftree h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.7rem; }
+  .tree-display {
+    font-family:'DM Mono',monospace; font-size:.82rem; line-height:2;
+    color:var(--text); text-align:center;
+    padding:.6rem; overflow-x:auto;
+  }
+  .prime { color:var(--amber); font-weight:500; }
+  .composite { color:var(--blue); }
+  .tree-line { color:var(--muted); }
+
+  /* ── comparison table ── */
+  .cmp-table {
+    width:100%; border-collapse:collapse; margin-bottom:1rem;
+    font-size:.82rem;
+  }
+  .cmp-table th {
+    background:var(--card2); color:var(--text);
+    font-family:'Playfair Display',serif; font-weight:700;
+    padding:.6rem .8rem; border:1px solid var(--border); text-align:left;
+  }
+  .cmp-table td {
+    padding:.55rem .8rem; border:1px solid var(--border);
+    vertical-align:top; line-height:1.55; color:var(--muted);
+  }
+  .cmp-table tr:hover td { background:rgba(56,189,248,.03); }
+  .cmp-table td:first-child { color:var(--text); font-weight:700; font-family:'DM Mono',monospace; font-size:.76rem; }
+  .cmp-table td.yes { color:var(--green); font-weight:700; }
+  .cmp-table td.no  { color:var(--red); }
+
+  /* ── timeline-like key steps ── */
+  .steps { position:relative; padding-left:2rem; margin-bottom:1rem; }
+  .steps::before {
+    content:''; position:absolute; left:.6rem; top:0; bottom:0;
+    width:2px; border-radius:2px;
+    background:linear-gradient(to bottom, var(--teal), var(--amber), var(--blue), var(--green));
+  }
+  .step-item {
+    position:relative; margin-bottom:.85rem;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.75rem 1rem; animation:slideIn .35s ease both;
+  }
+  .step-item::before {
+    content:''; position:absolute; left:-1.5rem; top:50%; transform:translateY(-50%);
+    width:10px; height:10px; border-radius:50%;
+    background:var(--bg); border:2px solid currentColor;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+  .step-item .s-label { font-family:'DM Mono',monospace; font-size:.67rem; margin-bottom:.28rem; }
+  .step-item .s-title { font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; margin-bottom:.22rem; }
+  .step-item .s-body  { font-size:.8rem; color:var(--muted); line-height:1.6; }
+
+  /* ── decimal classifier ── */
+  .dec-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.8rem; margin-bottom:1rem; }
+  .dec-card {
+    border-radius:12px; padding:1rem; border:1px solid; border-left-width:4px;
+    transition:transform .2s;
+  }
+  .dec-card:hover { transform:translateY(-2px); }
+  .dec-card h3 { font-family:'Playfair Display',serif; font-weight:700; font-size:.9rem; margin-bottom:.35rem; }
+  .dec-card .ex { font-family:'DM Mono',monospace; font-size:.76rem; margin:.25rem 0; }
+  .dec-card p { font-size:.78rem; color:var(--muted); line-height:1.6; }
+
+  /* ── proof box ── */
+  .proof-box {
+    background:rgba(244,63,94,.04); border:1px solid rgba(244,63,94,.2); border-left:4px solid var(--red);
+    border-radius:0 10px 10px 0; padding:.9rem 1.1rem; margin-bottom:.9rem;
+  }
+  .proof-box h3 { font-family:'Playfair Display',serif; font-weight:700; color:var(--red); margin-bottom:.5rem; font-size:.92rem; }
+  .proof-box ol { padding-left:1.3rem; font-size:.82rem; color:var(--muted); line-height:1.8; }
+  .proof-box li strong { color:var(--text); }
+  .proof-box .qed { text-align:right; font-family:'DM Mono',monospace; font-size:.76rem; color:var(--red); margin-top:.4rem; }
+
+  /* ── worked example ── */
+  .worked {
+    background:rgba(56,189,248,.04); border:1px solid rgba(56,189,248,.15); border-radius:10px;
+    padding:.9rem 1.1rem; margin-bottom:.9rem;
+  }
+  .worked h3 { font-family:'Playfair Display',serif; font-weight:700; color:var(--blue); margin-bottom:.5rem; font-size:.88rem; }
+  .worked .w-steps { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--text); line-height:1.9; }
+  .worked .w-ans { color:var(--green); font-weight:700; margin-top:.3rem; font-size:.82rem; }
+  .worked .w-note { color:var(--muted); font-size:.76rem; margin-top:.25rem; }
+
+  /* ── tip ── */
+  .tip {
+    background:rgba(245,158,11,.05); border-left:3px solid var(--amber);
+    border-radius:0 8px 8px 0; padding:.5rem .9rem;
+    font-size:.78rem; color:var(--amber); margin:.6rem 0 .9rem;
+  }
+
+  /* info box */
+  .info-block {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.85rem 1.1rem; margin-bottom:.9rem;
+  }
+  .info-block h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.5rem; font-size:.92rem; }
+  .info-block p, .info-block li { font-size:.82rem; color:var(--muted); line-height:1.7; }
+  .info-block ul { padding-left:1.1rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Real Numbers</h1>
+  <p>Class X · Mathematics Ch.1 · Interactive Diagrams &amp; Explanations</p>
+</header>
+
+<nav>
+  <button class="a-num" onclick="show('num',this,'a-num')">🔢 Number System</button>
+  <button onclick="show('euc',this,'a-euc')">📐 Euclid's Algorithm</button>
+  <button onclick="show('fta',this,'a-fta')">🌳 FTA</button>
+  <button onclick="show('hl',this,'a-hl')">⚖️ HCF &amp; LCM</button>
+  <button onclick="show('dec',this,'a-dec')">🔣 Decimal Types</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════ NUMBER SYSTEM ═══════════════ -->
+<section id="sec-num" class="vis">
+  <div class="sec-title" style="color:var(--indigo)">🔢 The Real Number System</div>
+
+  <div class="mbox">
+    <div class="label">Core Relationship</div>
+    <div class="formula">Real Numbers (ℝ) = Rational (ℚ) ∪ Irrational (ℚ′)</div>
+    <div class="sub">ℚ and ℚ′ are completely disjoint sets — a number cannot be both rational and irrational.</div>
+  </div>
+
+  <div class="hierarchy">
+    <div class="h-level" style="border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.05)">
+      <div class="h-sym" style="color:var(--indigo)">ℝ</div>
+      <div><div class="h-name">Real Numbers</div><div class="h-desc">Every point on the number line. Contains all rational AND irrational numbers.</div><div class="h-ex" style="color:var(--indigo)">√2, π, 3/4, −7, 0, e ∈ ℝ</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+      <div class="h-level" style="border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.05)">
+        <div class="h-sym" style="color:var(--blue)">ℚ</div>
+        <div><div class="h-name">Rational Numbers</div><div class="h-desc">Any number = p/q where p,q ∈ ℤ and q ≠ 0</div><div class="h-ex" style="color:var(--blue)">3/4, −7/2, 5, 0, 0.333…</div></div>
+      </div>
+      <div class="h-level" style="border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.05)">
+        <div class="h-sym" style="color:var(--red)">ℚ′</div>
+        <div><div class="h-name">Irrational Numbers</div><div class="h-desc">Cannot be written as p/q. Non-terminating non-recurring decimal.</div><div class="h-ex" style="color:var(--red)">√2, √3, π, e, √5</div></div>
+      </div>
+    </div>
+    <div class="h-level" style="border-color:rgba(56,189,248,.2);background:rgba(56,189,248,.03)">
+      <div class="h-sym" style="color:var(--blue)">ℤ</div>
+      <div><div class="h-name">Integers</div><div class="h-desc">All whole numbers and their negatives. Subset of ℚ (every integer = n/1).</div><div class="h-ex" style="color:var(--blue)">…−3, −2, −1, 0, 1, 2, 3…</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+      <div class="h-level" style="border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.04)">
+        <div class="h-sym" style="color:var(--green)">ℤ⁻</div>
+        <div><div class="h-name">Negative Integers</div><div class="h-ex" style="color:var(--green)">−1, −2, −3, …</div></div>
+      </div>
+      <div class="h-level" style="border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.04)">
+        <div class="h-sym" style="color:var(--green)">𝕎</div>
+        <div><div class="h-name">Whole Numbers</div><div class="h-ex" style="color:var(--green)">0, 1, 2, 3, …</div></div>
+      </div>
+    </div>
+    <div class="h-level" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)">
+      <div class="h-sym" style="color:var(--amber)">ℕ</div>
+      <div><div class="h-name">Natural Numbers</div><div class="h-desc">Counting numbers. The smallest subset. N ⊂ W ⊂ Z ⊂ Q ⊂ R</div><div class="h-ex" style="color:var(--amber)">1, 2, 3, 4, 5, …</div></div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">Key Fact</div>
+      <h3>22/7 ≠ π</h3>
+      <p>22/7 ≈ 3.14285… is a rational number. π ≈ 3.14159… is irrational. They are not equal — 22/7 is just a common approximation of π used in calculations.</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(129,140,248,.12);color:var(--indigo)">Number Line</div>
+      <h3>Locating √2 geometrically</h3>
+      <p>Draw a right triangle with both legs = 1 unit. By Pythagoras, hypotenuse = √2. Use a compass to mark this length on the number line at a point right of 1. This is the geometric home of √2.</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(244,63,94,.12);color:var(--red)">Density</div>
+      <h3>Infinitely many between any two</h3>
+      <p>Between any two distinct real numbers there are infinitely many rationals AND infinitely many irrationals. Surprisingly, there are far more irrationals than rationals (Cantor, 1874).</p>
+    </div>
+  </div>
+
+  <div class="tip">💡 Remember the subset chain with: "<strong>N</strong>ice <strong>W</strong>ild <strong>Z</strong>ebras <strong>Q</strong>uickly <strong>R</strong>oam" → N ⊂ W ⊂ Z ⊂ Q ⊂ R</div>
+</section>
+
+<!-- ═══════════════ EUCLID'S ALGORITHM ═══════════════ -->
+<section id="sec-euc">
+  <div class="sec-title" style="color:var(--teal)">📐 Euclid's Division Algorithm</div>
+
+  <div class="mbox">
+    <div class="label">Euclid's Division Lemma (statement)</div>
+    <div class="formula">a = bq + r &nbsp;&nbsp; where 0 ≤ r &lt; b</div>
+    <div class="sub">For any positive integers a and b, there exist unique integers q and r satisfying the above. (a = dividend, b = divisor, q = quotient, r = remainder)</div>
+  </div>
+
+  <div class="stepper-box">
+    <h3 style="color:var(--teal)">🔢 Interactive HCF Calculator</h3>
+    <div class="step-input">
+      <input type="number" id="inp-a" placeholder="Enter a" value="225" min="1">
+      <input type="number" id="inp-b" placeholder="Enter b" value="135" min="1">
+      <button class="calc-btn" onclick="runEuclid()">Find HCF</button>
+    </div>
+    <div id="euclid-steps" class="steps-list"></div>
+  </div>
+
+  <div class="steps">
+    <div class="step-item" style="color:var(--teal)">
+      <div class="s-label" style="color:var(--teal)">Step 1</div>
+      <div class="s-title">Write the division equation</div>
+      <div class="s-body">Divide the larger number by the smaller. Write in the form a = bq + r. Identify the remainder r.</div>
+    </div>
+    <div class="step-item" style="color:var(--amber)">
+      <div class="s-label" style="color:var(--amber)">Step 2</div>
+      <div class="s-title">Is remainder = 0?</div>
+      <div class="s-body">If r = 0: the divisor b is the HCF — you're done!<br>If r ≠ 0: continue to Step 3.</div>
+    </div>
+    <div class="step-item" style="color:var(--blue)">
+      <div class="s-label" style="color:var(--blue)">Step 3</div>
+      <div class="s-title">Replace a ← b, b ← r</div>
+      <div class="s-body">The old divisor becomes the new dividend. The remainder becomes the new divisor. Go back to Step 1.</div>
+    </div>
+    <div class="step-item" style="color:var(--green)">
+      <div class="s-label" style="color:var(--green)">Step 4</div>
+      <div class="s-title">HCF = last non-zero remainder</div>
+      <div class="s-body">Keep repeating until remainder = 0. The last non-zero remainder (which is also the last non-zero divisor) is the HCF.</div>
+    </div>
+  </div>
+
+  <div class="worked">
+    <h3>📝 Worked Example — HCF(870, 225)</h3>
+    <div class="w-steps">
+      870 = 225 × 3 + 195<br>
+      225 = 195 × 1 + 30<br>
+      195 = 30 × 6 + 15<br>
+      30 &nbsp;= 15 × 2 + 0
+    </div>
+    <div class="w-ans">∴ HCF(870, 225) = 15</div>
+    <div class="w-note">4 steps only! Compare this to listing all factors manually — much more efficient for large numbers.</div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(45,212,191,.1);color:var(--teal)">Application</div>
+      <h3>Word Problem — Equal Pieces</h3>
+      <p>Ropes of 840 cm and 560 cm need to be cut into equal lengths with no waste. Find the maximum length of each piece.</p>
+      <p style="margin-top:.5rem;font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal)">HCF(840, 560)<br>840 = 560×1+280<br>560 = 280×2+0<br>∴ Max length = 280 cm</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(245,158,11,.1);color:var(--amber)">Application</div>
+      <h3>Three Numbers: HCF(12, 18, 24)</h3>
+      <p>Apply algorithm twice:</p>
+      <p style="margin-top:.4rem;font-family:'DM Mono',monospace;font-size:.76rem;color:var(--amber)">HCF(12,18):<br>18=12×1+6, 12=6×2+0 → 6<br>HCF(6,24):<br>24=6×4+0 → 6<br>∴ HCF(12,18,24) = 6</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FTA ═══════════════ -->
+<section id="sec-fta">
+  <div class="sec-title" style="color:var(--amber)">🌳 Fundamental Theorem of Arithmetic</div>
+
+  <div class="mbox">
+    <div class="label">The Theorem</div>
+    <div class="formula">Every composite number = product of primes in a UNIQUE way</div>
+    <div class="sub">The prime factorisation of any natural number n > 1 is unique (ignoring the order of factors). Primes are the indivisible "building blocks" of all integers.</div>
+  </div>
+
+  <div class="ftree">
+    <h3 style="color:var(--amber)">Factor Trees — Visual Prime Factorisation</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:.4rem">EXAMPLE 1 — Factorise 360</div>
+        <div class="tree-display">
+          <span class="composite">360</span><br>
+          <span class="tree-line">╱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲</span><br>
+          <span class="prime">2</span>&nbsp;&nbsp;<span class="composite">180</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">2</span>&nbsp;&nbsp;<span class="composite">90</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">2</span>&nbsp;&nbsp;<span class="composite">45</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">3</span>&nbsp;&nbsp;<span class="composite">15</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">3</span>&nbsp;&nbsp;<span class="prime">5</span>
+        </div>
+        <div style="text-align:center;font-family:'DM Mono',monospace;font-size:.82rem;margin-top:.5rem">
+          360 = <span class="prime">2³ × 3² × 5</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:.4rem">EXAMPLE 2 — Factorise 420</div>
+        <div class="tree-display">
+          <span class="composite">420</span><br>
+          <span class="tree-line">╱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲</span><br>
+          <span class="prime">2</span>&nbsp;&nbsp;<span class="composite">210</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">2</span>&nbsp;&nbsp;<span class="composite">105</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">3</span>&nbsp;&nbsp;<span class="composite">35</span><br>
+          <span class="tree-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;╲</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prime">5</span>&nbsp;&nbsp;<span class="prime">7</span>
+        </div>
+        <div style="text-align:center;font-family:'DM Mono',monospace;font-size:.82rem;margin-top:.5rem">
+          420 = <span class="prime">2² × 3 × 5 × 7</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="worked">
+    <h3>📝 HCF and LCM using FTA — HCF(360, 420)</h3>
+    <div class="w-steps">
+      360 = 2³ × 3² × 5¹<br>
+      420 = 2² × 3¹ × 5¹ × 7¹<br><br>
+      HCF = lowest power of common primes<br>
+      Common primes: 2, 3, 5<br>
+      HCF = 2² × 3¹ × 5¹ = 4 × 3 × 5 = <strong>60</strong><br><br>
+      LCM = highest power of all primes<br>
+      All primes: 2, 3, 5, 7<br>
+      LCM = 2³ × 3² × 5¹ × 7¹ = 8 × 9 × 5 × 7 = <strong>2520</strong>
+    </div>
+    <div class="w-ans">Verify: HCF × LCM = 60 × 2520 = 151,200 = 360 × 420 ✓</div>
+  </div>
+
+  <div class="tip">💡 HCF → pick LOWEST powers of COMMON primes. LCM → pick HIGHEST powers of ALL primes. Easy mnemonic: HCF = "Humble" (low), LCM = "Large" (high).</div>
+
+  <div class="info-block">
+    <h3 style="color:var(--amber)">Why is this "Fundamental"?</h3>
+    <ul>
+      <li>Without uniqueness of prime factorisation, HCF and LCM calculations would be ambiguous</li>
+      <li>All of cryptography (RSA encryption) relies on the difficulty of finding prime factorisations of very large numbers</li>
+      <li>The theorem was proven by Euclid but was made rigorous by Gauss in 1801</li>
+      <li>Every rational number p/q (in lowest terms) has a unique prime factorisation for both p and q</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ HCF & LCM ═══════════════ -->
+<section id="sec-hl">
+  <div class="sec-title" style="color:var(--blue)">⚖️ HCF and LCM</div>
+
+  <div class="mbox">
+    <div class="label">Golden Formula (for two numbers only)</div>
+    <div class="formula">HCF(a, b) × LCM(a, b) = a × b</div>
+    <div class="sub">Proof: In prime factorisation, for each prime pᵢ: min(power in a, power in b) + max(power in a, power in b) = (power in a) + (power in b). So product of all min powers × product of all max powers = a × b.</div>
+  </div>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th style="color:var(--teal)">Euclid's Division</th>
+        <th style="color:var(--amber)">Prime Factorisation (FTA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Finds</td><td class="yes">HCF only</td><td class="yes">HCF and LCM both</td></tr>
+      <tr><td>Best for</td><td>Large numbers</td><td>Smaller numbers; when LCM needed</td></tr>
+      <tr><td>Steps</td><td>Division steps until remainder = 0</td><td>Factor tree + compare powers</td></tr>
+      <tr><td>Three numbers</td><td>Apply twice sequentially</td><td>Same formula works directly</td></tr>
+      <tr><td>Works if one number is prime?</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>Can make arithmetic errors?</td><td>Less likely (only division)</td><td>More likely (factorisation of large numbers)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(56,189,248,.1);color:var(--blue)">Co-prime</div>
+      <h3>HCF = 1 → Co-prime</h3>
+      <p>If HCF(a,b) = 1, then a and b are co-prime (relatively prime). In this case LCM = a × b.</p>
+      <p style="margin-top:.5rem;font-family:'DM Mono',monospace;font-size:.76rem;color:var(--blue)">Example: HCF(8,15) = 1<br>→ LCM = 8 × 15 = 120<br>Note: 8 and 15 are not prime — but they are co-prime!</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(244,63,94,.1);color:var(--red)">Caution!</div>
+      <h3>Formula for 3 numbers?</h3>
+      <p>HCF(a,b,c) × LCM(a,b,c) ≠ a × b × c in general!</p>
+      <p style="margin-top:.4rem;font-family:'DM Mono',monospace;font-size:.76rem;color:var(--red)">For 3 numbers, always use prime factorisation. The product formula ONLY holds for exactly two numbers.</p>
+    </div>
+  </div>
+
+  <div class="worked">
+    <h3>📝 Word Problem — Bells Ringing Together</h3>
+    <div class="w-steps">
+      Three bells ring every 6, 8, and 12 minutes respectively.<br>
+      If they all ring together at 8:00 am,<br>
+      when will they next ring together?<br><br>
+      LCM(6, 8, 12):<br>
+      6 = 2 × 3<br>
+      8 = 2³<br>
+      12 = 2² × 3<br>
+      LCM = 2³ × 3 = 24 minutes
+    </div>
+    <div class="w-ans">They will next ring together at 8:24 am</div>
+  </div>
+
+  <div class="worked">
+    <h3>📝 Word Problem — Remainder Questions</h3>
+    <div class="w-steps">
+      Find the largest number that divides 626, 3127, and 15628,<br>
+      leaving remainders 1, 2, and 3 respectively.<br><br>
+      Required: largest divisor of (626−1), (3127−2), (15628−3)<br>
+      = HCF(625, 3125, 15625)<br>
+      625 = 5⁴,  3125 = 5⁵,  15625 = 5⁶<br>
+      HCF = 5⁴ = 625
+    </div>
+    <div class="w-ans">Answer: 625</div>
+    <div class="w-note">Key insight: subtract the given remainders before finding HCF.</div>
+  </div>
+
+  <div class="tip">💡 "HCF when dividing equally; LCM when combining cycles." — The best mental rule for choosing between them in word problems.</div>
+</section>
+
+<!-- ═══════════════ DECIMAL EXPANSIONS ═══════════════ -->
+<section id="sec-dec">
+  <div class="sec-title" style="color:var(--green)">🔣 Decimal Expansions of Rational Numbers</div>
+
+  <div class="mbox">
+    <div class="label">The Rule for Terminating Decimals</div>
+    <div class="formula">p/q terminates ⟺ q = 2ⁿ × 5ᵐ (in lowest terms)</div>
+    <div class="sub">The denominator (after fully reducing the fraction) must have only 2s and/or 5s as prime factors. Any other prime factor in q → non-terminating decimal.</div>
+  </div>
+
+  <div class="dec-grid">
+    <div class="dec-card" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)">
+      <h3 style="color:var(--green)">✓ Terminating</h3>
+      <p>Decimal ends after a finite number of digits.</p>
+      <div class="ex" style="color:var(--green)">3/8 = 0.375</div>
+      <div class="ex" style="color:var(--green)">7/20 = 0.35</div>
+      <div class="ex" style="color:var(--green)">1/4 = 0.25</div>
+      <p style="margin-top:.4rem">Denominator = 2ⁿ × 5ᵐ only.<br>8 = 2³ ✓ | 20 = 2² × 5 ✓</p>
+    </div>
+    <div class="dec-card" style="border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.04)">
+      <h3 style="color:var(--blue)">↻ Non-term. Recurring</h3>
+      <p>Decimal goes on forever but a block repeats.</p>
+      <div class="ex" style="color:var(--blue)">1/3 = 0.333… = 0.3̄</div>
+      <div class="ex" style="color:var(--blue)">1/7 = 0.142857142857…</div>
+      <div class="ex" style="color:var(--blue)">5/6 = 0.8333… = 0.83̄</div>
+      <p style="margin-top:.4rem">Denominator has other prime factors.<br>3 has factor 3 | 6 = 2 × 3 ✓/✗</p>
+    </div>
+    <div class="dec-card" style="border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.04)">
+      <h3 style="color:var(--red)">∞ Non-term. Non-recurring</h3>
+      <p>Decimal goes on forever with NO repeating block.</p>
+      <div class="ex" style="color:var(--red)">√2 = 1.41421356…</div>
+      <div class="ex" style="color:var(--red)">π = 3.14159265…</div>
+      <div class="ex" style="color:var(--red)">e = 2.71828182…</div>
+      <p style="margin-top:.4rem">Always irrational — cannot be p/q. Not possible for any rational number.</p>
+    </div>
+  </div>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>Fraction</th>
+        <th>Denominator factors</th>
+        <th>Type</th>
+        <th>Decimal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>3/8</td><td style="color:var(--green)">2³ only ✓</td><td style="color:var(--green)">Terminating</td><td style="font-family:'DM Mono',monospace;font-size:.76rem">0.375</td></tr>
+      <tr><td>7/20</td><td style="color:var(--green)">2² × 5 only ✓</td><td style="color:var(--green)">Terminating</td><td style="font-family:'DM Mono',monospace;font-size:.76rem">0.35</td></tr>
+      <tr><td>1/6</td><td style="color:var(--red)">2 × 3 — has 3 ✗</td><td style="color:var(--blue)">Non-term. Recurring</td><td style="font-family:'DM Mono',monospace;font-size:.76rem">0.1666… = 0.16̄</td></tr>
+      <tr><td>2/11</td><td style="color:var(--red)">11 — prime ✗</td><td style="color:var(--blue)">Non-term. Recurring</td><td style="font-family:'DM Mono',monospace;font-size:.76rem">0.181818… = 0.18̄</td></tr>
+      <tr><td>7/12</td><td style="color:var(--red)">2² × 3 — has 3 ✗</td><td style="color:var(--blue)">Non-term. Recurring</td><td style="font-family:'DM Mono',monospace;font-size:.76rem">0.5833… = 0.583̄</td></tr>
+      <tr><td>√2</td><td style="color:var(--red)">Not p/q form</td><td style="color:var(--red)">Non-term. Non-recurring</td><td style="font-family:'DM Mono',monospace;font-size:.76rem">1.41421356…</td></tr>
+    </tbody>
+  </table>
+
+  <div class="proof-box">
+    <h3>Proof: √2 is Irrational (Proof by Contradiction)</h3>
+    <ol>
+      <li><strong>Assume</strong> √2 = p/q where p, q are integers, q ≠ 0, and p/q is in its lowest terms (HCF(p,q) = 1)</li>
+      <li><strong>Square both sides:</strong> 2 = p²/q² → p² = 2q²</li>
+      <li><strong>p² is even</strong> → p must be even (if p were odd, p² would be odd) → let p = 2m</li>
+      <li><strong>Substitute:</strong> (2m)² = 2q² → 4m² = 2q² → q² = 2m² → q² is even → q is even</li>
+      <li><strong>Contradiction!</strong> Both p and q are even, so HCF(p,q) ≥ 2. But we assumed HCF(p,q) = 1.</li>
+    </ol>
+    <div class="qed">∴ Our assumption was false → √2 is irrational ■</div>
+  </div>
+
+  <div class="tip">💡 Exam shortcut: To check if p/q terminates — simplify the fraction fully, then check if the denominator = 2ⁿ × 5ᵐ. If yes: terminating. If no: non-terminating recurring.</div>
+</section>
+
+</main>
+
+<script>
+function show(id, btn, cls) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('vis'));
+  document.getElementById('sec-'+id).classList.add('vis');
+  document.querySelectorAll('nav button').forEach(b => b.className='');
+  btn.className = cls;
+}
+
+function runEuclid() {
+  let a = parseInt(document.getElementById('inp-a').value)||0;
+  let b = parseInt(document.getElementById('inp-b').value)||0;
+  const container = document.getElementById('euclid-steps');
+  container.innerHTML = '';
+  if(a<=0||b<=0){ container.innerHTML='<div class="step-row" style="color:var(--red)">Please enter positive integers.</div>'; return; }
+  if(a<b){ [a,b]=[b,a]; }
+  const origA=a, origB=b;
+  const steps=[];
+  let stepNum=1;
+  while(b!==0){
+    const q=Math.floor(a/b), r=a%b;
+    steps.push({n:stepNum++, eq:`${a} = ${b} × ${q} + ${r}`, note: r===0?'remainder = 0 → done!':'remainder = '+r, final:r===0});
+    a=b; b=r;
+  }
+  const hcf=a;
+  steps.forEach(s=>{
+    const row=document.createElement('div');
+    row.className='step-row'+(s.final?' final':'');
+    row.innerHTML=`<span class="s-num">${s.n}.</span><span class="s-eq">${s.eq}</span><span class="s-note">${s.note}</span>`;
+    container.appendChild(row);
+  });
+  const result=document.createElement('div');
+  result.className='step-row final';
+  result.style.justifyContent='center';
+  result.innerHTML=`<span style="color:var(--green);font-weight:700;font-size:.9rem">∴ HCF(${origA}, ${origB}) = ${hcf}</span>`;
+  container.appendChild(result);
+}
+
+// Run with default values on load
+runEuclid();
+</script>
+</body>
+</html>

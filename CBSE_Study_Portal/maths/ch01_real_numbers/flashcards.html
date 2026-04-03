@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Real Numbers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,.05) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem .8rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,4vw,2rem); font-weight:900;
+    color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem .8rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px;
+    background:linear-gradient(90deg,var(--teal),var(--amber));
+    transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); white-space:nowrap; }
+
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.2rem 1rem .8rem; }
+  .f-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.72rem;
+    padding:.3rem .9rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#040810; border-color:transparent; }
+  .f-all.on  { background:var(--muted); color:var(--text) !important; }
+  .f-edl.on  { background:var(--teal); }
+  .f-fta.on  { background:var(--amber); }
+  .f-hl.on   { background:var(--blue); }
+  .f-irr.on  { background:var(--red); color:#fff !important; }
+  .f-dec.on  { background:var(--green); }
+
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+  .fc-face { position:absolute; inset:0; border-radius:16px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.4rem; text-align:center; }
+  .fc-front { background:var(--card); border:1px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card);
+    border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:500;
+    padding:.18rem .65rem; border-radius:2px; margin-bottom:.7rem; }
+  .fc-q { font-family:'Playfair Display',serif; font-size:clamp(.88rem,2.4vw,1.1rem);
+    font-weight:700; line-height:1.45; }
+  .fc-hint { font-size:.68rem; color:var(--muted); margin-top:.5rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.75rem; font-size:.65rem;
+    font-family:'DM Mono',monospace; color:#1a2d45; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+  .fc-ans-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--green); margin-bottom:.5rem; }
+  .fc-ans { font-size:clamp(.78rem,2vw,.95rem); line-height:1.65; color:var(--text); }
+  .fc-ans strong { color:var(--amber); }
+  .fc-ans em { color:var(--teal); font-style:normal; }
+  .fc-mono { font-family:'DM Mono',monospace; font-size:.84rem; color:var(--teal); }
+  .known-badge { position:absolute; top:.7rem; right:.7rem;
+    font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:2px; }
+  .known   { background:rgba(34,197,94,.15); color:#4ade80; }
+  .unknown { background:rgba(239,68,68,.1);  color:#f87171; }
+  .nav-row { display:flex; gap:.7rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.85rem;
+    padding:.5rem 1.3rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#2a4a6a; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-ctr { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted);
+    min-width:70px; text-align:center; }
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.75rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--amber); color:var(--amber); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Real Numbers · Mathematics Ch.1 · 40 Cards · Tap to flip</p>
+</header>
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-edl" onclick="setFilter('edl',this)">📐 Euclid's</button>
+  <button class="f-btn f-fta" onclick="setFilter('fta',this)">🌳 FTA</button>
+  <button class="f-btn f-hl"  onclick="setFilter('hl',this)">⚖️ HCF &amp; LCM</button>
+  <button class="f-btn f-irr" onclick="setFilter('irr',this)">∞ Irrationals</button>
+  <button class="f-btn f-dec" onclick="setFilter('dec',this)">🔣 Decimals</button>
+</div>
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flipCard()">
+    <div class="fc-face fc-front" id="fc-front"></div>
+    <div class="fc-face fc-back"  id="fc-back"></div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="prevCard()" disabled>← Prev</button>
+  <div class="card-ctr" id="card-ctr">1 / 40</div>
+  <button class="nav-btn" id="next-btn" onclick="nextCard()">Next →</button>
+</div>
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown()">✓ Know it</button>
+  <button class="bot-btn" onclick="markUnknown()">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffleDeck()">🔀 Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const ALL_CARDS = [
+  // ── EUCLID'S DIVISION (edl) ──
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'State Euclid\'s Division Lemma.',
+    a:'For any two positive integers <strong>a</strong> and <strong>b</strong>:<br><em>a = bq + r</em> &nbsp; where <em>0 ≤ r &lt; b</em><br>q and r are unique for the given a, b.' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'What are the 4 steps of Euclid\'s Division Algorithm to find HCF(a, b)?',
+    a:'1. Write <strong>a = bq + r</strong><br>2. If r = 0 → <em>HCF = b</em>, done<br>3. Else: replace a ← b, b ← r<br>4. Repeat from step 1' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Find HCF(225, 135) using Euclid\'s Algorithm.',
+    a:'225 = 135×1 + 90<br>135 = 90×1 + 45<br>90 = 45×2 + 0<br>∴ <strong>HCF(225, 135) = 45</strong>' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Find HCF(870, 225) using Euclid\'s Algorithm.',
+    a:'870 = 225×3 + 195<br>225 = 195×1 + 30<br>195 = 30×6 + 15<br>30 = 15×2 + 0<br>∴ <strong>HCF = 15</strong>' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'How do you find HCF of three numbers using Euclid\'s algorithm?',
+    a:'Apply algorithm <strong>twice</strong>:<br>HCF(a,b,c) = HCF( HCF(a,b), c )<br><em>Example:</em> HCF(12,18,24)<br>HCF(12,18)=6, then HCF(6,24)=<strong>6</strong>' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Two ropes are 840 cm and 560 cm. What is the maximum equal-length piece?',
+    a:'Find <strong>HCF(840, 560)</strong><br>840 = 560×1 + 280<br>560 = 280×2 + 0<br>∴ Max length = <em>280 cm</em><br>(3 pieces from 840, 2 pieces from 560)' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'In Euclid\'s Lemma a = bq + r, what are the constraints on r?',
+    a:'The remainder r must satisfy:<br><em>0 ≤ r &lt; b</em><br>r cannot be negative and cannot equal or exceed the divisor b.<br>This makes q and r <strong>unique</strong>.' },
+  { cat:'edl', tag:'📐 Euclid\'s Division', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Show 17 = 6q + r. What are the valid values of r?',
+    a:'17 ÷ 6: q = 2, r = 5<br>So: 17 = 6×2 + 5<br>r = 5, and 0 ≤ 5 &lt; 6 ✓<br>The values r can take are: <em>0, 1, 2, 3, 4, 5</em>' },
+
+  // ── FTA (fta) ──
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'State the Fundamental Theorem of Arithmetic.',
+    a:'Every composite number can be expressed as a product of primes in <strong>exactly one way</strong> (ignoring order of factors).<br>This factorisation is <em>unique</em>.' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Write the prime factorisation of 360.',
+    a:'360 = 2 × 180 = 2 × 2 × 90<br>= 4 × 2 × 45 = 8 × 9 × 5<br>∴ <strong>360 = 2³ × 3² × 5</strong><br>Unique — same result whatever path you take!' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Write the prime factorisation of 420.',
+    a:'420 ÷ 2 = 210 ÷ 2 = 105 ÷ 3 = 35 ÷ 5 = 7<br>∴ <strong>420 = 2² × 3 × 5 × 7</strong>' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Using FTA, find HCF(360, 420).',
+    a:'360 = <em>2³ × 3² × 5</em><br>420 = <em>2² × 3 × 5 × 7</em><br>Common primes: 2, 3, 5<br>Lowest powers: 2², 3¹, 5¹<br>∴ <strong>HCF = 4 × 3 × 5 = 60</strong>' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Using FTA, find LCM(360, 420).',
+    a:'360 = 2³ × 3² × 5 &nbsp; 420 = 2² × 3 × 5 × 7<br>All primes: 2, 3, 5, 7<br>Highest powers: 2³, 3², 5¹, 7¹<br>∴ <strong>LCM = 8 × 9 × 5 × 7 = 2520</strong>' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Why is 1 not a prime number?',
+    a:'If 1 were prime, prime factorisation would <strong>not be unique</strong>:<br>6 = 2×3 = 1×2×3 = 1²×2×3 … (infinite ways!)<br>Uniqueness requires excluding 1 from primes.' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Find LCM(12, 18) using prime factorisation.',
+    a:'12 = 2² × 3 &nbsp;&nbsp; 18 = 2 × 3²<br>LCM = highest powers of all primes<br>= 2² × 3² = <strong>36</strong><br>Verify: HCF(12,18)=6; 6×36=216=12×18 ✓' },
+  { cat:'fta', tag:'🌳 FTA', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Express 5765 as a product of its prime factors.',
+    a:'5765 ÷ 5 = 1153<br>Is 1153 prime? Check divisibility up to √1153 ≈ 34<br>Not divisible by 2,3,5,7,11,13,17,19,23,29,31 → <strong>1153 is prime</strong><br>∴ <strong>5765 = 5 × 1153</strong>' },
+
+  // ── HCF & LCM (hl) ──
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'State the Golden Formula relating HCF and LCM.',
+    a:'For any two positive integers a and b:<br><em>HCF(a,b) × LCM(a,b) = a × b</em><br>⚠ Valid for <strong>exactly two numbers</strong> only!' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'What are co-prime numbers? Give two examples.',
+    a:'Two numbers are <strong>co-prime</strong> (relatively prime) if their HCF = 1.<br>Co-prime ≠ both are prime!<br><em>Examples:</em> (8, 15): HCF=1 ✓ &nbsp; (4, 9): HCF=1 ✓<br>If co-prime: LCM = a × b' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'Three bells ring every 6, 8, and 12 minutes. They ring together at 8:00 am. When next?',
+    a:'Find LCM(6, 8, 12):<br>6=2×3, 8=2³, 12=2²×3<br>LCM = 2³×3 = <strong>24</strong> minutes<br>∴ They ring together again at <em>8:24 am</em>' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'HCF of two numbers is 9 and their LCM is 360. One number is 45. Find the other.',
+    a:'HCF × LCM = a × b<br>9 × 360 = 45 × b<br>b = 3240 ÷ 45 = <strong>72</strong>' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'When should you use HCF vs LCM in a word problem?',
+    a:'<strong>HCF →</strong> dividing into equal groups, max piece size, "largest number that divides both"<br><strong>LCM →</strong> events repeating together, bells synchronising, "smallest divisible by both"' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'Find the largest number that divides 245 and 1029 leaving remainder 5 each time.',
+    a:'Required: largest divisor of (245−5) and (1029−5)<br>= HCF(240, 1024)<br>240=2⁴×3×5, 1024=2¹⁰<br>Common: 2⁴ = <strong>16</strong>' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'Is it true that HCF(a,b,c) × LCM(a,b,c) = a×b×c?',
+    a:'<strong>No! This is FALSE.</strong><br>The product formula only holds for exactly 2 numbers.<br><em>Counter-example:</em> a=4, b=6, c=12<br>HCF=2, LCM=12 → 2×12=24 ≠ 4×6×12=288' },
+  { cat:'hl', tag:'⚖️ HCF & LCM', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'HCF(a,b)=5, LCM(a,b)=60. If a=20, find b.',
+    a:'HCF × LCM = a × b<br>5 × 60 = 20 × b<br>300 = 20b<br>b = <strong>15</strong><br>Check: HCF(20,15)=5 ✓ LCM(20,15)=60 ✓' },
+
+  // ── IRRATIONAL NUMBERS (irr) ──
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'What is an irrational number?',
+    a:'A number that <strong>cannot</strong> be written as p/q where p and q are integers and q ≠ 0.<br>Decimal form: <em>non-terminating AND non-recurring</em><br>Examples: √2, √3, π, e' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'Prove that √2 is irrational. (Outline the proof)',
+    a:'Assume √2 = p/q (HCF(p,q)=1)<br>→ 2q²=p² → p even → p=2m<br>→ q²=2m² → q even<br>→ Both even: HCF≥2. <strong>Contradiction!</strong><br>∴ √2 is irrational ■' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'Is √4 irrational? Is √5 irrational?',
+    a:'<strong>√4 = 2</strong> → rational (4 is a perfect square)<br><strong>√5</strong> → irrational (5 is prime)<br>Key: √p is irrational for any <em>prime p</em>.<br>√(perfect square) is always rational.' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'If r is rational and x is irrational, what is r + x?',
+    a:'<strong>r + x is irrational</strong><br>Proof: If r+x=q (rational), then x=q−r=rational. Contradiction!<br>Same rule: r−x, r×x, r÷x are also irrational (r≠0).' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'Can the sum of two irrational numbers be rational?',
+    a:'<strong>Yes!</strong> √2 + (−√2) = 0 (rational)<br>But this is a special case where the irrationals cancel.<br>In general, sum of two irrationals is <em>usually irrational</em> but not always.' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'Is 3 + 2√5 rational or irrational? Prove it.',
+    a:'Suppose 3+2√5 = r (rational)<br>Then √5 = (r−3)/2 = rational<br>But √5 is <strong>irrational</strong>. Contradiction!<br>∴ 3+2√5 is <em>irrational</em>' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'What key lemma is used in the proof that √2 is irrational?',
+    a:'<strong>Lemma:</strong> If prime p divides a², then p divides a.<br>Used in step: p²=2q² → 2|p² → 2|p<br>This lemma is proved using the Fundamental Theorem of Arithmetic — showing why FTA is so fundamental!' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'Prove that √3 is irrational.',
+    a:'Assume √3=p/q (HCF(p,q)=1)<br>3q²=p² → 3|p² → 3|p → p=3m<br>3q²=9m² → q²=3m² → 3|q<br>Both 3|p and 3|q → HCF≥3. <strong>Contradiction!</strong><br>∴ √3 is irrational ■' },
+  { cat:'irr', tag:'∞ Irrational Numbers', tagBg:'rgba(244,63,94,.15)', tagCol:'#f43f5e',
+    q:'Is 0.1001000100001… rational or irrational?',
+    a:'This decimal is <strong>non-terminating AND non-recurring</strong> — the "gap" between 1s keeps growing (1, 3, 5… zeros), so there is no repeating block.<br>∴ It is <em>irrational</em>.' },
+
+  // ── DECIMAL EXPANSIONS (dec) ──
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'What is the condition for p/q to have a terminating decimal?',
+    a:'After simplifying p/q to lowest terms, the denominator q must be of the form <strong>2ⁿ × 5ᵐ</strong> (only 2s and 5s).<br>Any other prime factor in q → non-terminating decimal.' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Does 3/8 terminate or recur? Show the check.',
+    a:'8 = 2³ (only factor of 2) ✓<br>Denominator = 2ⁿ × 5⁰ form ✓<br>→ <strong>Terminating</strong><br>3/8 = 0.375' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Does 7/12 terminate? Why or why not?',
+    a:'12 = 2² × 3<br>Has prime factor <strong>3</strong> (not just 2s and 5s) ✗<br>→ <strong>Non-terminating recurring</strong><br>7/12 = 0.58333… = 0.583̄' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Without actually dividing, decide if 77/210 terminates.',
+    a:'First simplify: GCD(77,210)=7 → 77/210 = 11/30<br>30 = 2 × 3 × 5 — has factor 3 ✗<br>→ <strong>Non-terminating recurring</strong><br>(Always simplify first!)' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Name the three types of decimal expansions and their connection to rational/irrational.',
+    a:'1. <strong>Terminating</strong> → rational (denominator = 2ⁿ×5ᵐ)<br>2. <strong>Non-term. recurring</strong> → rational (denominator has other primes)<br>3. <strong>Non-term. non-recurring</strong> → always irrational' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Is 1.232323… rational? Express it as p/q.',
+    a:'Yes — it is <strong>non-terminating recurring → rational</strong><br>Let x=1.23̄. Then 100x=123.23̄<br>99x=122 → x = <strong>122/99</strong>' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Is 0.3̄ (= 0.3333…) rational? Write as p/q.',
+    a:'Yes — recurring decimals are always rational.<br>Let x = 0.3̄. Then 10x = 3.3̄<br>10x − x = 3 → 9x = 3 → x = <strong>1/3</strong>' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Is 2/15 terminating or non-terminating?',
+    a:'15 = 3 × 5<br>Has prime factor 3 ✗<br>→ <strong>Non-terminating recurring</strong><br>2/15 = 0.1333… = 0.13̄' },
+  { cat:'dec', tag:'🔣 Decimal Expansions', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'The decimal expansion of a number is 0.142857142857…. Is it rational?',
+    a:'This decimal is <strong>non-terminating but recurring</strong>.<br>The block "142857" repeats after 6 digits.<br>∴ It is <strong>rational</strong>.<br>(In fact, 0.142857̄ = 1/7)' },
+];
+
+let deck = [...ALL_CARDS];
+let current = 0;
+let known = new Set();
+
+function getVisible() { return deck; }
+
+function renderCard() {
+  const c = deck[current];
+  const isKnown = known.has(current);
+  const fc = document.getElementById('fc');
+  fc.classList.remove('flipped');
+  const front = document.getElementById('fc-front');
+  const back  = document.getElementById('fc-back');
+  front.innerHTML = `
+    <div class="fc-tag" style="background:${c.tagBg};color:${c.tagCol}">${c.tag}</div>
+    <div class="fc-q">${c.q}</div>
+    <div class="fc-hint">tap to reveal answer</div>
+    <div class="fc-flip-hint">↻ flip</div>
+    ${isKnown !== undefined ? `<div class="known-badge ${isKnown?'known':'unknown'}">${isKnown?'✓ Know it':'✗ Learning'}</div>` : ''}
+  `;
+  back.innerHTML = `
+    <div class="fc-tag" style="background:${c.tagBg};color:${c.tagCol}">${c.tag}</div>
+    <div class="fc-ans-lbl">✅ Answer</div>
+    <div class="fc-ans">${c.a}</div>
+    ${isKnown !== undefined ? `<div class="known-badge ${isKnown?'known':'unknown'}">${isKnown?'✓ Know it':'✗ Learning'}</div>` : ''}
+  `;
+  document.getElementById('card-ctr').textContent = `${current+1} / ${deck.length}`;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').disabled = current === deck.length-1;
+  const pct = deck.length > 0 ? ((current+1)/deck.length*100) : 0;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-text').textContent = `${current+1} / ${deck.length}`;
+}
+
+function flipCard() {
+  document.getElementById('fc').classList.toggle('flipped');
+}
+
+function nextCard() { if(current < deck.length-1){ current++; renderCard(); } }
+function prevCard() { if(current > 0){ current--; renderCard(); } }
+
+function markKnown()   { known.add(current); renderCard(); if(current < deck.length-1) setTimeout(nextCard, 400); }
+function markUnknown() { known.delete(current); renderCard(); if(current < deck.length-1) setTimeout(nextCard, 400); }
+
+function shuffleDeck() {
+  for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  current=0; known.clear(); renderCard();
+}
+
+function resetDeck() { deck=[...ALL_CARDS]; current=0; known.clear(); renderCard(); updateFilterUI('all'); }
+
+function setFilter(cat, btn) {
+  deck = cat==='all' ? [...ALL_CARDS] : ALL_CARDS.filter(c=>c.cat===cat);
+  current=0; known.clear();
+  updateFilterUI(cat);
+  renderCard();
+}
+
+function updateFilterUI(cat) {
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  const map = {all:'.f-all',edl:'.f-edl',fta:'.f-fta',hl:'.f-hl',irr:'.f-irr',dec:'.f-dec'};
+  document.querySelector(map[cat])?.classList.add('on');
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight') nextCard();
+  else if(e.key==='ArrowLeft') prevCard();
+  else if(e.key===' ') { e.preventDefault(); flipCard(); }
+});
+
+renderCard();
+</script>
+</body>
+</html>
