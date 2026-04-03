@@ -181,12 +181,11 @@ function getNode(id) { return allNodes.find(n=>n.id===id); }
 canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
 canvas.addEventListener('mousemove', e => {
   if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
-  const {nx,ny} = toCanvas(0,0);
   const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
   let found=null;
   allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
-  if(found){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
-    tip.innerHTML=`<strong>${found.label.replace(/\n/,' ')}</strong>${(found.info||'').replace(/\n/g,'<br>')}`;
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
     canvas.style.cursor='pointer';
   } else { tip.style.display='none'; canvas.style.cursor='grab'; }
 });
