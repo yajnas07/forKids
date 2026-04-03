@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Life Processes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f172a; --card:#1e293b; --border:#334155; --text:#e2e8f0; --muted:#94a3b8;
+    --nutr:#22c55e; --resp:#f97316; --trans:#3b82f6; --excr:#a855f7;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(34,197,94,.06) 0%, transparent 60%);
+  }
+
+  header { text-align:center; padding:2rem 1rem 1rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:800;
+    background:linear-gradient(135deg,#22c55e,#06b6d4,#f97316);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.78rem; margin-top:.3rem; }
+
+  /* progress */
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem 1rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--nutr),var(--resp));
+    transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--muted); white-space:nowrap; }
+
+  /* filter */
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem .8rem; }
+  .f-btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; padding:.3rem .9rem;
+    border-radius:99px; border:1.5px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#0f172a; border-color:transparent; }
+  .f-all.on   { background:var(--muted); }
+  .f-nutr.on  { background:var(--nutr); }
+  .f-resp.on  { background:var(--resp); }
+  .f-trans.on { background:var(--trans); }
+  .f-excr.on  { background:var(--excr); }
+
+  /* card stage */
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+
+  .fc-wrap {
+    width:100%; aspect-ratio:3/2; position:relative;
+    cursor:pointer; transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,0,.2,1);
+  }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+
+  .fc-face {
+    position:absolute; inset:0; border-radius:20px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.5rem; text-align:center;
+  }
+  .fc-front {
+    background:var(--card); border:1.5px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+  .fc-back {
+    transform:rotateY(180deg);
+    background:var(--card); border:1.5px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+
+  .fc-tag {
+    font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
+    padding:.2rem .7rem; border-radius:99px; margin-bottom:.8rem; align-self:center;
+  }
+  .fc-q { font-family:'Syne',sans-serif; font-size:clamp(.9rem,2.5vw,1.15rem); font-weight:700; line-height:1.4; }
+  .fc-hint { font-size:.72rem; color:var(--muted); margin-top:.6rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint {
+    position:absolute; bottom:.8rem; font-size:.68rem;
+    font-family:'DM Mono',monospace; color:#334155;
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  .fc-ans-label { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--nutr); margin-bottom:.6rem; }
+  .fc-ans { font-size:clamp(.82rem,2.2vw,1rem); line-height:1.6; color:var(--text); }
+  .fc-ans strong { color:#fcd34d; }
+  .fc-ans em { color:#93c5fd; font-style:normal; }
+  .chem { font-family:'DM Mono',monospace; background:#0f172a; border:1px solid var(--border);
+    border-radius:8px; padding:.4rem .7rem; font-size:.8rem; color:#34d399; margin:.4rem 0; }
+
+  /* nav */
+  .nav-row { display:flex; gap:.8rem; align-items:center; padding:1rem; }
+  .nav-btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem;
+    padding:.55rem 1.4rem; border-radius:99px;
+    border:2px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .nav-btn:hover:not(:disabled) { border-color:#64748b; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-counter { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--muted); min-width:70px; text-align:center; }
+
+  /* bottom */
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.78rem;
+    padding:.4rem 1.1rem; border-radius:99px;
+    border:1.5px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .bot-btn:hover { border-color:var(--nutr); color:var(--nutr); }
+
+  /* known badges */
+  .known-badge {
+    position:absolute; top:.8rem; right:.8rem;
+    font-size:.68rem; font-family:'DM Mono',monospace;
+    padding:.15rem .5rem; border-radius:99px;
+  }
+  .known   { background:rgba(16,185,129,.15); color:#34d399; }
+  .unknown { background:rgba(239,68,68,.1);   color:#f87171; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Life Processes · 40 Cards · Tap to flip</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on"  onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-nutr"    onclick="setFilter('nutr',this)">🌿 Nutrition</button>
+  <button class="f-btn f-resp"    onclick="setFilter('resp',this)">💨 Respiration</button>
+  <button class="f-btn f-trans"   onclick="setFilter('trans',this)">❤️ Transport</button>
+  <button class="f-btn f-excr"    onclick="setFilter('excr',this)">🫘 Excretion</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front" id="fc-front">
+      <div class="fc-tag" id="fc-tag"></div>
+      <div class="fc-q" id="fc-q"></div>
+      <div class="fc-hint" id="fc-hint"></div>
+      <div class="fc-flip-hint">tap to reveal →</div>
+    </div>
+    <div class="fc-face fc-back" id="fc-back">
+      <div class="fc-tag" id="fc-tag-b"></div>
+      <div class="fc-ans-label">✅ Answer</div>
+      <div class="fc-ans" id="fc-ans"></div>
+      <div id="fc-chem"></div>
+      <div class="known-badge" id="known-badge" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="move(-1)" disabled>← Prev</button>
+  <div class="card-counter" id="counter">1 / 40</div>
+  <button class="nav-btn" id="next-btn" onclick="move(1)">Next →</button>
+</div>
+
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown(true)">✓ Know it</button>
+  <button class="bot-btn" onclick="markKnown(false)">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const CARDS = [
+  // ── NUTRITION ──
+  { cat:'nutr', q:'Write the balanced chemical equation for photosynthesis.', a:'<strong>6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</strong>\n(in the presence of chlorophyll and sunlight)', chem:'6CO₂ + 6H₂O →(sunlight/chlorophyll)→ C₆H₁₂O₆ + 6O₂', hint:'Reactants: CO₂ + H₂O. Products: Glucose + O₂. Chlorophyll is catalyst, not consumed.' },
+  { cat:'nutr', q:'Where do the light reaction and dark reaction of photosynthesis occur?', a:'<strong>Light reaction:</strong> Thylakoid membranes (grana) of chloroplast\n<em>Products: ATP + NADPH + O₂</em>\n\n<strong>Dark reaction (Calvin cycle):</strong> Stroma of chloroplast\n<em>Products: Glucose using CO₂ + ATP + NADPH</em>' },
+  { cat:'nutr', q:'What is the difference between autotrophic and heterotrophic nutrition?', a:'<strong>Autotrophic:</strong> Organisms that make their own food from inorganic substances.\nExamples: Green plants, algae, cyanobacteria.\n\n<strong>Heterotrophic:</strong> Organisms that depend on other organisms for food.\nExamples: Animals, fungi, most bacteria, Amoeba.' },
+  { cat:'nutr', q:'Name the four types of heterotrophic nutrition with one example each.', a:'1. <strong>Holozoic</strong> — Ingest solid food (Humans, Amoeba)\n2. <strong>Saprophytic</strong> — Feed on dead/decaying matter (Fungi, Rhizopus)\n3. <strong>Parasitic</strong> — Live on/in a living host (Tapeworm, Cuscuta)\n4. <strong>Mutualistic</strong> — Both organisms benefit (Lichens = fungi + algae)', hint:'Board exams regularly ask for all 4 types with examples.' },
+  { cat:'nutr', q:'How does Amoeba obtain its nutrition?', a:'Amoeba uses <strong>holozoic nutrition</strong>:\n1. <em>Ingestion:</em> Pseudopodia engulf food particle forming a food vacuole\n2. <em>Digestion:</em> Lysosomes release enzymes into the food vacuole\n3. <em>Absorption:</em> Nutrients diffuse into cytoplasm\n4. <em>Assimilation:</em> Used for energy and growth\n5. <em>Egestion:</em> Undigested waste expelled by exocytosis' },
+  { cat:'nutr', q:'What is the role of HCl in the stomach?', a:'HCl in gastric juice (pH ≈ 2):\n• Creates acidic medium for <strong>pepsin</strong> to work (pepsin is only active in acid)\n• Kills harmful bacteria in food\n• Provides optimum pH for protein digestion\n• Converts pepsinogen (inactive) → pepsin (active)\nMucus protects the stomach lining from HCl.', hint:'HCl is produced by oxyntic/parietal cells of the stomach.' },
+  { cat:'nutr', q:'What are villi? What is their function?', a:'Villi are <strong>finger-like projections</strong> lining the inner wall of the small intestine.\n\n<strong>Functions:</strong>\n• Increase surface area for absorption\n• Microvilli (brush border) further increase area\n• Rich network of blood capillaries absorb glucose, amino acids\n• Lacteals (lymph capillaries) absorb fatty acids and glycerol' },
+  { cat:'nutr', q:'What is the role of bile in digestion?', a:'Bile is secreted by the <strong>liver</strong> and stored in the gall bladder.\n\n• It is <em>alkaline</em> — neutralises the acidic chyme from the stomach\n• Contains <strong>bile salts</strong> that emulsify fats (break large fat globules into tiny droplets)\n• Does NOT contain digestive enzymes\n• Increases surface area of fats for lipase to work', hint:'Bile emulsifies = makes small droplets. Lipase then digests these droplets into fatty acids + glycerol.' },
+  { cat:'nutr', q:'What is peristalsis?', a:'<strong>Peristalsis</strong> is the wave-like muscular contractions of the walls of the alimentary canal (oesophagus, stomach, intestines) that push food forward.\n\n• Caused by alternating contraction and relaxation of circular and longitudinal muscles\n• Moves food in one direction (mouth → anus)\n• Also mixes food with digestive juices' },
+  { cat:'nutr', q:'Why is nutrition necessary for an organism?', a:'Nutrition provides:\n1. <strong>Energy</strong> — for all life processes (ATP production)\n2. <strong>Raw materials</strong> — for growth, repair and replacement of cells\n3. <strong>Enzymes and hormones</strong> — for metabolic regulation\n4. <strong>Vitamins and minerals</strong> — for defence and metabolic cofactors\n\nWithout nutrition, cellular respiration cannot occur.', hint:'Energy for life processes, materials for growth = two key reasons.' },
+
+  // ── RESPIRATION ──
+  { cat:'resp', q:'Define cellular respiration. Where does it occur?', a:'<strong>Cellular respiration</strong> is the biochemical process of breaking down glucose to release energy in the form of ATP.\n\n• Occurs in ALL living cells\n• Site: <em>Mitochondria</em> (aerobic) and <em>Cytoplasm</em> (anaerobic + glycolysis)\n• Continuous process — occurs 24 hours a day', chem:'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 38 ATP' },
+  { cat:'resp', q:'What is glycolysis? Where does it occur?', a:'<strong>Glycolysis</strong> is the first step of cellular respiration.\n\n• Location: <em>Cytoplasm</em> (NOT mitochondria)\n• Does NOT require oxygen\n• Glucose (6C) → 2 Pyruvate (3C) + 2 ATP + 2 NADH\n• Common starting point for BOTH aerobic and anaerobic respiration', hint:'Glyco = sugar; Lysis = breaking. Happens in cytoplasm always.' },
+  { cat:'resp', q:'Compare aerobic and anaerobic respiration in terms of ATP yield.', a:'<strong>Aerobic:</strong> 38 ATP per glucose molecule\n• Complete oxidation\n• Requires O₂; occurs in mitochondria\n• Products: CO₂ + H₂O\n\n<strong>Anaerobic:</strong> 2 ATP per glucose molecule\n• Partial oxidation\n• No O₂ required; occurs in cytoplasm only\n• Products: Lactic acid (muscle) OR Ethanol + CO₂ (yeast)', hint:'Aerobic = 38 ATP (19× more efficient). Anaerobic = 2 ATP.' },
+  { cat:'resp', q:'Write the equation for anaerobic respiration in yeast. What is its commercial use?', a:'', chem:'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + 2 ATP\n(Glucose) → (Ethanol) + (Carbon dioxide)', hint:'CO₂ makes bread rise. Ethanol is used in wine, beer, biofuel.' },
+  { cat:'resp', q:'What is lactic acid fermentation? When does it occur in humans?', a:'When muscle cells respire WITHOUT sufficient oxygen during intense exercise:\n', chem:'C₆H₁₂O₆ → 2CH₃CHOHCOOH + 2 ATP\n(Glucose → Lactic acid)', hint:'Lactic acid accumulates → muscle cramps + burning sensation → oxygen debt.' },
+  { cat:'resp', q:'Why do we breathe faster during exercise?', a:'During exercise:\n• Muscle cells need <strong>more ATP</strong> rapidly\n• More oxygen is consumed; more CO₂ is produced\n• Rising CO₂ in blood is detected by the brain\n• Brain signals the diaphragm + intercostal muscles to contract faster\n• Result: <strong>breathing rate increases</strong> to supply more O₂ and remove CO₂ faster' },
+  { cat:'resp', q:'Describe the structure of alveoli and how gas exchange occurs.', a:'<strong>Alveoli</strong> (singular: alveolus) are tiny air sacs in the lungs.\n\nStructure:\n• ~300 million per lung; total area ≈ <strong>70 m²</strong>\n• Walls: 1 cell thick (very thin for fast diffusion)\n• Rich blood capillary network surrounds each alveolus\n\nGas exchange (passive diffusion):\n• O₂: alveolar air → blood capillaries\n• CO₂: blood → alveolar air', hint:'Key word: PASSIVE diffusion. Along concentration gradient. No energy needed.' },
+  { cat:'resp', q:'What is oxygen debt? How is it repaid?', a:'After intense anaerobic exercise, lactic acid builds up in muscles.\n\n<strong>Oxygen debt</strong> = extra O₂ needed to break down the accumulated lactic acid back into CO₂ + H₂O.\n\nRepayment:\n• Rapid breathing continues after exercise stops\n• Extra O₂ oxidises lactic acid in the liver\n• Breathing gradually returns to normal\n• That is why you keep breathing heavily after stopping exercise.' },
+  { cat:'resp', q:'Why is the left ventricle wall thicker than the right?', a:'The <strong>left ventricle</strong> pumps oxygenated blood to the <em>entire body</em> (systemic circulation) — requires very HIGH pressure.\n\nThe <strong>right ventricle</strong> pumps deoxygenated blood only to the <em>lungs</em> (short distance, pulmonary circulation) — requires lower pressure.\n\nThicker walls generate greater force of contraction and higher blood pressure.', hint:'Left = body (long distance) = thick walls. Right = lungs (short) = thinner.' },
+  { cat:'resp', q:'Name the three stages of aerobic respiration and where each occurs.', a:'1. <strong>Glycolysis</strong> → Cytoplasm\n   Glucose → 2 Pyruvate + 2 ATP\n\n2. <strong>Krebs Cycle (Citric acid cycle)</strong> → Mitochondrial matrix\n   Pyruvate → CO₂ + NADH + FADH₂ + 2 ATP\n\n3. <strong>Electron Transport Chain (ETC)</strong> → Inner mitochondrial membrane\n   NADH + FADH₂ + O₂ → H₂O + 34 ATP', hint:'Cytoplasm → Matrix → Inner membrane. 2 → 2 → 34 ATP.' },
+
+  // ── TRANSPORT ──
+  { cat:'trans', q:'What is transpiration? What role does it play in transport?', a:'<strong>Transpiration</strong> is the loss of water vapour from aerial parts of plants (mainly through stomata).\n\nRole in transport:\n• Creates <em>transpiration pull</em> — negative pressure that draws water upward through xylem\n• This is the main driving force for water movement (Cohesion-Tension theory)\n• Water molecules are cohesive — they pull each other up in an unbroken column', hint:'Transpiration = evaporation from leaves → creates a "pull" that sucks water up from roots.' },
+  { cat:'trans', q:'Distinguish between xylem and phloem transport.', a:'<strong>Xylem:</strong>\n• Transports water + dissolved minerals\n• Unidirectional: roots → stem → leaves\n• Passive (no ATP); driven by transpiration pull\n• Dead, hollow cells\n\n<strong>Phloem:</strong>\n• Transports food (sucrose, amino acids)\n• Bidirectional: source → sink\n• Active transport (needs ATP) — Translocation\n• Living: sieve tubes + companion cells' },
+  { cat:'trans', q:'Describe the double circulation of blood in humans.', a:'Blood passes through the heart TWICE per complete circuit:\n\n<strong>Pulmonary Circuit:</strong>\nRight atrium → Right ventricle → Pulmonary artery → Lungs (O₂ absorbed, CO₂ released) → Pulmonary vein → Left atrium\n\n<strong>Systemic Circuit:</strong>\nLeft atrium → Left ventricle → Aorta → Body → Vena cava → Right atrium', hint:'Double circulation = separated oxygenated + deoxygenated blood → more efficient O₂ delivery.' },
+  { cat:'trans', q:'What is the composition of blood? Name the components and their functions.', a:'<strong>Plasma (55%):</strong> Water + proteins + glucose + hormones + CO₂\n<strong>RBC (40%):</strong> Haemoglobin carries O₂ as oxyhaemoglobin; biconcave disc; no nucleus (mature)\n<strong>WBC (~1%):</strong> Immune defence; phagocytosis; antibody production\n<strong>Platelets (~4%):</strong> Blood clotting; no nucleus; fragments', hint:'Plasma > RBC > WBC+Platelets in terms of percentage.' },
+  { cat:'trans', q:'What is the role of haemoglobin in transport?', a:'<strong>Haemoglobin (Hb)</strong> is the iron-containing protein in red blood cells (RBC).\n\n• Combines with O₂ in lungs to form <em>oxyhaemoglobin</em>\n• Releases O₂ to tissues (where O₂ concentration is low)\n• Also transports CO₂ (as carboxyhaemoglobin and in plasma as bicarbonate HCO₃⁻)\n\nEach Hb molecule carries 4 O₂ molecules.', chem:'Hb + 4O₂ ⇌ Hb(O₂)₄ (Oxyhaemoglobin)' },
+  { cat:'trans', q:'Why do veins have valves but arteries do not?', a:'<strong>Veins</strong> carry blood back to the heart, often against gravity (from legs). Valves prevent <em>backflow</em> of blood.\n\n<strong>Arteries</strong> carry blood away from the heart under HIGH pressure generated by the heart beat — this pressure itself keeps blood moving forward. Valves are not needed.', hint:'Veins = low pressure + uphill flow → need valves to prevent backflow. Arteries = high pressure → no valves.' },
+  { cat:'trans', q:'What is lymph? How does it differ from blood?', a:'<strong>Lymph</strong> is the pale yellowish fluid that leaks from blood capillaries into the tissue spaces.\n\n<strong>Differences from blood:</strong>\n• No RBC; colourless/pale\n• More WBC (lymphocytes) than blood\n• Flows in one direction (tissues → blood)\n• No haemoglobin; carries digested fats from intestinal lacteals\n• Returns excess interstitial fluid to bloodstream', hint:'Lymph = blood plasma that leaked out of capillaries, filtered through lymph nodes.' },
+  { cat:'trans', q:'How does water enter root hair cells?', a:'Water enters root hair cells by <strong>osmosis</strong>.\n\n• Root hair cells have a higher solute concentration than soil water\n• Water (lower solute) moves from soil → root hair cell through the semi-permeable cell membrane\n• This is <em>passive</em> — no energy needed\n• Water then moves cell to cell via osmosis until it reaches the xylem\n• Root pressure also helps push water upward', hint:'Osmosis = water moves from high water potential (soil) to low water potential (root cell).' },
+  { cat:'trans', q:'What is the difference between an artery and a vein?', a:'<strong>Artery:</strong>\n• Carries blood AWAY from heart\n• Thick, elastic, muscular walls\n• High blood pressure; NO valves\n• Mostly oxygenated (except pulmonary artery)\n\n<strong>Vein:</strong>\n• Carries blood TOWARD heart\n• Thin, less elastic walls\n• Low blood pressure; HAS valves\n• Mostly deoxygenated (except pulmonary vein)' },
+
+  // ── EXCRETION ──
+  { cat:'excr', q:'Define excretion. Why is it necessary?', a:'<strong>Excretion</strong> is the process of removing toxic metabolic waste products from the body.\n\nWaste products: Urea, CO₂, excess water, salts, uric acid, creatinine.\n\nNecessity:\n• Metabolic wastes (especially urea/NH₃) are toxic\n• Accumulation disrupts homeostasis\n• Maintains proper blood pH and ionic balance\n• Ensures cells function normally' },
+  { cat:'excr', q:'What is the functional unit of the kidney? Describe its structure briefly.', a:'The functional unit is the <strong>Nephron</strong> (~1 million per kidney).\n\n<strong>Parts:</strong>\n• <em>Glomerulus:</em> Tuft of capillaries; filtration site\n• <em>Bowman\'s capsule:</em> Cup surrounding glomerulus; collects filtrate\n• <em>Proximal convoluted tubule:</em> Reabsorption of glucose, amino acids, water\n• <em>Loop of Henle:</em> Water conservation; concentrates urine\n• <em>Distal tubule + Collecting duct:</em> Final adjustment; ADH controlled' },
+  { cat:'excr', q:'Explain ultrafiltration in the nephron.', a:'<strong>Ultrafiltration</strong> occurs in the <em>glomerulus + Bowman\'s capsule</em>.\n\n• Blood enters the afferent arteriole at HIGH pressure\n• The glomerulus acts as a filter under hydrostatic pressure\n• Small molecules are forced into Bowman\'s capsule: water, glucose, amino acids, urea, salts, uric acid, creatinine\n• Large molecules are RETAINED in blood: RBC, WBC, plasma proteins\n• Filtrate formed: ~180 L per day' },
+  { cat:'excr', q:'What is selective reabsorption in the nephron?', a:'In the <strong>proximal convoluted tubule and Loop of Henle</strong>:\n\n• ALL glucose and amino acids are reabsorbed (active transport)\n• ~178.5 L of water per day is reabsorbed (osmosis)\n• Na⁺, K⁺, Cl⁻ and other useful ions are reabsorbed\n• Urea, uric acid, creatinine, excess salts remain in tubule → concentrated\n\nResult: Only 1.5–1.8 L of urine is produced per day.', hint:'99%+ of filtered water is reabsorbed. Glucose is ALWAYS fully reabsorbed (unless diabetic).' },
+  { cat:'excr', q:'What is dialysis? When is it used?', a:'<strong>Haemodialysis (Artificial Kidney)</strong> is used when kidneys fail.\n\n• Blood is pumped through a machine containing a semi-permeable cellophane tube\n• The tube is surrounded by dialysing fluid (isotonic to normal blood plasma)\n• Urea, excess salts diffuse out through the membrane (by osmosis + diffusion)\n• RBC, proteins, glucose, etc. are too large — retained in blood\n• Purified blood returned to patient\n• Required ~3 times per week for kidney failure patients', hint:'Dialysing fluid is isotonic so only WASTES diffuse out; useful substances stay.' },
+  { cat:'excr', q:'How do plants excrete waste products?', a:'Plants do NOT have specialised excretory organs. They excrete by:\n\n1. <strong>Stomata:</strong> Release O₂ (photosynthesis by-product) and CO₂ (respiration waste)\n2. <strong>Transpiration:</strong> Removes excess water vapour\n3. <strong>Storage in vacuoles:</strong> Resins, tannins, gums, alkaloids — stored in old wood/bark\n4. <strong>Leaf fall:</strong> Accumulated wastes in leaves are removed when leaves fall\n5. <strong>Secretion:</strong> Some waste excreted into soil around roots (e.g., alkaloids)' },
+  { cat:'excr', q:'What are the organs of excretion in humans and what do they excrete?', a:'• <strong>Kidneys:</strong> Urea, uric acid, creatinine, excess water and salts (as urine)\n• <strong>Lungs:</strong> CO₂ and water vapour (exhaled air)\n• <strong>Skin:</strong> Water, NaCl, traces of urea (as sweat)\n• <strong>Liver:</strong> Bile pigments (bilirubin from broken-down RBCs); converts NH₃ → urea (urea cycle)\n• <strong>Intestine:</strong> Some bile pigments, cholesterol (via faeces)' },
+  { cat:'excr', q:'What is the composition of urine?', a:'Normal urine composition:\n• <strong>Water:</strong> ~95%\n• <strong>Urea:</strong> ~2% (main nitrogenous waste)\n• <strong>Uric acid, creatinine:</strong> ~1%\n• <strong>Inorganic salts (NaCl, phosphates, sulphates):</strong> ~2%\n• <strong>Yellow colour:</strong> Urochrome pigment (from breakdown of haemoglobin)\n• Normal pH: 4.5–8.0 (average ~6, slightly acidic)\n• ABSENCE of glucose and protein (presence indicates disease)', hint:'No glucose and no protein in normal urine — their presence is pathological.' },
+  { cat:'excr', q:'What is the role of ADH (Anti-Diuretic Hormone) in excretion?', a:'<strong>ADH</strong> is produced by the hypothalamus, stored and released by the pituitary gland.\n\n• If blood is too concentrated (dehydrated) → more ADH released\n• ADH makes the collecting duct walls more <em>permeable</em> to water\n• More water is reabsorbed → less (concentrated) urine produced\n• If well hydrated → less ADH → less reabsorption → more (dilute) urine\n\nADH is the key regulator of urine concentration.', hint:'ADH = Anti-DIURETIC Hormone. Diuretic = causes more urine. Anti-diuretic = LESS urine.' },
+  { cat:'excr', q:'Describe the path of urine from nephron to outside the body.', a:'Urine formation → Collecting duct → Renal pelvis → Ureter → Urinary bladder (stored) → Urethra → Excreted outside\n\n<strong>Key facts:</strong>\n• 2 ureters (one per kidney) — carry urine to bladder\n• Bladder can hold ~400–600 mL\n• Urethra: shorter in females (higher UTI risk)\n• Urination controlled by internal + external urethral sphincters', hint:'Nephron → Collecting duct → Renal pelvis → Ureter → Bladder → Urethra. Remember this order.' },
+];
+
+let deck = [...CARDS];
+let idx = 0;
+let filter = 'all';
+let known = {};
+let isFlipped = false;
+
+function filtered() {
+  return filter === 'all' ? deck : deck.filter(c => c.cat === filter);
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  idx = 0;
+  isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+function updateCard() {
+  const cards = filtered();
+  if (!cards.length) return;
+  const c = cards[idx % cards.length];
+  const total = cards.length;
+  const cur = (idx % total) + 1;
+
+  const tagStyle = {
+    nutr: 'background:rgba(34,197,94,.15);color:#4ade80',
+    resp: 'background:rgba(249,115,22,.15);color:#fb923c',
+    trans:'background:rgba(59,130,246,.15);color:#60a5fa',
+    excr: 'background:rgba(168,85,247,.15);color:#c084fc'
+  };
+  const tagLabel = { nutr:'🌿 Nutrition', resp:'💨 Respiration', trans:'❤️ Transport', excr:'🫘 Excretion' };
+
+  document.getElementById('fc-tag').style.cssText = tagStyle[c.cat];
+  document.getElementById('fc-tag').textContent = tagLabel[c.cat];
+  document.getElementById('fc-tag-b').style.cssText = tagStyle[c.cat];
+  document.getElementById('fc-tag-b').textContent = tagLabel[c.cat];
+  document.getElementById('fc-q').textContent = c.q;
+  document.getElementById('fc-hint').textContent = c.hint ? '💡 '+c.hint : '';
+  document.getElementById('fc-ans').innerHTML = (c.a||'').replace(/\n/g,'<br>');
+  const chemEl = document.getElementById('fc-chem');
+  chemEl.innerHTML = c.chem ? `<div class="chem">${c.chem.replace(/\n/g,'<br>')}</div>` : '';
+
+  // known badge
+  const kb = document.getElementById('known-badge');
+  const cardId = deck.indexOf(c);
+  if (known[cardId] === true)       { kb.style.display='block'; kb.className='known-badge known';   kb.textContent='✓ Known'; }
+  else if (known[cardId] === false) { kb.style.display='block'; kb.className='known-badge unknown'; kb.textContent='Still learning'; }
+  else kb.style.display='none';
+
+  document.getElementById('counter').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-text').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-fill').style.width = `${(cur/total)*100}%`;
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx >= total-1;
+}
+
+function flip() {
+  isFlipped = !isFlipped;
+  document.getElementById('fc').classList.toggle('flipped', isFlipped);
+}
+
+function move(dir) {
+  const total = filtered().length;
+  idx = Math.max(0, Math.min(total-1, idx+dir));
+  isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+function markKnown(val) {
+  const cards = filtered();
+  const c = cards[idx % cards.length];
+  const cardId = deck.indexOf(c);
+  known[cardId] = val;
+  updateCard();
+  if (val) setTimeout(() => move(1), 400);
+}
+
+function shuffle() {
+  for (let i = deck.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]] = [deck[j],deck[i]];
+  }
+  idx = 0; isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+function resetDeck() {
+  deck = [...CARDS]; known = {}; idx = 0; isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+// keyboard
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') move(1);
+  else if (e.key==='ArrowLeft') move(-1);
+  else if (e.key===' ') { e.preventDefault(); flip(); }
+});
+
+updateCard();
+</script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Life Processes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --nutr: #22c55e;
+    --resp: #f97316;
+    --trans: #3b82f6;
+    --excr: #a855f7;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263148;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+    --correct: #10b981;
+    --wrong: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; }
+
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(34,197,94,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(168,85,247,.07) 0%, transparent 60%);
+    z-index: 0;
+  }
+
+  header { text-align: center; padding: 2.5rem 1rem 1.5rem; position: relative; z-index: 1; }
+  .back-chip {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-size: .78rem; font-family: 'DM Mono', monospace;
+    color: var(--muted); background: var(--card);
+    border: 1px solid var(--border); border-radius: 99px;
+    padding: .3rem .9rem; margin-bottom: 1rem;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif; font-size: clamp(1.6rem,4vw,2.6rem); font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, #22c55e 0%, #06b6d4 50%, #f97316 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  header p { color: var(--muted); font-size: .88rem; margin-top: .3rem; font-family: 'DM Mono', monospace; }
+
+  /* ── dashboard ── */
+  .dashboard { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 0 1rem 1.5rem; position: relative; z-index: 1; }
+  .dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: .7rem 1.4rem; text-align: center; min-width: 90px; }
+  .dash-val { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
+  .dash-lbl { font-size: .72rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: .1rem; }
+
+  /* ── filter nav ── */
+  nav {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: .5rem;
+    padding: 0 1rem 1.5rem; position: relative; z-index: 1;
+  }
+  nav button {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .8rem;
+    padding: .45rem 1.1rem; border-radius: 99px; border: 2px solid var(--border);
+    background: var(--card); color: var(--muted); cursor: pointer; transition: all .2s;
+  }
+  nav button:hover { color: var(--text); border-color: #64748b; }
+  nav button.active { border-color: var(--nutr); color: var(--nutr); background: rgba(34,197,94,.1); }
+
+  /* ── question list ── */
+  main { max-width: 820px; margin: 0 auto; padding: 0 1rem 5rem; position: relative; z-index: 1; }
+
+  .q-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    margin-bottom: 1.2rem; overflow: hidden; transition: box-shadow .2s;
+    animation: slideIn .35s ease both;
+  }
+  .q-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  .q-header { display: flex; align-items: flex-start; gap: .8rem; padding: 1.1rem 1.2rem .8rem; cursor: pointer; }
+  .q-num {
+    font-family: 'DM Mono', monospace; font-size: .72rem; font-weight: 500;
+    min-width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .q-text { font-size: .93rem; font-weight: 600; line-height: 1.5; flex: 1; }
+  .q-meta { display: flex; gap: .4rem; flex-wrap: wrap; padding: 0 1.2rem .8rem 4rem; }
+  .badge { font-size: .68rem; font-family: 'DM Mono', monospace; padding: .15rem .55rem; border-radius: 99px; font-weight: 500; }
+  .badge-mcq    { background: rgba(59,130,246,.15);  color: #60a5fa; }
+  .badge-short  { background: rgba(34,197,94,.15);   color: #4ade80; }
+  .badge-long   { background: rgba(249,115,22,.15);  color: #fb923c; }
+  .badge-assert { background: rgba(168,85,247,.15);  color: #c084fc; }
+  .badge-1m { background: rgba(148,163,184,.1); color: var(--muted); }
+  .badge-2m { background: rgba(34,197,94,.1);   color: #6ee7b7; }
+  .badge-3m { background: rgba(249,115,22,.1);  color: #fed7aa; }
+  .badge-5m { background: rgba(239,68,68,.15);  color: #f87171; }
+
+  .strip-nutr    { border-left: 4px solid var(--nutr); }
+  .strip-resp    { border-left: 4px solid var(--resp); }
+  .strip-trans   { border-left: 4px solid var(--trans); }
+  .strip-excr    { border-left: 4px solid var(--excr); }
+  .strip-general { border-left: 4px solid #64748b; }
+
+  /* ── MCQ ── */
+  .mcq-body { padding: 0 1.2rem .5rem 1.2rem; }
+  .mcq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: .6rem; }
+  @media(max-width:480px) { .mcq-opts { grid-template-columns: 1fr; } }
+  .opt-btn {
+    display: flex; align-items: center; gap: .6rem;
+    background: var(--card2); border: 1.5px solid var(--border); border-radius: 10px;
+    padding: .6rem .8rem; cursor: pointer; transition: all .18s;
+    text-align: left; color: var(--text); font-family: 'Nunito', sans-serif; font-size: .85rem; font-weight: 600;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: #64748b; background: #2d3f57; }
+  .opt-btn .opt-label { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--muted); min-width: 18px; }
+  .opt-btn.correct { border-color: var(--correct); background: rgba(16,185,129,.12); color: #6ee7b7; }
+  .opt-btn.wrong   { border-color: var(--wrong);   background: rgba(239,68,68,.1);   color: #fca5a5; }
+
+  /* ── answer reveal ── */
+  .ans-reveal { overflow: hidden; max-height: 0; transition: max-height .4s ease; }
+  .ans-reveal.open { max-height: 800px; }
+  .ans-body { padding: .8rem 1.2rem 1.1rem 1.2rem; border-top: 1px solid var(--border); }
+  .ans-label { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--correct); margin-bottom: .4rem; display: flex; align-items: center; gap: .4rem; }
+  .ans-text { font-size: .88rem; color: var(--text); line-height: 1.7; }
+  .ans-text strong { color: #fcd34d; }
+  .ans-text em { color: #93c5fd; font-style: normal; }
+  .chemical { font-family: 'DM Mono', monospace; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: .5rem .8rem; font-size: .82rem; margin: .5rem 0; color: #34d399; line-height: 1.8; }
+  .hint { font-size: .78rem; color: #fb923c; background: rgba(251,146,60,.08); border-left: 3px solid #fb923c; border-radius: 0 6px 6px 0; padding: .4rem .7rem; margin-top: .6rem; }
+
+  .show-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .78rem;
+    padding: .4rem 1rem; border-radius: 99px; border: 1.5px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; transition: all .2s;
+    margin: .2rem 0 .8rem 1.2rem;
+  }
+  .show-btn:hover { color: var(--text); border-color: #64748b; }
+  .show-btn.active { color: var(--correct); border-color: var(--correct); background: rgba(16,185,129,.08); }
+
+  .feedback { font-size: .8rem; font-family: 'DM Mono', monospace; padding: .4rem .8rem; border-radius: 8px; margin: .3rem 0 .6rem; display: none; }
+  .feedback.correct { background: rgba(16,185,129,.1); color: #34d399; display: block; }
+  .feedback.wrong   { background: rgba(239,68,68,.1);  color: #f87171; display: block; }
+
+  .reset-bar { text-align: center; padding: 1rem; position: relative; z-index: 1; }
+  .reset-btn {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem;
+    padding: .6rem 1.8rem; border-radius: 99px; border: 2px solid var(--border);
+    background: var(--card); color: var(--muted); cursor: pointer; transition: all .2s;
+  }
+  .reset-btn:hover { border-color: var(--nutr); color: var(--nutr); }
+  .empty { text-align: center; padding: 3rem; color: var(--muted); font-family: 'DM Mono', monospace; font-size: .88rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="back-chip">🔬 Class X · CBSE · Biology</div>
+  <h1>Question Bank</h1>
+  <p>Chapter 6 — Life Processes &nbsp;|&nbsp; 30 Questions</p>
+</header>
+
+<div class="dashboard">
+  <div class="dash-card"><div class="dash-val" id="d-total">30</div><div class="dash-lbl">Total</div></div>
+  <div class="dash-card"><div class="dash-val" id="d-attempted" style="color:var(--resp)">0</div><div class="dash-lbl">Attempted</div></div>
+  <div class="dash-card"><div class="dash-val" id="d-correct" style="color:var(--correct)">0</div><div class="dash-lbl">Correct</div></div>
+  <div class="dash-card"><div class="dash-val" id="d-score" style="color:var(--excr)">0%</div><div class="dash-lbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filterQ('all',this)">All (30)</button>
+  <button onclick="filterQ('mcq',this)">MCQ</button>
+  <button onclick="filterQ('short',this)">Short Answer</button>
+  <button onclick="filterQ('long',this)">Long Answer</button>
+  <button onclick="filterQ('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button></div>
+
+<script>
+const Q = [
+  // ───── MCQ (1 mark each) ─────
+  {
+    id:1, type:'mcq', topic:'nutr', marks:1,
+    q:'Which of the following is the correct equation for photosynthesis?',
+    opts:['6O₂ + 6H₂O → C₆H₁₂O₆ + 6CO₂','6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂','C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP','6CO₂ + 6O₂ → C₆H₁₂O₆ + 6H₂O'],
+    ans:1,
+    explain:'Photosynthesis: 6CO₂ + 6H₂O → (sunlight/chlorophyll) → C₆H₁₂O₆ + 6O₂. Reactants are CO₂ and H₂O; products are glucose and O₂.'
+  },
+  {
+    id:2, type:'mcq', topic:'resp', marks:1,
+    q:'The net gain of ATP molecules in aerobic respiration per molecule of glucose is:',
+    opts:['2','4','36–38','12'],
+    ans:2,
+    explain:'Aerobic respiration yields 38 ATP total (2 from glycolysis + 2 from Krebs + 34 from ETC). This is the maximum possible energy yield from one glucose molecule.'
+  },
+  {
+    id:3, type:'mcq', topic:'nutr', marks:1,
+    q:'Which organelle is the site of photosynthesis?',
+    opts:['Mitochondria','Ribosome','Chloroplast','Nucleus'],
+    ans:2,
+    explain:'Photosynthesis occurs in the chloroplast. Light reactions take place in the thylakoid membranes; the Calvin cycle (dark reactions) takes place in the stroma.'
+  },
+  {
+    id:4, type:'mcq', topic:'trans', marks:1,
+    q:'Which blood vessel carries oxygenated blood from the lungs to the heart?',
+    opts:['Pulmonary artery','Aorta','Pulmonary vein','Vena cava'],
+    ans:2,
+    explain:'The pulmonary VEIN carries oxygenated blood from the lungs to the left atrium of the heart. The pulmonary ARTERY carries deoxygenated blood from the right ventricle to the lungs.'
+  },
+  {
+    id:5, type:'mcq', topic:'excr', marks:1,
+    q:'The functional unit of the kidney is:',
+    opts:['Nephron','Neuron','Alveolus','Villus'],
+    ans:0,
+    explain:'The nephron is the basic functional and structural unit of the kidney. Each kidney contains approximately 1 million nephrons that filter blood and produce urine.'
+  },
+  {
+    id:6, type:'mcq', topic:'resp', marks:1,
+    q:'In which part of the cell does glycolysis occur?',
+    opts:['Mitochondrial matrix','Thylakoid membrane','Cytoplasm','Nucleus'],
+    ans:2,
+    explain:'Glycolysis occurs in the cytoplasm (cytosol) of the cell, NOT in the mitochondria. It is the first step of both aerobic and anaerobic respiration and does not require oxygen.'
+  },
+  {
+    id:7, type:'mcq', topic:'trans', marks:1,
+    q:'Which of the following transport system in plants requires ATP?',
+    opts:['Xylem transport','Transpiration','Phloem transport (Translocation)','Root pressure'],
+    ans:2,
+    explain:'Phloem transport (translocation) of food from source to sink is an active process requiring ATP. Xylem transport is passive, driven by transpiration pull (physical force).'
+  },
+  {
+    id:8, type:'mcq', topic:'excr', marks:1,
+    q:'The yellow colour of urine is due to:',
+    opts:['Urea','Creatinine','Urochrome (Urobilin)','Haemoglobin'],
+    ans:2,
+    explain:'Urochrome (urobilin) is a pigment produced from the breakdown of haemoglobin in old red blood cells. It gives urine its characteristic yellow colour.'
+  },
+  {
+    id:9, type:'mcq', topic:'nutr', marks:1,
+    q:'Which enzyme begins starch digestion in the mouth?',
+    opts:['Pepsin','Trypsin','Salivary amylase (Ptyalin)','Lipase'],
+    ans:2,
+    explain:'Salivary amylase (also called ptyalin) is secreted by salivary glands and begins the digestion of starch into maltose in the mouth. The pH in the mouth is ~7, optimal for amylase activity.'
+  },
+  {
+    id:10, type:'mcq', topic:'resp', marks:1,
+    q:'Which of the following is a product of anaerobic respiration in yeast?',
+    opts:['Lactic acid','Pyruvate + water','Ethanol + CO₂','Glucose + ATP'],
+    ans:2,
+    explain:'In yeast (fermentation): C₆H₁₂O₆ → 2C₂H₅OH (ethanol) + 2CO₂ + 2 ATP. CO₂ makes bread rise; ethanol is used in brewing. Muscle cells produce lactic acid instead.'
+  },
+
+  // ───── ASSERTION–REASON (1 mark each) ─────
+  {
+    id:11, type:'assert', topic:'nutr', marks:1,
+    q:'Assertion (A): Leaves appear green because chlorophyll reflects green light.\nReason (R): Chlorophyll absorbs red and blue wavelengths of light for photosynthesis.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'Chlorophyll absorbs red and blue wavelengths and uses that energy for photosynthesis. The green wavelength is reflected, which is why leaves appear green. R correctly explains A.'
+  },
+  {
+    id:12, type:'assert', topic:'trans', marks:1,
+    q:'Assertion (A): Left ventricle has thicker walls than the right ventricle.\nReason (R): The left ventricle pumps blood to the entire body and requires greater force.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'The left ventricle pumps oxygenated blood to the entire body through the aorta (systemic circulation), requiring high pressure. The right ventricle only pumps to the nearby lungs (pulmonary circulation). Thicker walls generate more force.'
+  },
+  {
+    id:13, type:'assert', topic:'excr', marks:1,
+    q:'Assertion (A): Glucose is not normally present in urine.\nReason (R): All glucose filtered in the glomerulus is completely reabsorbed in the proximal convoluted tubule.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'Under normal conditions, all filtered glucose is reabsorbed by active transport in the PCT before reaching the collecting duct. Glucose in urine (glycosuria) indicates diabetes mellitus — blood glucose exceeds the renal threshold.'
+  },
+  {
+    id:14, type:'assert', topic:'resp', marks:1,
+    q:'Assertion (A): Anaerobic respiration in muscles produces lactic acid causing cramps.\nReason (R): During intense exercise, oxygen supply is insufficient for complete aerobic respiration.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'During intense exercise, O₂ supply to muscle cells becomes insufficient. Muscles switch to anaerobic respiration: glucose → lactic acid + 2 ATP. Lactic acid accumulates causing the burning sensation and cramps. R correctly explains A.'
+  },
+
+  // ───── SHORT ANSWER (2–3 marks) ─────
+  {
+    id:15, type:'short', topic:'nutr', marks:2,
+    q:'What are the two stages of photosynthesis? Where does each stage occur and what are the products?',
+    ans:'<strong>Stage 1: Light Reactions (Light-dependent reactions)</strong>\n• Location: <em>Thylakoid membranes</em> (grana) of chloroplast\n• Requires: Sunlight + Chlorophyll\n• Products: ATP, NADPH (energy carriers) + O₂ released (from splitting water H₂O)\n\n<strong>Stage 2: Dark Reactions (Calvin Cycle / Light-independent reactions)</strong>\n• Location: <em>Stroma</em> of chloroplast\n• Requires: ATP + NADPH (from Stage 1) + CO₂\n• Products: Glucose (C₆H₁₂O₆)',
+    hint:'Light reactions = energy capture; Dark reactions = carbon fixation into glucose. Remember their locations!'
+  },
+  {
+    id:16, type:'short', topic:'resp', marks:2,
+    q:'How does respiration differ from breathing? Explain with examples.',
+    ans:'<strong>Breathing (Ventilation):</strong> The PHYSICAL process of inhaling air (O₂) into the lungs and exhaling CO₂ out.\n• Involves lungs, diaphragm, intercostal muscles\n• Rate: ~15–18 breaths/min\n• Example: Chest expanding when you inhale\n\n<strong>Cellular Respiration:</strong> The CHEMICAL/BIOCHEMICAL process of breaking down glucose in cells to release energy as ATP.\n• Occurs in mitochondria + cytoplasm of EVERY cell\n• Continuous process, 24 hours a day\n• Example: Glucose + O₂ → CO₂ + H₂O + 38 ATP\n\nKey difference: Breathing delivers O₂ needed for respiration; respiration is the actual energy release.',
+    hint:'Breathing is mechanical (lungs). Respiration is chemical (cells). Board exams often ask students to distinguish these.'
+  },
+  {
+    id:17, type:'short', topic:'trans', marks:2,
+    q:'What is transpiration? State its role in the transport of water in plants.',
+    ans:'<strong>Transpiration</strong> is the loss of water vapour from aerial parts of plants, primarily through stomata in leaves.\n\n<strong>Role in water transport:</strong>\n• Transpiration creates a <em>negative pressure (suction force)</em> at the top of the plant\n• This is called the <em>Transpiration Pull</em>\n• Water molecules are cohesive (stick together) — the pull draws the entire water column upward through xylem (Cohesion-Tension Theory)\n• Water enters the roots by osmosis to replace what is lost\n• This unidirectional flow: Roots → Stem → Leaves is called the <em>Ascent of Sap</em>',
+    hint:'Transpiration pull + Cohesion-Tension = main driving force for water movement in xylem. Root pressure is secondary.'
+  },
+  {
+    id:18, type:'short', topic:'excr', marks:2,
+    q:'What is haemodialysis (artificial kidney)? On what principle does it work?',
+    ans:'<strong>Haemodialysis</strong> is a procedure used to purify blood artificially when kidneys fail.\n\n<strong>Procedure:</strong>\n• Blood is drawn from the patient\'s artery\n• Pumped through a dialysis machine containing a semi-permeable cellophane tube\n• The tube is immersed in dialysing fluid (isotonic to normal blood plasma)\n\n<strong>Principle — Selective Diffusion (Osmosis):</strong>\n• Urea, excess salts, creatinine: small molecules → diffuse OUT through the membrane\n• Blood cells, plasma proteins, glucose: large molecules → cannot pass, RETAINED in blood\n• Purified blood returned to the patient via a vein\n\nRequired ~3 times/week; permanent solution is kidney transplant.',
+    hint:'Dialysing fluid is isotonic so only waste molecules diffuse out (concentration gradient). Useful substances stay because they are too large.'
+  },
+  {
+    id:19, type:'short', topic:'nutr', marks:2,
+    q:'Describe the nutrition in Amoeba. Draw a simple labelled diagram of the process.',
+    ans:'Amoeba uses <strong>holozoic nutrition</strong> — ingesting solid food particles.\n\n<strong>Steps:</strong>\n1. <em>Ingestion:</em> Pseudopodia (false feet) extend and surround food particle → food vacuole forms around it\n2. <em>Digestion:</em> Lysosomes fuse with food vacuole → release digestive enzymes → food digested into simple molecules\n3. <em>Absorption:</em> Digested nutrients diffuse into the cytoplasm\n4. <em>Assimilation:</em> Nutrients used for energy (respiration) and growth\n5. <em>Egestion:</em> Undigested remnants expelled by exocytosis (cell membrane opens and pushes waste out)',
+    hint:'5 steps: Ingestion → Digestion → Absorption → Assimilation → Egestion. All happen inside ONE cell in Amoeba!'
+  },
+  {
+    id:20, type:'short', topic:'trans', marks:2,
+    q:'Differentiate between arteries and veins. Give one example of each.',
+    ans:'<table style="width:100%;font-size:.82rem;border-collapse:collapse"><tr><th style="padding:.3rem;text-align:left;color:#94a3b8">Feature</th><th style="padding:.3rem;text-align:left;color:#3b82f6">Artery</th><th style="padding:.3rem;text-align:left;color:#a855f7">Vein</th></tr><tr style="border-top:1px solid #334155"><td>Direction</td><td>Away from heart</td><td>Toward heart</td></tr><tr style="border-top:1px solid #334155"><td>Wall</td><td>Thick, elastic, muscular</td><td>Thin, less elastic</td></tr><tr style="border-top:1px solid #334155"><td>Pressure</td><td>High</td><td>Low</td></tr><tr style="border-top:1px solid #334155"><td>Valves</td><td>No (except at heart exit)</td><td>Yes (prevent backflow)</td></tr><tr style="border-top:1px solid #334155"><td>Blood type</td><td>Mostly oxygenated*</td><td>Mostly deoxygenated*</td></tr><tr style="border-top:1px solid #334155"><td>Example</td><td>Aorta, Pulmonary artery</td><td>Vena cava, Pulmonary vein</td></tr></table>\n*Exception: Pulmonary artery (deoxygenated); Pulmonary vein (oxygenated)',
+    hint:'*Pulmonary artery/vein are exceptions — remember this for 1-mark trick questions.'
+  },
+  {
+    id:21, type:'short', topic:'excr', marks:3,
+    q:'Describe the three steps of urine formation in the nephron.',
+    ans:'<strong>Step 1: Ultrafiltration (Glomerulus + Bowman\'s capsule)</strong>\nBlood enters glomerulus at HIGH pressure. Small molecules forced through capillary walls into Bowman\'s capsule.\nFiltered OUT: Water, glucose, amino acids, urea, salts, uric acid, creatinine\nRetained: RBC, WBC, platelets, large plasma proteins\nFiltrate formed: ~180 L/day\n\n<strong>Step 2: Selective Reabsorption (Proximal tubule + Loop of Henle)</strong>\nUseful substances reabsorbed back into blood:\n• ALL glucose and amino acids (active transport)\n• Most water (~178.5 L/day by osmosis)\n• Na⁺, K⁺, Cl⁻ ions reabsorbed\nLeft in tubule: Urea, uric acid, creatinine (concentrated)\n\n<strong>Step 3: Tubular Secretion (Distal tubule + Collecting duct)</strong>\nAdditional wastes actively secreted from blood → tubule:\n• H⁺, excess K⁺, NH₃, certain drugs\nADH (Anti-Diuretic Hormone) regulates final water reabsorption\nFinal product: 1.5–1.8 L of concentrated urine/day',
+    hint:'3 steps: Filtration → Reabsorption → Secretion. 180 L → 1.8 L (99% reabsorbed). A classic 3-mark question!'
+  },
+  {
+    id:22, type:'short', topic:'resp', marks:2,
+    q:'What is the role of haemoglobin in transport of respiratory gases?',
+    ans:'<strong>Haemoglobin (Hb)</strong> is the iron-containing protein in Red Blood Cells.\n\n<strong>Oxygen transport:</strong>\n• In lungs (high O₂ concentration): Hb combines with O₂',
+    chemical:'Hb + 4O₂ → Hb(O₂)₄ (Oxyhaemoglobin)',
+    ans2:'• In tissues (low O₂ concentration): Hb releases O₂ to cells (reaction reverses)\n• Each Hb carries 4 O₂ molecules\n\n<strong>CO₂ transport:</strong>\n• ~70% as bicarbonate (HCO₃⁻) ions in plasma\n• ~20% combines with Hb as carboxyhaemoglobin\n• ~10% dissolved directly in plasma',
+    hint:'Hb binds O₂ in lungs (high O₂) and releases it in tissues (low O₂) — this is based on reversible O₂ binding.'
+  },
+  {
+    id:23, type:'short', topic:'nutr', marks:2,
+    q:'Explain the role of the liver in digestion.',
+    ans:'The liver plays several key roles in digestion:\n\n1. <strong>Bile production:</strong> Liver produces bile, stored in the gall bladder and released into the small intestine\n2. <strong>Emulsification of fats:</strong> Bile salts break large fat globules → tiny droplets (emulsification) → increases surface area for lipase enzyme\n3. <strong>Alkalisation:</strong> Bile is alkaline — neutralises the acidic chyme from stomach (creates optimal pH for intestinal enzymes)\n4. <strong>Detoxification:</strong> Breaks down toxins, drugs, alcohol, excess hormones\n5. <strong>Urea cycle:</strong> Converts toxic ammonia (from amino acid breakdown) → urea for excretion',
+    hint:'Bile: emulsification + alkalisation. Liver itself does NOT produce digestive enzymes for the gut — the pancreas does that.'
+  },
+  {
+    id:24, type:'short', topic:'trans', marks:2,
+    q:'What is double circulation? Why is it important?',
+    ans:'<strong>Double circulation</strong> is the system where blood passes through the heart TWICE in one complete circuit of the body.\n\n<strong>Two loops:</strong>\n1. <em>Pulmonary circulation:</em> Right side of heart → Lungs (to pick up O₂ and drop CO₂) → Left side of heart\n2. <em>Systemic circulation:</em> Left side of heart → Entire body (deliver O₂, collect CO₂) → Right side of heart\n\n<strong>Importance:</strong>\n• Keeps oxygenated and deoxygenated blood completely SEPARATE\n• Allows high-pressure delivery of oxygenated blood to all tissues\n• More efficient O₂ delivery compared to single circulation (fish)\n• Maintains constant body temperature (warm-blooded animals)',
+    hint:'Double circulation = SEPARATED oxygenated + deoxygenated blood = high efficiency. Compare with fish (single circulation).'
+  },
+
+  // ───── LONG ANSWER (5 marks) ─────
+  {
+    id:25, type:'long', topic:'nutr', marks:5,
+    q:'Describe in detail the process of nutrition in humans from ingestion to egestion. Name the enzymes involved at each stage.',
+    ans:'<strong>1. Mouth (Buccal Cavity):</strong>\n• Mechanical digestion: Teeth break food into smaller pieces\n• Chemical digestion: <em>Salivary amylase (ptyalin)</em> → starch to maltose\n• Mucus lubricates food → bolus formed',
+    chemical:'Starch → (salivary amylase) → Maltose',
+    ans2:'<strong>2. Oesophagus:</strong>\n• Food moved by peristalsis (muscular waves)\n• No digestion here\n\n<strong>3. Stomach:</strong>\n• Gastric glands secrete gastric juice (HCl + pepsinogen + mucus)\n• HCl: activates pepsin, kills bacteria, pH ≈ 2\n• <em>Pepsin</em>: Proteins → peptides\n• Mucus: Protects stomach lining from HCl\n• Food → semi-liquid chyme',
+    chemical2:'Protein → (pepsin + HCl) → Peptides',
+    ans3:'<strong>4. Small Intestine (main digestion + absorption site):</strong>\n• Bile (liver) emulsifies fats; alkalises the medium\n• <em>Pancreatic enzymes:</em> Trypsin (proteins), Lipase (fats), Amylase (starch)\n• <em>Intestinal enzymes:</em> Maltase, Sucrase, Lactase (complete carbohydrate digestion)\n• Villi and microvilli absorb: Glucose + amino acids → blood capillaries; Fatty acids + glycerol → lacteals (lymph)',
+    chemical3:'Fats → (lipase + bile) → Fatty acids + Glycerol\nPeptides → (trypsin/peptidases) → Amino acids',
+    ans4:'<strong>5. Large Intestine:</strong>\n• Absorbs remaining water and electrolytes\n• Gut bacteria produce vitamins (K, B₁₂)\n• Undigested matter → faeces\n\n<strong>6. Egestion (Anus):</strong>\nFaeces expelled from the body.',
+    hint:'5-mark digestion: Name ALL organs + enzymes + products at each stage. Board examiners check for completeness.'
+  },
+  {
+    id:26, type:'long', topic:'resp', marks:5,
+    q:'Explain aerobic and anaerobic respiration in detail. Compare the two with reference to location, equations, ATP yield and products.',
+    ans:'<strong>Respiration</strong> is the process of breaking down glucose to release energy as ATP. It occurs in ALL living cells.\n\n<strong>A. AEROBIC RESPIRATION (Requires O₂)</strong>\n\nLocation: Cytoplasm (glycolysis) + Mitochondria (Krebs cycle + ETC)',
+    chemical:'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 38 ATP',
+    ans2:'Three stages:\n1. <em>Glycolysis (cytoplasm):</em> Glucose → 2 Pyruvate + 2 ATP\n2. <em>Krebs Cycle (mitochondrial matrix):</em> Pyruvate → CO₂ + NADH + 2 ATP\n3. <em>ETC (inner mitochondrial membrane):</em> NADH + O₂ → H₂O + 34 ATP\n\n<strong>B. ANAEROBIC RESPIRATION (No O₂)</strong>\n\nLocation: Cytoplasm only',
+    chemical2:'In yeast: C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + 2 ATP\nIn muscle: C₆H₁₂O₆ → 2 Lactic acid + 2 ATP',
+    ans3:'<strong>Comparison:</strong>\n• O₂: Aerobic needs O₂; Anaerobic does NOT\n• ATP: Aerobic = 38 ATP; Anaerobic = 2 ATP (19× less efficient)\n• Products: Aerobic = CO₂ + H₂O; Anaerobic = Lactic acid or Ethanol + CO₂\n• Location: Aerobic uses mitochondria; Anaerobic stays in cytoplasm\n• Glucose oxidation: Aerobic = complete; Anaerobic = partial\n\n<strong>Common step:</strong> BOTH start with glycolysis in cytoplasm.',
+    hint:'5-mark answer: Write both equations, compare ATP (38 vs 2), name all 3 stages of aerobic, explain muscle cramps (lactic acid).'
+  },
+  {
+    id:27, type:'long', topic:'trans', marks:5,
+    q:'Describe the human circulatory system including the heart, blood vessels and blood. Explain double circulation.',
+    ans:'<strong>THE HUMAN HEART:</strong>\n4-chambered pump: 2 Atria (upper, receiving) + 2 Ventricles (lower, pumping).\n• Right side handles deoxygenated blood\n• Left side handles oxygenated blood\n• Heartbeat ~70 times/min; Left ventricle = thickest walls\n\n<strong>BLOOD VESSELS:</strong>\n• <em>Arteries:</em> Carry blood away from heart; thick elastic walls; high pressure; no valves\n• <em>Veins:</em> Carry blood to heart; thin walls; low pressure; have valves\n• <em>Capillaries:</em> 1-cell thick; site of O₂/CO₂/nutrient exchange\n\n<strong>BLOOD COMPOSITION:</strong>\n• Plasma (55%): Water + nutrients + hormones + CO₂\n• RBC (40%): Haemoglobin carries O₂ as oxyhaemoglobin\n• WBC (~1%): Immune defence\n• Platelets (~4%): Clotting',
+    chemical:'Hb + 4O₂ ⇌ Hb(O₂)₄',
+    ans2:'<strong>DOUBLE CIRCULATION:</strong>\n<em>Pulmonary circuit:</em> Right ventricle → Pulmonary artery → Lungs (O₂ absorbed, CO₂ released) → Pulmonary vein → Left atrium\n<em>Systemic circuit:</em> Left ventricle → Aorta → Body (O₂ delivered, CO₂ collected) → Vena cava → Right atrium\n\n<em>Importance:</em> Separates oxygenated and deoxygenated blood completely → high pressure delivery of oxygen-rich blood → efficient O₂ supply to all tissues.',
+    hint:'5-mark heart question: 4 chambers, both circuits, blood vessels (artery/vein/capillary), blood components, and why double circulation is efficient.'
+  },
+  {
+    id:28, type:'long', topic:'excr', marks:5,
+    q:'Describe the structure of the nephron and explain the three processes involved in urine formation.',
+    ans:'<strong>THE NEPHRON</strong> is the functional unit of the kidney (~1 million per kidney).\n\n<strong>Parts:</strong>\n• <em>Glomerulus:</em> Tuft of capillaries; filtration occurs here\n• <em>Bowman\'s capsule:</em> Cup-like structure surrounding glomerulus; collects filtrate\n• <em>Proximal convoluted tubule (PCT):</em> Selective reabsorption of useful substances\n• <em>Loop of Henle:</em> Water conservation; runs deep into the medulla\n• <em>Distal convoluted tubule (DCT):</em> Secretion of H⁺, K⁺, NH₃\n• <em>Collecting duct:</em> Final water reabsorption (ADH controlled); joins to renal pelvis\n\n<strong>URINE FORMATION — 3 STEPS:</strong>\n\n<em>Step 1: Ultrafiltration</em>\nHigh blood pressure in glomerulus forces small molecules into Bowman\'s capsule.\nFiltered: Water, glucose, amino acids, urea, uric acid, creatinine, salts.\nNot filtered: RBC, proteins (too large).\nFiltrate: ~180 L/day.',
+    chemical:'Blood (high pressure) → Glomerulus → Filtrate (in Bowman\'s capsule)',
+    ans2:'<em>Step 2: Selective Reabsorption</em>\nIn PCT + Loop of Henle:\n• ALL glucose + amino acids reabsorbed by active transport\n• ~178.5 L water reabsorbed by osmosis\n• Na⁺, K⁺, Cl⁻ ions reabsorbed\n• Urea, creatinine left in tubule → concentrated\n\n<em>Step 3: Tubular Secretion</em>\nAdditional wastes secreted from blood → tubule:\n• H⁺, excess K⁺, NH₃, certain drugs\n• ADH controls water permeability of collecting duct\n\nFinal urine: 1.5–1.8 L/day (from 180 L filtrate — 99%+ reabsorbed!)',
+    hint:'Nephron 5-mark: Name ALL parts + 3 steps with substances filtered/reabsorbed/secreted. Always mention the 180 L → 1.8 L figure.'
+  },
+  {
+    id:29, type:'long', topic:'nutr', marks:5,
+    q:'Compare nutrition in plants (autotrophic) and animals (heterotrophic). What is the significance of each mode of nutrition in the ecosystem?',
+    ans:'<strong>A. AUTOTROPHIC NUTRITION (Plants)</strong>\n• Organisms make their own food from inorganic substances\n• Source of carbon: CO₂ (from air via stomata)\n• Source of H: H₂O (absorbed by roots)\n• Energy: Sunlight captured by chlorophyll\n• Process: Photosynthesis\n• Site: Chloroplast\n• Products: Glucose + O₂',
+    chemical:'6CO₂ + 6H₂O → (sunlight/chlorophyll) → C₆H₁₂O₆ + 6O₂',
+    ans2:'<strong>B. HETEROTROPHIC NUTRITION (Animals)</strong>\n• Organisms consume other organisms for food\n• Types: Holozoic (humans), Saprophytic (fungi), Parasitic (tapeworm), Mutualistic\n• Process: Ingestion → Digestion → Absorption → Assimilation → Egestion\n• Site: Digestive system\n\n<strong>C. ECOSYSTEM SIGNIFICANCE:</strong>\n• <em>Autotrophs (Producers):</em> Base of every food chain. Convert solar energy → chemical energy. Release O₂ — sustains all aerobic life.\n• <em>Heterotrophs (Consumers):</em> Transfer energy up the food chain. Herbivores → carnivores → decomposers.\n• <em>Saprophytes (Decomposers):</em> Return nutrients from dead organic matter back to soil → nutrient cycling.\n• Together they maintain the balance of CO₂ and O₂ in the atmosphere.',
+    hint:'5-mark comparison: Write both with equations, types, sites. Then explain food chain + nutrient cycling roles in ecosystem.'
+  },
+  {
+    id:30, type:'long', topic:'excr', marks:5,
+    q:'Describe excretion in plants. How does it differ from excretion in animals? Explain with examples.',
+    ans:'<strong>EXCRETION IN PLANTS</strong>\nPlants produce relatively less metabolic waste since much of their waste is reused. They lack specialised excretory organs.\n\n<em>Methods of excretion in plants:</em>\n1. <strong>CO₂ and O₂ via stomata:</strong> CO₂ from respiration and O₂ from photosynthesis are released through stomatal pores and lenticels in bark.\n2. <strong>Water vapour:</strong> Excess water removed by transpiration through stomata.\n3. <strong>Vacuoles:</strong> Waste products (resins, gums, tannins, essential oils, alkaloids like morphine, caffeine) stored in vacuoles of old cells in bark and heartwood.\n4. <strong>Leaf fall:</strong> Accumulated wastes in leaves are permanently removed when leaves fall in autumn/dry season.\n5. <strong>Root secretion:</strong> Some waste excreted into surrounding soil (allelopathic chemicals).',
+    chemical:'Plant waste: CO₂ (via stomata), H₂O (transpiration), tannins/resins (stored)',
+    ans2:'<strong>EXCRETION IN ANIMALS (Humans):</strong>\n• Specialised excretory organs: Kidneys, Lungs, Skin, Liver\n• Urea (nitrogenous waste) produced in liver and removed by kidneys as urine\n• CO₂ removed by lungs during breathing\n• Water, NaCl, traces of urea removed by skin (sweat)\n\n<strong>KEY DIFFERENCES:</strong>\n1. Plants have NO specialised excretory organs; animals have dedicated organs (kidneys, lungs)\n2. Plant wastes are often stored and reused; animal wastes (urea, CO₂) are toxic and must be eliminated\n3. Plants produce less toxic waste (CO₂ and O₂ interchange in photosynthesis/respiration); animals produce toxic urea from protein metabolism\n4. Plant excretion is largely passive (diffusion, transpiration); animal excretion involves active transport (kidneys)\n5. Plant waste can be useful raw material (CO₂ for photosynthesis); animal waste (urea) has no further use in the body',
+    hint:'5-mark comparison: List ALL methods in plants (5 methods) + ALL organs in animals + give clear numbered differences.'
+  }
+];
+
+// ── state ──
+const state = {};
+let currentFilter = 'all';
+
+function getVisible() {
+  if (currentFilter === 'all') return Q;
+  return Q.filter(q => q.type === currentFilter);
+}
+
+function filterQ(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function topicStrip(t) {
+  const m = { nutr:'strip-nutr', resp:'strip-resp', trans:'strip-trans', excr:'strip-excr', general:'strip-general' };
+  return m[t] || 'strip-general';
+}
+function typeBadge(t) {
+  const m = { mcq:'badge-mcq MCQ', short:'badge-short Short Answer', long:'badge-long Long Answer', assert:'badge-assert Assertion–Reason' };
+  return m[t] || t;
+}
+function markBadge(m) {
+  const c = m===1?'badge-1m':m===2?'badge-2m':m===3?'badge-3m':'badge-5m';
+  return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`;
+}
+function numColor(t) {
+  const m = { nutr:'rgba(34,197,94,.15)', resp:'rgba(249,115,22,.15)', trans:'rgba(59,130,246,.15)', excr:'rgba(168,85,247,.15)', general:'rgba(100,116,139,.15)' };
+  return m[t] || m.general;
+}
+function numTextColor(t) {
+  const m = { nutr:'#4ade80', resp:'#fb923c', trans:'#60a5fa', excr:'#c084fc', general:'#94a3b8' };
+  return m[t] || m.general;
+}
+
+function renderMCQ(q) {
+  const s = state[q.id] || {};
+  const done = s.chosen !== undefined;
+  return `<div class="mcq-body">
+    <div class="mcq-opts">
+      ${q.opts.map((o,i) => {
+        let cls = '';
+        if (done) {
+          if (i === q.ans) cls = 'correct';
+          else if (i === s.chosen && i !== q.ans) cls = 'wrong';
+        }
+        return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+          <span class="opt-label">${String.fromCharCode(65+i)}</span>${o}
+        </button>`;
+      }).join('')}
+    </div>
+    ${done ? `<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+      ${s.chosen===q.ans ? '✓ Correct!' : '✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}
+    </div>
+    <div class="ans-body" style="border-top:1px solid var(--border);padding:.7rem 0 .3rem">
+      <div class="ans-label">💡 Explanation</div>
+      <div class="ans-text">${q.explain}</div>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderShortLong(q) {
+  const s = state[q.id] || {};
+  const open = s.open;
+  let ansHtml = '<div class="ans-label">✅ Model Answer</div><div class="ans-text">';
+  ansHtml += (q.ans||'').replace(/\n/g,'<br>');
+  if (q.chemical)  ansHtml += `</div><div class="chemical">${q.chemical}</div><div class="ans-text">`;
+  if (q.ans2)      ansHtml += q.ans2.replace(/\n/g,'<br>');
+  if (q.chemical2) ansHtml += `</div><div class="chemical">${q.chemical2}</div><div class="ans-text">`;
+  if (q.ans3)      ansHtml += q.ans3.replace(/\n/g,'<br>');
+  if (q.chemical3) ansHtml += `</div><div class="chemical">${q.chemical3}</div><div class="ans-text">`;
+  if (q.ans4)      ansHtml += q.ans4.replace(/\n/g,'<br>');
+  if (q.chemical4) ansHtml += `</div><div class="chemical">${q.chemical4}</div><div class="ans-text">`;
+  if (q.ans5)      ansHtml += q.ans5.replace(/\n/g,'<br>');
+  if (q.chemical5) ansHtml += `</div><div class="chemical">${q.chemical5}</div><div class="ans-text">`;
+  ansHtml += '</div>';
+  if (q.hint) ansHtml += `<div class="hint">🎯 Exam tip: ${q.hint}</div>`;
+  return `<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+    ${open ? '▲ Hide Answer' : '▼ Show Model Answer'}
+  </button>
+  <div class="ans-reveal ${open?'open':''}">
+    <div class="ans-body">${ansHtml}</div>
+  </div>`;
+}
+
+function render() {
+  const list = getVisible();
+  const el = document.getElementById('qlist');
+  if (!list.length) { el.innerHTML = '<div class="empty">No questions in this category.</div>'; return; }
+  el.innerHTML = list.map((q,i) => {
+    const tb = typeBadge(q.type).split(' ');
+    const cls = tb[0]; const lbl = tb.slice(1).join(' ');
+    return `<div class="q-card ${topicStrip(q.topic)}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${numColor(q.topic)};color:${numTextColor(q.topic)}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${cls}">${lbl}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert' ? renderMCQ(q) : renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id, optIdx) {
+  const q = Q.find(x => x.id===id);
+  if (!q || state[id]?.chosen !== undefined) return;
+  if (!state[id]) state[id] = {};
+  state[id].chosen = optIdx;
+  updateDash();
+  const el = document.getElementById('qcard-'+id);
+  const visible = getVisible();
+  const i = visible.findIndex(x => x.id===id);
+  const tb = typeBadge(q.type).split(' ');
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = `<div class="q-card ${topicStrip(q.topic)}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${numColor(q.topic)};color:${numTextColor(q.topic)}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta">
+      <span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>
+      ${markBadge(q.marks)}
+    </div>
+    ${renderMCQ(q)}
+  </div>`;
+  el.replaceWith(tempDiv.firstElementChild);
+}
+
+function toggleAns(id) {
+  if (!state[id]) state[id] = {};
+  state[id].open = !state[id].open;
+  if (!state[id].viewed) { state[id].viewed = true; updateDash(); }
+  const btn = document.querySelector(`#qcard-${id} .show-btn`);
+  const rev = document.querySelector(`#qcard-${id} .ans-reveal`);
+  if (btn && rev) {
+    const open = state[id].open;
+    btn.classList.toggle('active', open);
+    btn.textContent = open ? '▲ Hide Answer' : '▼ Show Model Answer';
+    rev.classList.toggle('open', open);
+  }
+}
+
+function updateDash() {
+  const attempted = Object.keys(state).length;
+  const correct = Q.filter(q => state[q.id]?.chosen === q.ans).length;
+  const mcqTotal = Q.filter(q => q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-attempted').textContent = attempted;
+  document.getElementById('d-correct').textContent = correct;
+  const pct = mcqTotal > 0 ? Math.round((correct / mcqTotal) * 100) : 0;
+  document.getElementById('d-score').textContent = pct + '%';
+}
+
+function resetAll() {
+  for (const k in state) delete state[k];
+  updateDash();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Processes — Class X Biology</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --nutr:  #22c55e;
+    --resp:  #f97316;
+    --trans: #3b82f6;
+    --excr:  #a855f7;
+    --bg:    #0f172a;
+    --card:  #1e293b;
+    --card2: #263148;
+    --text:  #e2e8f0;
+    --muted: #94a3b8;
+    --border:#334155;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── header ── */
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1rem;
+    position: relative;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34,197,94,.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #22c55e 0%, #06b6d4 50%, #f97316 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p {
+    color: var(--muted);
+    font-size: .95rem;
+    margin-top: .4rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── nav tabs ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: 1.5rem 1rem .5rem;
+  }
+  nav button {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    padding: .5rem 1.3rem;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .25s;
+    letter-spacing: .5px;
+  }
+  nav button:hover { border-color: #64748b; color: var(--text); }
+  nav button.active-nutr  { border-color: var(--nutr);  color: var(--nutr);  background: rgba(34,197,94,.1); }
+  nav button.active-resp  { border-color: var(--resp);  color: var(--resp);  background: rgba(249,115,22,.1); }
+  nav button.active-trans { border-color: var(--trans); color: var(--trans); background: rgba(59,130,246,.1); }
+  nav button.active-excr  { border-color: var(--excr);  color: var(--excr);  background: rgba(168,85,247,.1); }
+
+  /* ── main sections ── */
+  main { padding: 1.5rem 1rem 4rem; max-width: 900px; margin: 0 auto; }
+  section { display: none; animation: fadeUp .4s ease; }
+  section.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── section title ── */
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+  }
+
+  /* ── cards grid ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  .card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+  .card p, .card li { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+  .card ul { padding-left: 1.1rem; }
+  .card .tag {
+    display: inline-block;
+    font-size: .72rem;
+    font-family: 'DM Mono', monospace;
+    padding: .15rem .5rem;
+    border-radius: 99px;
+    margin-bottom: .5rem;
+    font-weight: 500;
+  }
+  .nutr-tag  { background: rgba(34,197,94,.15);  color: var(--nutr); }
+  .resp-tag  { background: rgba(249,115,22,.15);  color: var(--resp); }
+  .trans-tag { background: rgba(59,130,246,.15);  color: var(--trans); }
+  .excr-tag  { background: rgba(168,85,247,.15);  color: var(--excr); }
+
+  /* ── concept pills ── */
+  .concept-pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.2rem; }
+  .pill {
+    font-size: .78rem;
+    font-family: 'DM Mono', monospace;
+    padding: .25rem .75rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--card);
+  }
+
+  /* ── observation ── */
+  .observation {
+    font-size: .85rem;
+    color: var(--nutr);
+    padding: .6rem .8rem;
+    background: rgba(34,197,94,.08);
+    border-left: 3px solid var(--nutr);
+    border-radius: 0 8px 8px 0;
+    margin-top: .6rem;
+  }
+  .obs-resp  { color: var(--resp);  background: rgba(249,115,22,.08);  border-left-color: var(--resp); }
+  .obs-trans { color: var(--trans); background: rgba(59,130,246,.08);  border-left-color: var(--trans); }
+  .obs-excr  { color: var(--excr);  background: rgba(168,85,247,.08);  border-left-color: var(--excr); }
+
+  /* ── equation display ── */
+  .eq-display {
+    font-family: 'DM Mono', monospace;
+    font-size: .9rem;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: .6rem 0;
+    border: 1px solid var(--border);
+    line-height: 1.8;
+  }
+  .eq-display .reactant { color: #f87171; }
+  .eq-display .product  { color: #34d399; }
+  .eq-display .arrow    { color: #fbbf24; margin: 0 .4rem; }
+  .eq-display .cond     { color: var(--muted); font-size: .78rem; }
+
+  /* ─────────────────────────────────────────
+     NUTRITION — Photosynthesis scene
+  ───────────────────────────────────────── */
+  .photo-scene {
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .photo-scene h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+
+  .photo-stage {
+    position: relative;
+    height: 160px;
+    background: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  /* Sun */
+  .sun {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 48px; height: 48px;
+    background: radial-gradient(circle, #fde68a, #f59e0b);
+    border-radius: 50%;
+    box-shadow: 0 0 22px #f59e0b88, 0 0 44px #f59e0b33;
+    animation: sunPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes sunPulse {
+    0%,100% { box-shadow: 0 0 22px #f59e0b88, 0 0 44px #f59e0b33; }
+    50%      { box-shadow: 0 0 34px #f59e0bcc, 0 0 66px #f59e0b55; }
+  }
+
+  /* Leaf */
+  .leaf {
+    position: absolute;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 84px; height: 62px;
+    background: radial-gradient(ellipse at 40% 40%, #16a34a, #052e16);
+    border-radius: 0 80% 0 80%;
+    box-shadow: 0 0 18px rgba(34,197,94,.45);
+    animation: leafGlow 2.5s ease-in-out infinite;
+  }
+  @keyframes leafGlow {
+    0%,100% { box-shadow: 0 0 18px rgba(34,197,94,.45); }
+    50%      { box-shadow: 0 0 30px rgba(34,197,94,.75); }
+  }
+
+  /* Particles */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    font-size: .58rem;
+    font-family: 'DM Mono', monospace;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    width: 28px; height: 28px;
+  }
+  .co2-p { background: rgba(251,146,60,.2); border: 1px solid #fb923c; color: #fb923c; }
+  .o2-p  { background: rgba(34,197,94,.2);  border: 1px solid #4ade80; color: #4ade80; }
+
+  @keyframes co2in {
+    0%   { opacity: .9; transform: translate(0,0); }
+    100% { opacity: 0;  transform: translate(-70px, 18px) scale(.3); }
+  }
+  @keyframes o2out {
+    0%   { opacity: 0;  transform: translate(0,0) scale(.3); }
+    100% { opacity: .9; transform: translate(58px,-42px) scale(1); }
+  }
+  .co2-1 { top: 85px; left: 18%; animation: co2in 2.2s ease-in-out infinite; }
+  .co2-2 { top:102px; left: 24%; animation: co2in 2.2s .55s ease-in-out infinite; }
+  .co2-3 { top: 68px; left: 12%; animation: co2in 2.2s 1.1s ease-in-out infinite; }
+  .o2-1  { top: 28px; right:18%; animation: o2out 2.2s .2s  ease-in-out infinite; }
+  .o2-2  { top: 48px; right:26%; animation: o2out 2.2s .75s ease-in-out infinite; }
+  .o2-3  { top: 18px; right:12%; animation: o2out 2.2s 1.3s ease-in-out infinite; }
+
+  .photo-labels {
+    display: flex; justify-content: space-between;
+    font-size: .72rem; font-family: 'DM Mono', monospace;
+    color: var(--muted); padding: 0 .5rem;
+  }
+  .photo-labels .co2-lbl { color: #fb923c; }
+  .photo-labels .o2-lbl  { color: #4ade80; }
+
+  /* ── Digestion journey ── */
+  .digest-journey {
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .digest-journey h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .digest-step {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: .8rem; border-radius: 12px;
+    cursor: pointer; transition: background .2s; margin-bottom: .2rem;
+    border: 1px solid transparent;
+  }
+  .digest-step:hover { background: var(--card2); }
+  .digest-step.active { background: var(--card2); border-color: var(--border); }
+  .digest-icon {
+    font-size: 1.4rem; min-width: 36px; height: 36px;
+    background: var(--bg); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .digest-info h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; }
+  .digest-info p { font-size: .82rem; color: var(--muted); line-height: 1.5; margin-top: .2rem; }
+  .digest-connector { width: 2px; height: 12px; background: var(--border); margin-left: 17px; }
+
+  /* ─────────────────────────────────────────
+     RESPIRATION — Lungs scene
+  ───────────────────────────────────────── */
+  .lungs-scene {
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .lungs-scene h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .lungs-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1.5rem; padding: 1rem 0;
+  }
+  .lung {
+    width: 76px; height: 100px;
+    border-radius: 80% 20% 80% 20%;
+    border: 2px solid var(--resp);
+    background: rgba(249,115,22,.1);
+    animation: breathe 4s ease-in-out infinite;
+    box-shadow: 0 0 18px rgba(249,115,22,.3);
+  }
+  .lung.lung-r { border-radius: 20% 80% 20% 80%; animation-delay: .12s; }
+  @keyframes breathe {
+    0%,100% { transform: scaleY(1)    scaleX(1);    opacity: .6; box-shadow: 0 0 18px rgba(249,115,22,.3); }
+    42%      { transform: scaleY(1.2)  scaleX(1.14); opacity: 1;  box-shadow: 0 0 30px rgba(249,115,22,.6); }
+  }
+  .trachea {
+    width: 16px; height: 62px;
+    background: linear-gradient(to bottom, #334155, rgba(249,115,22,.4));
+    border-radius: 8px;
+  }
+  .lung-labels {
+    display: flex; justify-content: center; gap: 4rem;
+    font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--muted);
+    margin-top: .4rem;
+  }
+  .breathe-status {
+    text-align: center;
+    font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700;
+    color: var(--resp); margin-top: .6rem;
+  }
+
+  /* ── Aerobic / Anaerobic toggle ── */
+  .resp-toggle {
+    background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .resp-toggle h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .toggle-btns { display: flex; gap: .5rem; margin-bottom: 1rem; }
+  .tog-btn {
+    flex: 1; padding: .6rem; border-radius: 10px;
+    border: 2px solid var(--border); background: var(--card2);
+    color: var(--muted); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .25s;
+    text-align: center;
+  }
+  .tog-btn.active-aerobic   { border-color: var(--nutr);  color: var(--nutr);  background: rgba(34,197,94,.1); }
+  .tog-btn.active-anaerobic { border-color: var(--resp);  color: var(--resp);  background: rgba(249,115,22,.1); }
+  .resp-panel { display: none; }
+  .resp-panel.visible { display: block; animation: fadeUp .3s ease; }
+
+  /* ATP display */
+  .atp-display {
+    display: flex; align-items: center; gap: 1.5rem;
+    background: var(--bg); border-radius: 12px; padding: 1rem 1.2rem;
+    border: 1px solid var(--border); margin: .8rem 0; flex-wrap: wrap;
+  }
+  .atp-val { font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; }
+  .atp-label { font-family: 'DM Mono', monospace; font-size: .8rem; color: var(--muted); }
+  .atp-bar { flex: 1; height: 10px; border-radius: 99px; background: var(--border); overflow: hidden; min-width: 100px; }
+  .atp-fill { height: 100%; border-radius: 99px; transition: width 1s ease; }
+
+  /* ─────────────────────────────────────────
+     TRANSPORT — Heart scene
+  ───────────────────────────────────────── */
+  .heart-scene {
+    background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .heart-scene h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .heart-wrap { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+  .heart-anim {
+    flex-shrink: 0; width: 100px; height: 90px;
+    position: relative;
+    animation: heartbeat 1.2s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    14%  { transform: scale(1.13); }
+    28%  { transform: scale(1); }
+    42%  { transform: scale(1.07); }
+    70%  { transform: scale(1); }
+  }
+  .heart-anim::before, .heart-anim::after {
+    content: '';
+    position: absolute; top: 0;
+    width: 50px; height: 76px;
+    border-radius: 50px 50px 0 0;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 0 22px rgba(239,68,68,.45);
+  }
+  .heart-anim::before { left: 50px; transform: rotate(-45deg); transform-origin: 0 100%; }
+  .heart-anim::after  { left: 0;    transform: rotate(45deg);  transform-origin: 100% 100%; }
+
+  .heart-info { flex: 1; min-width: 200px; }
+  .chamber-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .5rem; }
+  .chamber {
+    padding: .6rem .8rem; border-radius: 10px;
+    font-size: .8rem; font-family: 'DM Mono', monospace; line-height: 1.4;
+  }
+  .chamber strong { display: block; font-family: 'Syne', sans-serif; font-size: .78rem; margin-bottom: .2rem; }
+  .ch-ra { background: rgba(100,116,139,.1); border: 1px solid #475569; }
+  .ch-la { background: rgba(239,68,68,.08);  border: 1px solid rgba(239,68,68,.2); color: #fca5a5; }
+  .ch-rv { background: rgba(100,116,139,.1); border: 1px solid #475569; }
+  .ch-lv { background: rgba(239,68,68,.1);   border: 1px solid rgba(239,68,68,.3); color: #f87171; }
+
+  /* ── Blood composition bar ── */
+  .blood-comp {
+    background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .blood-comp h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .blood-bar {
+    display: flex; height: 40px; border-radius: 8px; overflow: hidden;
+    margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  .blood-seg {
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: .7rem; font-weight: 500;
+    white-space: nowrap; overflow: hidden; padding: 0 .3rem; cursor: default;
+  }
+  .seg-plasma    { flex: 55; background: #fef3c7; color: #78350f; }
+  .seg-rbc       { flex: 40; background: #dc2626; color: #fee2e2; }
+  .seg-wbc       { flex: 4;  background: #f0fdf4; color: #052e16; }
+  .seg-platelets { flex: 1;  background: #bfdbfe; color: #1e40af; }
+  .blood-legend { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .leg-item { display: flex; align-items: center; gap: .4rem; font-size: .78rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ─────────────────────────────────────────
+     EXCRETION — Nephron scene
+  ───────────────────────────────────────── */
+  .nephron-scene {
+    background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .nephron-scene h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .nephron-btns { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .nbtn {
+    padding: .4rem 1rem; border-radius: 99px;
+    border: 1px solid var(--border); background: var(--card2);
+    color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  }
+  .nbtn:hover, .nbtn.active { background: var(--excr); color: #fff; border-color: var(--excr); }
+  .nephron-display {
+    background: var(--bg); border-radius: 12px;
+    border: 1px solid var(--border); padding: 1rem; min-height: 110px;
+  }
+  .nephron-display .n-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+  .nephron-display .n-desc  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+  .nephron-display .n-eq    {
+    font-family: 'DM Mono', monospace; font-size: .8rem;
+    background: var(--card); padding: .6rem .8rem; border-radius: 8px;
+    margin-top: .6rem; color: var(--excr); line-height: 1.7;
+  }
+
+  /* ── Dialysis animation ── */
+  .dialysis-scene {
+    background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .dialysis-scene h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .dialysis-tube {
+    width: 100%; height: 56px; background: var(--bg);
+    border-radius: 28px; border: 2px solid var(--excr);
+    position: relative; overflow: hidden; margin: 1rem 0;
+    box-shadow: 0 0 16px rgba(168,85,247,.2);
+  }
+  .blood-flow {
+    position: absolute; top: 50%; left: -32px;
+    transform: translateY(-50%);
+    width: 28px; height: 28px; background: #dc2626; border-radius: 50%;
+    animation: flowBlood 3.2s linear infinite;
+    box-shadow: 0 0 12px rgba(220,38,38,.5);
+  }
+  .waste-ptcl {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 9px; height: 9px; background: #a855f7; border-radius: 50%;
+    animation: wasteOut 3.2s linear infinite; opacity: 0;
+  }
+  .waste-ptcl:nth-child(2) { animation-delay: .9s; }
+  .waste-ptcl:nth-child(3) { animation-delay: 1.8s; }
+  @keyframes flowBlood { 0% { left: -32px; } 100% { left: calc(100% + 32px); } }
+  @keyframes wasteOut  {
+    0%   { opacity: 0;  top: 50%; }
+    25%  { opacity: 0; }
+    50%  { opacity: 1;  top: 85%; }
+    100% { opacity: 0;  top: 120%; }
+  }
+  .dialysis-label {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--muted);
+  }
+
+  /* ── info-box ── */
+  .info-box {
+    background: var(--card); border-radius: 16px;
+    padding: 1.5rem; border: 1px solid var(--border); margin-bottom: 1rem;
+  }
+  .info-box h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+
+  /* ── mobile ── */
+  @media (max-width: 520px) {
+    .heart-wrap { justify-content: center; }
+    .blood-bar  { height: 28px; font-size: .6rem; }
+    .toggle-btns { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Life Processes</h1>
+  <p>Class X · CBSE Biology · Chapter 6</p>
+</header>
+
+<nav>
+  <button onclick="show('nutr')"  id="btn-nutr"  class="active-nutr">🌿 Nutrition</button>
+  <button onclick="show('resp')"  id="btn-resp">💨 Respiration</button>
+  <button onclick="show('trans')" id="btn-trans">❤️ Transport</button>
+  <button onclick="show('excr')"  id="btn-excr">🫘 Excretion</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════ NUTRITION ═══════════════ -->
+<section id="nutr" class="visible">
+  <div class="sec-title" style="color:var(--nutr)">🌿 Nutrition</div>
+
+  <div class="concept-pills">
+    <span class="pill">Autotrophic</span>
+    <span class="pill">Heterotrophic</span>
+    <span class="pill">Chlorophyll</span>
+    <span class="pill">6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</span>
+    <span class="pill">Holozoic · Saprophytic · Parasitic</span>
+  </div>
+
+  <!-- Photosynthesis animation -->
+  <div class="photo-scene">
+    <h3>☀️ Photosynthesis — Live Process</h3>
+    <div class="photo-stage">
+      <div class="sun"></div>
+      <div class="leaf"></div>
+      <!-- CO₂ particles -->
+      <div class="particle co2-p co2-1">CO₂</div>
+      <div class="particle co2-p co2-2">CO₂</div>
+      <div class="particle co2-p co2-3">CO₂</div>
+      <!-- O₂ particles -->
+      <div class="particle o2-p o2-1">O₂</div>
+      <div class="particle o2-p o2-2">O₂</div>
+      <div class="particle o2-p o2-3">O₂</div>
+    </div>
+    <div class="photo-labels">
+      <span class="co2-lbl">← CO₂ + H₂O (Reactants)</span>
+      <span>☀️ Sunlight + Chlorophyll</span>
+      <span class="o2-lbl">O₂ + Glucose → (Products)</span>
+    </div>
+    <div class="eq-display" style="margin-top:1rem">
+      <span class="reactant">6CO₂</span> <span class="arrow">+</span>
+      <span class="reactant">6H₂O</span>
+      <span class="arrow">— sunlight / chlorophyll →</span>
+      <span class="product">C₆H₁₂O₆</span> <span class="arrow">+</span>
+      <span class="product">6O₂</span>
+      <br>
+      <span class="cond">Light reactions (thylakoid) produce ATP + NADPH · Dark reactions (stroma/Calvin cycle) fix CO₂ → glucose</span>
+    </div>
+    <div class="observation">🔬 Chlorophyll absorbs red and blue light, reflects green — that's why leaves appear green. Only the green parts of a leaf can photosynthesize.</div>
+  </div>
+
+  <!-- Nutrition type cards -->
+  <div class="cards">
+    <div class="card">
+      <span class="tag nutr-tag">AUTOTROPHIC</span>
+      <h3>Photosynthesis Stages</h3>
+      <ul>
+        <li><strong>Light Reaction (thylakoid):</strong> Splits H₂O, releases O₂, forms ATP + NADPH</li>
+        <li><strong>Dark Reaction (stroma):</strong> CO₂ + ATP + NADPH → Glucose (Calvin cycle)</li>
+        <li>Requires chlorophyll, sunlight, CO₂, H₂O</li>
+        <li>Stomata open to take in CO₂</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag nutr-tag">HETEROTROPHIC</span>
+      <h3>Holozoic Nutrition</h3>
+      <ul>
+        <li>Ingest → Digest → Absorb → Assimilate → Egestion</li>
+        <li>Herbivores: Plants only (cow, deer)</li>
+        <li>Carnivores: Animals only (lion, eagle)</li>
+        <li>Omnivores: Both (humans, bears, cockroach)</li>
+        <li>Amoeba: Engulfs food via pseudopodia (phagocytosis)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag nutr-tag">HETEROTROPHIC</span>
+      <h3>Saprophytic &amp; Parasitic</h3>
+      <ul>
+        <li>Saprophytic: Dead/decaying matter (fungi, bacteria)</li>
+        <li>Important for decomposition &amp; nutrient cycling</li>
+        <li>Parasitic: Live on/in a living host</li>
+        <li>Ectoparasites: Lice, leeches (on surface)</li>
+        <li>Endoparasites: Tapeworm, Ascaris (inside host)</li>
+        <li>Cuscuta: Plant parasite (dodder)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag nutr-tag">NUTRITION IN AMOEBA</span>
+      <h3>Amoeba — Holozoic</h3>
+      <ul>
+        <li>Pseudopodia engulf food particle</li>
+        <li>Food vacuole formed inside cytoplasm</li>
+        <li>Lysosomes release enzymes → digestion</li>
+        <li>Nutrients diffuse into cytoplasm</li>
+        <li>Undigested remnants expelled by exocytosis</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Digestive journey -->
+  <div class="digest-journey">
+    <h3>🍽️ Human Digestive Journey — Click each step</h3>
+    <div class="digest-step active" onclick="activateStep(this)">
+      <div class="digest-icon">👄</div>
+      <div class="digest-info">
+        <h4>Mouth (Buccal Cavity)</h4>
+        <p>Teeth mechanically break food. Salivary amylase (ptyalin) begins starch digestion → maltose. Saliva lubricates food into a bolus. pH ≈ 7.</p>
+      </div>
+    </div>
+    <div class="digest-connector"></div>
+    <div class="digest-step" onclick="activateStep(this)">
+      <div class="digest-icon">🌀</div>
+      <div class="digest-info">
+        <h4>Oesophagus</h4>
+        <p>Muscular tube connecting mouth to stomach. Peristalsis (wave-like muscular contractions) pushes the bolus downward. No digestion occurs here.</p>
+      </div>
+    </div>
+    <div class="digest-connector"></div>
+    <div class="digest-step" onclick="activateStep(this)">
+      <div class="digest-icon">🫃</div>
+      <div class="digest-info">
+        <h4>Stomach</h4>
+        <p>Gastric glands secrete HCl (pH ≈ 2) — kills bacteria. Pepsin (activated by HCl) digests proteins → peptides. Mucus protects stomach lining. Food becomes chyme.</p>
+      </div>
+    </div>
+    <div class="digest-connector"></div>
+    <div class="digest-step" onclick="activateStep(this)">
+      <div class="digest-icon">🔄</div>
+      <div class="digest-info">
+        <h4>Small Intestine</h4>
+        <p>Liver secretes bile — emulsifies fats. Pancreatic juice: Trypsin (proteins), Lipase (fats), Amylase (starch). Intestinal enzymes: Maltase, Sucrase. Villi &amp; microvilli absorb nutrients into the blood &amp; lymph.</p>
+      </div>
+    </div>
+    <div class="digest-connector"></div>
+    <div class="digest-step" onclick="activateStep(this)">
+      <div class="digest-icon">💧</div>
+      <div class="digest-info">
+        <h4>Large Intestine (Colon)</h4>
+        <p>Absorbs remaining water and electrolytes. Gut bacteria produce vitamins (B12, K). Undigested material forms faeces, stored in rectum, then egested via the anus.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ RESPIRATION ═══════════════ -->
+<section id="resp">
+  <div class="sec-title" style="color:var(--resp)">💨 Respiration</div>
+
+  <div class="concept-pills">
+    <span class="pill">ATP — energy currency</span>
+    <span class="pill">Mitochondria</span>
+    <span class="pill">Cytoplasm (Glycolysis)</span>
+    <span class="pill">Aerobic vs Anaerobic</span>
+    <span class="pill">Alveoli</span>
+  </div>
+
+  <!-- Lungs animation -->
+  <div class="lungs-scene">
+    <h3>🫁 Breathing — Gas Exchange in Alveoli</h3>
+    <div class="lungs-wrap">
+      <div class="lung lung-l"></div>
+      <div class="trachea"></div>
+      <div class="lung lung-r"></div>
+    </div>
+    <div class="lung-labels">
+      <span>Left Lung</span>
+      <span>Right Lung</span>
+    </div>
+    <p class="breathe-status" id="breatheStatus">🫁 Inhaling O₂ ...</p>
+    <div class="observation obs-resp" style="margin-top:1rem">🔬 ~300 million alveoli in each lung give a total surface area of ~70 m². Walls are 1 cell thick with a dense capillary network. O₂ diffuses from air → blood; CO₂ from blood → air (passive diffusion along concentration gradients).</div>
+  </div>
+
+  <!-- Aerobic vs Anaerobic -->
+  <div class="resp-toggle">
+    <h3>⚡ Choose Respiration Type</h3>
+    <div class="toggle-btns">
+      <button class="tog-btn active-aerobic"   onclick="setResp('aerobic',   this)">🟢 Aerobic (With O₂)</button>
+      <button class="tog-btn"                  onclick="setResp('anaerobic', this)">🔴 Anaerobic (Without O₂)</button>
+    </div>
+
+    <div class="resp-panel visible" id="panel-aerobic">
+      <div class="atp-display">
+        <div>
+          <div class="atp-val" style="color:#22c55e">38</div>
+          <div class="atp-label">ATP molecules</div>
+        </div>
+        <div class="atp-bar">
+          <div class="atp-fill" style="width:100%;background:linear-gradient(90deg,#22c55e,#06b6d4)"></div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted)">Complete oxidation<br>Maximum efficiency</div>
+      </div>
+      <div class="eq-display">
+        <span class="reactant">C₆H₁₂O₆</span> <span class="arrow">+</span>
+        <span class="reactant">6O₂</span> <span class="arrow">→</span>
+        <span class="product">6CO₂</span> <span class="arrow">+</span>
+        <span class="product">6H₂O</span> <span class="arrow">+</span>
+        <span class="product">38 ATP</span>
+        <br>
+        <span class="cond">Occurs in mitochondria · Requires O₂ · Complete oxidation of glucose</span>
+      </div>
+      <div class="observation obs-resp">🔬 3 stages: Glycolysis (cytoplasm, 2 ATP) → Krebs cycle (mitochondrial matrix, 2 ATP) → Electron Transport Chain (inner mitochondrial membrane, 34 ATP). O₂ is the final electron acceptor.</div>
+    </div>
+
+    <div class="resp-panel" id="panel-anaerobic">
+      <div class="atp-display">
+        <div>
+          <div class="atp-val" style="color:#f97316">2</div>
+          <div class="atp-label">ATP molecules</div>
+        </div>
+        <div class="atp-bar">
+          <div class="atp-fill" style="width:5.3%;background:linear-gradient(90deg,#f97316,#ef4444)"></div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted)">Partial oxidation<br>Very low efficiency</div>
+      </div>
+      <div class="toggle-btns" style="margin-bottom:.8rem">
+        <button class="tog-btn active-aerobic" style="font-size:.78rem" onclick="setAnaerobicType('yeast', this)">🍺 Yeast (Fermentation)</button>
+        <button class="tog-btn"               style="font-size:.78rem" onclick="setAnaerobicType('muscle', this)">💪 Muscle Cells</button>
+      </div>
+      <div id="anaerobic-display">
+        <div class="eq-display">
+          <span class="reactant">C₆H₁₂O₆</span> <span class="arrow">→</span>
+          <span class="product">2C₂H₅OH</span> <span class="arrow">+</span>
+          <span class="product">2CO₂</span> <span class="arrow">+</span>
+          <span class="product">2 ATP</span>
+          <br>
+          <span class="cond">Yeast fermentation · Used in bread, wine and beer production</span>
+        </div>
+        <div class="observation obs-resp">🔬 CO₂ produced causes bread dough to rise. Ethanol (alcohol) is a by-product used in brewing. Industrial application: biofuel production from fermentation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pathway cards -->
+  <div class="cards">
+    <div class="card">
+      <span class="tag resp-tag">STAGE 1</span>
+      <h3>Glycolysis</h3>
+      <ul>
+        <li>Occurs in <strong>cytoplasm</strong></li>
+        <li>Glucose (6C) → 2 Pyruvate (3C)</li>
+        <li>Net yield: 2 ATP + 2 NADH</li>
+        <li>Does NOT require O₂</li>
+        <li>Common step for both aerobic &amp; anaerobic</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag resp-tag">STAGE 2</span>
+      <h3>Krebs Cycle</h3>
+      <ul>
+        <li>Occurs in <strong>mitochondrial matrix</strong></li>
+        <li>Pyruvate → Acetyl CoA → CO₂ released</li>
+        <li>Produces NADH and FADH₂</li>
+        <li>Yield: 2 ATP per glucose molecule</li>
+        <li>Aerobic only — requires O₂</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag resp-tag">STAGE 3</span>
+      <h3>Electron Transport Chain</h3>
+      <ul>
+        <li>Inner mitochondrial membrane</li>
+        <li>NADH + FADH₂ donate electrons → ATP formed</li>
+        <li>Produces 34 ATP (bulk of energy)</li>
+        <li>O₂ is the final electron acceptor → H₂O</li>
+        <li>Chemiosmosis drives ATP synthesis</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag resp-tag">BREATHING</span>
+      <h3>Human Respiratory Tract</h3>
+      <ul>
+        <li>Nose: Filters, warms, moistens air; mucus traps dust</li>
+        <li>Trachea: Lined with cilia and mucus</li>
+        <li>Bronchi → Bronchioles → Alveoli</li>
+        <li>Diaphragm + intercostal muscles drive breathing</li>
+        <li>Haemoglobin in RBC transports O₂ (oxyhaemoglobin)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TRANSPORT ═══════════════ -->
+<section id="trans">
+  <div class="sec-title" style="color:var(--trans)">❤️ Transportation</div>
+
+  <div class="concept-pills">
+    <span class="pill">Xylem — Water &amp; Minerals</span>
+    <span class="pill">Phloem — Food (Sucrose)</span>
+    <span class="pill">Double Circulation</span>
+    <span class="pill">Haemoglobin</span>
+    <span class="pill">Transpiration Pull</span>
+  </div>
+
+  <!-- Beating heart -->
+  <div class="heart-scene">
+    <h3>❤️ Human Heart — Double Circulation</h3>
+    <div class="heart-wrap">
+      <div class="heart-anim"></div>
+      <div class="heart-info">
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:.6rem">The heart beats ~70 times/min, pumping blood through two separate circuits simultaneously.</p>
+        <div class="chamber-grid">
+          <div class="chamber ch-ra">
+            <strong>Right Atrium</strong>
+            Receives deoxygenated blood from body via vena cava
+          </div>
+          <div class="chamber ch-la">
+            <strong>Left Atrium</strong>
+            Receives oxygenated blood from lungs via pulmonary vein
+          </div>
+          <div class="chamber ch-rv">
+            <strong>Right Ventricle</strong>
+            Pumps deoxygenated blood to lungs via pulmonary artery
+          </div>
+          <div class="chamber ch-lv">
+            <strong>Left Ventricle</strong>
+            Pumps oxygenated blood to body via aorta. Thickest walls.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="observation obs-trans" style="margin-top:1rem">🔬 Double circulation means blood passes through the heart TWICE per complete circuit — pulmonary (heart → lungs → heart) and systemic (heart → body → heart). This maintains high pressure for efficient oxygen delivery to all tissues.</div>
+  </div>
+
+  <!-- Blood composition -->
+  <div class="blood-comp">
+    <h3>🩸 Blood Composition</h3>
+    <div class="blood-bar">
+      <div class="blood-seg seg-plasma">Plasma 55%</div>
+      <div class="blood-seg seg-rbc">RBC 40%</div>
+      <div class="blood-seg seg-wbc">WBC</div>
+      <div class="blood-seg seg-platelets"></div>
+    </div>
+    <div class="blood-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#fef3c7;border:1px solid #92400e"></div>Plasma (55%) — Water, proteins, glucose, hormones, CO₂, ions</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#dc2626"></div>RBC (40%) — Haemoglobin, O₂ transport; no nucleus in mature human RBCs</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f0fdf4;border:1px solid #475569"></div>WBC (~1%) — Immune defence; phagocytosis &amp; antibody production</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#bfdbfe"></div>Platelets (~4%) — Blood clotting; thrombocytes; no nucleus</div>
+    </div>
+  </div>
+
+  <!-- Transport cards -->
+  <div class="cards">
+    <div class="card">
+      <span class="tag trans-tag">PLANTS — XYLEM</span>
+      <h3>Xylem Transport</h3>
+      <ul>
+        <li>Carries water + dissolved minerals upward</li>
+        <li>Unidirectional: roots → stem → leaves</li>
+        <li>Driving force: Transpiration pull (cohesion-tension theory)</li>
+        <li>Root pressure also contributes (push from below)</li>
+        <li>Dead cells, hollow, no cytoplasm</li>
+        <li>Water enters root hair cells by osmosis</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag trans-tag">PLANTS — PHLOEM</span>
+      <h3>Phloem Transport</h3>
+      <ul>
+        <li>Transports food (sucrose, amino acids)</li>
+        <li>Bidirectional: leaves → roots AND fruits/seeds</li>
+        <li>Process called Translocation</li>
+        <li>Requires ATP (energy-dependent active transport)</li>
+        <li>Living cells: sieve tubes + companion cells</li>
+        <li>Source (leaf) → Sink (roots, growing tips, fruits)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag trans-tag">BLOOD VESSELS</span>
+      <h3>Arteries vs Veins</h3>
+      <ul>
+        <li><strong>Arteries:</strong> Carry blood AWAY from heart</li>
+        <li>Thick muscular elastic walls; high pressure; no valves</li>
+        <li>Pulmonary artery carries deoxygenated blood</li>
+        <li><strong>Veins:</strong> Carry blood TOWARD heart</li>
+        <li>Thin walls, lower pressure; have valves</li>
+        <li><strong>Capillaries:</strong> Site of O₂/CO₂/nutrient exchange; 1 cell thick</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag trans-tag">LYMPH</span>
+      <h3>Lymphatic System</h3>
+      <ul>
+        <li>Lymph: Pale yellowish fluid leaked from capillaries</li>
+        <li>Returns excess interstitial fluid back to blood</li>
+        <li>Carries digested fats absorbed from small intestine</li>
+        <li>Contains WBCs — important for immunity</li>
+        <li>Lymph nodes filter pathogens before returning to blood</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ EXCRETION ═══════════════ -->
+<section id="excr">
+  <div class="sec-title" style="color:var(--excr)">🫘 Excretion</div>
+
+  <div class="concept-pills">
+    <span class="pill">Urea — nitrogenous waste</span>
+    <span class="pill">Nephron — functional unit</span>
+    <span class="pill">Ultrafiltration</span>
+    <span class="pill">Selective Reabsorption</span>
+    <span class="pill">Dialysis</span>
+  </div>
+
+  <!-- Nephron steps -->
+  <div class="nephron-scene">
+    <h3>🔬 Urine Formation in Nephron — 3 Steps</h3>
+    <div class="nephron-btns">
+      <button class="nbtn active" onclick="showNephron('filter',   this)">Step 1: Ultrafiltration</button>
+      <button class="nbtn"        onclick="showNephron('reabsorb', this)">Step 2: Reabsorption</button>
+      <button class="nbtn"        onclick="showNephron('secrete',  this)">Step 3: Secretion</button>
+    </div>
+    <div class="nephron-display" id="nephron-display">
+      <div class="n-title" style="color:var(--excr)">Step 1: Ultrafiltration</div>
+      <div class="n-desc">Blood enters the <strong>glomerulus</strong> (a tuft of capillaries) at HIGH pressure. Small molecules are forced out through capillary walls into the Bowman's capsule, forming the <em>glomerular filtrate</em>.</div>
+      <div class="n-eq">Filtered out (into tubule): Water, glucose, amino acids, urea, salts, uric acid, creatinine<br>Retained in blood: RBC, WBC, platelets, large plasma proteins</div>
+    </div>
+    <div class="observation obs-excr" style="margin-top:.8rem">🔬 ~180 litres of filtrate formed per day in both kidneys, but only 1.5–1.8 litres become urine after reabsorption — over 99% is reclaimed!</div>
+  </div>
+
+  <!-- Dialysis -->
+  <div class="dialysis-scene">
+    <h3>🏥 Artificial Kidney — Haemodialysis</h3>
+    <div class="dialysis-tube">
+      <div class="blood-flow"></div>
+      <div class="waste-ptcl"></div>
+      <div class="waste-ptcl"></div>
+      <div class="waste-ptcl"></div>
+    </div>
+    <div class="dialysis-label">
+      <span style="color:#dc2626">← Blood enters (with urea/waste)</span>
+      <span>Semi-permeable membrane</span>
+      <span style="color:#a855f7">Waste diffuses out ↓</span>
+    </div>
+    <div class="observation obs-excr" style="margin-top:.8rem">🔬 Dialysing fluid is isotonic (same concentration as normal blood plasma) so only waste molecules (urea, excess salts) diffuse out by osmosis/diffusion. Blood cells and large proteins cannot pass through the cellophane membrane.</div>
+  </div>
+
+  <!-- Excretion cards -->
+  <div class="cards">
+    <div class="card">
+      <span class="tag excr-tag">HUMAN EXCRETION</span>
+      <h3>Organs of Excretion</h3>
+      <ul>
+        <li><strong>Kidneys:</strong> Urea, uric acid, excess salts (via urine)</li>
+        <li><strong>Skin:</strong> Sweat — water, NaCl, traces of urea</li>
+        <li><strong>Lungs:</strong> CO₂ + water vapour (exhaled)</li>
+        <li><strong>Liver:</strong> Bile pigments (bilirubin from broken RBCs)</li>
+        <li>Liver converts amino acids → urea (urea cycle)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag excr-tag">NEPHRON</span>
+      <h3>Parts of the Nephron</h3>
+      <ul>
+        <li><strong>Glomerulus:</strong> Ultrafiltration (high pressure)</li>
+        <li><strong>Bowman's capsule:</strong> Collects glomerular filtrate</li>
+        <li><strong>Proximal tubule:</strong> Reabsorbs glucose, amino acids, Na⁺, water</li>
+        <li><strong>Loop of Henle:</strong> Concentrates urine; water recovery</li>
+        <li><strong>Distal tubule + Collecting duct:</strong> Final adjustment; regulated by ADH</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag excr-tag">PLANTS</span>
+      <h3>Excretion in Plants</h3>
+      <ul>
+        <li>O₂ (photosynthesis) expelled via stomata</li>
+        <li>CO₂ (respiration) released via stomata</li>
+        <li>Excess water removed by transpiration</li>
+        <li>Wastes stored: vacuoles, bark, resins, gums, tannins</li>
+        <li>Leaf fall removes accumulated waste products</li>
+        <li>NO specialised excretory organ needed</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag excr-tag">URINE</span>
+      <h3>Composition of Urine</h3>
+      <ul>
+        <li>Water: ~95%</li>
+        <li>Urea: ~2% (main nitrogenous waste)</li>
+        <li>Uric acid, creatinine, inorganic salts: ~3%</li>
+        <li>Normal pH: 4.5 – 8.0 (average ~6)</li>
+        <li>Yellow colour: Urochrome (urobilin pigment)</li>
+        <li>Absence of glucose &amp; protein (presence = disease signal)</li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<script>
+// ── Tab switching ──
+function show(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('nav button').forEach(b => { b.className = ''; });
+  document.getElementById(id).classList.add('visible');
+  document.getElementById('btn-' + id).className = 'active-' + id;
+}
+
+// ── Digestion steps ──
+function activateStep(el) {
+  document.querySelectorAll('.digest-step').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Respiration toggle ──
+function setResp(type, btn) {
+  document.querySelectorAll('.tog-btn').forEach(b => b.className = 'tog-btn');
+  document.querySelectorAll('.resp-panel').forEach(p => p.classList.remove('visible'));
+  btn.className = 'tog-btn active-' + type;
+  document.getElementById('panel-' + type).classList.add('visible');
+}
+
+// ── Anaerobic sub-type ──
+const anaerobicData = {
+  yeast: {
+    eq: `<span class="reactant">C₆H₁₂O₆</span> <span class="arrow">→</span> <span class="product">2C₂H₅OH</span> <span class="arrow">+</span> <span class="product">2CO₂</span> <span class="arrow">+</span> <span class="product">2 ATP</span><br><span class="cond">Yeast fermentation · Used in bread baking and wine/beer production</span>`,
+    obs: '🔬 CO₂ produced makes bread dough rise. Ethanol (alcohol) is a by-product. Used industrially for biofuels and brewing. Reverse: aerobic conditions resume normal respiration.'
+  },
+  muscle: {
+    eq: `<span class="reactant">C₆H₁₂O₆</span> <span class="arrow">→</span> <span class="product">2CH₃CHOHCOOH</span> <span class="arrow">+</span> <span class="product">2 ATP</span><br><span class="cond">Lactic acid fermentation in muscle cells · Occurs during intense/rapid exercise</span>`,
+    obs: '🔬 Lactic acid accumulates in muscles causing a burning sensation and cramps (muscle fatigue). Oxygen debt: extra O₂ is consumed after exercise to break down lactic acid back to glucose in the liver.'
+  }
+};
+
+function setAnaerobicType(type, btn) {
+  const d = anaerobicData[type];
+  document.getElementById('anaerobic-display').innerHTML =
+    `<div class="eq-display">${d.eq}</div><div class="observation obs-resp">${d.obs}</div>`;
+  document.querySelectorAll('#panel-anaerobic .toggle-btns .tog-btn').forEach(b => b.className = 'tog-btn');
+  btn.className = 'tog-btn active-aerobic';
+}
+
+// ── Nephron steps ──
+const nephronData = {
+  filter: {
+    title: 'Step 1: Ultrafiltration',
+    desc: 'Blood enters the <strong>glomerulus</strong> (a tuft of capillaries) at HIGH pressure. Small molecules are forced out through capillary walls into the Bowman\'s capsule, forming the <em>glomerular filtrate</em>.',
+    eq: 'Filtered out (into tubule): Water, glucose, amino acids, urea, salts, uric acid, creatinine\nRetained in blood: RBC, WBC, platelets, large plasma proteins'
+  },
+  reabsorb: {
+    title: 'Step 2: Selective Reabsorption',
+    desc: 'As filtrate passes through the proximal convoluted tubule and Loop of Henle, useful substances are reabsorbed back into surrounding capillaries by active and passive transport.',
+    eq: 'Reabsorbed back into blood: ALL glucose, ALL amino acids, ~178.5 L water/day, Na⁺, K⁺, Cl⁻\nLeft in tubule: Urea (concentrated), uric acid, creatinine, some salts'
+  },
+  secrete: {
+    title: 'Step 3: Tubular Secretion',
+    desc: 'Additional waste products are <strong>actively secreted</strong> from blood capillaries into the tubular fluid. The collecting duct fine-tunes water content under control of the hormone ADH (Anti-Diuretic Hormone).',
+    eq: 'Secreted into tubule: H⁺, excess K⁺, NH₃, certain drugs (e.g. penicillin)\nFinal product leaving collecting duct: Concentrated urine → renal pelvis → ureter → bladder'
+  }
+};
+
+function showNephron(key, btn) {
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = nephronData[key];
+  document.getElementById('nephron-display').innerHTML =
+    `<div class="n-title" style="color:var(--excr)">${d.title}</div>` +
+    `<div class="n-desc">${d.desc}</div>` +
+    `<div class="n-eq">${d.eq.replace(/\n/g,'<br>')}</div>`;
+}
+
+// ── Breathing status animation ──
+const breatheMsgs = [
+  '🫁 Inhaling O₂ ...',
+  '🫁 Lungs expanding ...',
+  '🫁 Exhaling CO₂ ...',
+  '🫁 Lungs contracting ...'
+];
+let bIdx = 0;
+setInterval(() => {
+  bIdx = (bIdx + 1) % breatheMsgs.length;
+  const el = document.getElementById('breatheStatus');
+  if (el) el.textContent = breatheMsgs[bIdx];
+}, 1000);
+</script>
+</body>
+</html>

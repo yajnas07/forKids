@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Life Processes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0b1120; --card:#161f30; --card2:#1c2840;
+    --border:#1e2f48; --text:#dde6f0; --muted:#6b82a0;
+    --nutr:#22c55e;  --nutr-bg:rgba(34,197,94,.08);
+    --resp:#f97316;  --resp-bg:rgba(249,115,22,.08);
+    --trans:#3b82f6; --trans-bg:rgba(59,130,246,.08);
+    --excr:#a855f7;  --excr-bg:rgba(168,85,247,.08);
+    --cyan:#06b6d4;  --cyan-bg:rgba(6,182,212,.08);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; padding:1.2rem; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 30% at 10% 5%, rgba(34,197,94,.05) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 90% 95%, rgba(168,85,247,.05) 0%, transparent 50%);
+  }
+
+  header { text-align:center; padding:1rem 0 1.5rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.5rem,4vw,2.4rem); font-weight:800;
+    background:linear-gradient(135deg,#22c55e,#06b6d4,#f97316);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.75rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1rem; max-width:1100px; margin:0 auto; }
+
+  /* ── panel ── */
+  .panel { background:var(--card); border-radius:16px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head {
+    display:flex; align-items:center; gap:.6rem;
+    padding:.8rem 1rem; font-family:'Syne',sans-serif;
+    font-weight:800; font-size:.95rem;
+    border-bottom:1px solid var(--border);
+  }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-nutr .panel-head  { background:var(--nutr-bg);  color:var(--nutr); }
+  .ph-resp .panel-head  { background:var(--resp-bg);  color:var(--resp); }
+  .ph-trans .panel-head { background:var(--trans-bg); color:var(--trans); }
+  .ph-excr .panel-head  { background:var(--excr-bg);  color:var(--excr); }
+  .ph-cyan .panel-head  { background:var(--cyan-bg);  color:var(--cyan); }
+  .ph-grey .panel-head  { background:rgba(107,130,160,.08); color:#94a3b8; }
+
+  /* ── table ── */
+  table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  th { font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; padding:.5rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.45rem .6rem; border-top:1px solid var(--border); line-height:1.4; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.02); }
+  .hi { font-family:'DM Mono',monospace; }
+  .green { color:var(--nutr); } .orange { color:var(--resp); }
+  .blue  { color:var(--trans); } .purple { color:var(--excr); }
+  .cyan  { color:var(--cyan); }
+
+  /* ── equation ── */
+  .eq {
+    font-family:'DM Mono',monospace; font-size:.78rem;
+    background:var(--card2); border-left:3px solid;
+    border-radius:0 8px 8px 0; padding:.5rem .8rem;
+    margin:.35rem 0; line-height:1.7;
+  }
+  .eq.nutr  { border-color:var(--nutr);  color:#bbf7d0; }
+  .eq.resp  { border-color:var(--resp);  color:#fed7aa; }
+  .eq.trans { border-color:var(--trans); color:#bfdbfe; }
+  .eq.excr  { border-color:var(--excr);  color:#e9d5ff; }
+  .eq.cyan  { border-color:var(--cyan);  color:#a5f3fc; }
+
+  /* ── fact list ── */
+  .fact { display:flex; gap:.5rem; font-size:.82rem; padding:.3rem 0; line-height:1.5; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  /* ── flow row ── */
+  .flow { display:flex; align-items:center; flex-wrap:wrap; gap:.3rem; margin:.4rem 0; font-size:.76rem; font-family:'DM Mono',monospace; }
+  .flow-step { background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:.25rem .55rem; color:var(--text); }
+  .flow-arrow { color:var(--muted); }
+
+  /* ── organ-use rows ── */
+  .org-row { display:flex; align-items:flex-start; gap:.6rem; padding:.4rem 0; border-top:1px solid var(--border); font-size:.8rem; }
+  .org-row:first-child { border-top:none; }
+  .org-name { font-weight:700; color:var(--text); min-width:110px; }
+  .org-waste { font-family:'DM Mono',monospace; color:var(--excr); font-size:.75rem; min-width:80px; }
+  .org-note  { color:var(--muted); font-size:.75rem; }
+
+  /* ── memory tricks ── */
+  .trick { background:var(--card2); border-radius:10px; padding:.6rem .8rem; margin:.35rem 0; font-size:.8rem; }
+  .trick strong { color:#fbbf24; font-family:'Syne',sans-serif; }
+  .trick p { color:var(--muted); font-size:.75rem; margin-top:.2rem; }
+
+  /* ── atp bar ── */
+  .atp-row { display:flex; align-items:center; gap:.8rem; margin:.35rem 0; font-size:.8rem; }
+  .atp-label { min-width:80px; font-family:'DM Mono',monospace; }
+  .atp-bar { flex:1; height:12px; border-radius:99px; background:var(--card2); overflow:hidden; }
+  .atp-fill { height:100%; border-radius:99px; }
+
+  /* span 2 */
+  .span2 { grid-column:1/-1; }
+
+  @media(max-width:640px) { .grid { grid-template-columns:1fr; } .span2 { grid-column:1; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Cheat Sheet</h1>
+  <p>Life Processes · Class X CBSE Biology · Chapter 6 · Quick Revision</p>
+</header>
+
+<div class="grid">
+
+  <!-- ── Autotrophic vs Heterotrophic ── -->
+  <div class="panel span2 ph-nutr">
+    <div class="panel-head ph-nutr">🌿 Nutrition — Autotrophic vs Heterotrophic</div>
+    <div class="panel-body">
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th class="green">Autotrophic</th>
+          <th class="orange">Heterotrophic</th>
+        </tr>
+        <tr><td>Food source</td><td class="green hi">Inorganic raw materials (CO₂, H₂O)</td><td class="orange">Other organisms (organic matter)</td></tr>
+        <tr><td>Energy source</td><td class="green">Sunlight / Chemical reactions</td><td class="orange">Oxidation of ingested food</td></tr>
+        <tr><td>Examples</td><td class="green">Green plants, algae, cyanobacteria</td><td class="orange">Animals, fungi, most bacteria</td></tr>
+        <tr><td>Types</td><td class="green">Photoautotroph, Chemoautotroph</td><td class="orange">Holozoic, Saprophytic, Parasitic</td></tr>
+        <tr><td>Key organ</td><td class="green">Chloroplast (chlorophyll)</td><td class="orange">Digestive system / cell membrane</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Photosynthesis ── -->
+  <div class="panel ph-nutr">
+    <div class="panel-head ph-nutr">☀️ Photosynthesis — Key Facts</div>
+    <div class="panel-body">
+      <div class="eq nutr">6CO₂ + 6H₂O →(chl/sunlight)→ C₆H₁₂O₆ + 6O₂</div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">TWO STAGES:</div>
+      <div class="fact"><div class="dot" style="background:var(--nutr)"></div><div><span class="green">Light Reaction (Thylakoid):</span> H₂O splits → O₂ released, ATP + NADPH formed. Needs light.</div></div>
+      <div class="fact"><div class="dot" style="background:var(--nutr)"></div><div><span class="green">Dark Reaction / Calvin Cycle (Stroma):</span> CO₂ + ATP + NADPH → Glucose. Does NOT need light directly.</div></div>
+      <div style="margin-top:.5rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)">
+        Factors affecting photosynthesis: Light intensity, CO₂ conc., Temperature, Water availability<br>
+        Chlorophyll absorbs RED + BLUE; reflects GREEN → leaves look green
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Human Digestion ── -->
+  <div class="panel ph-nutr">
+    <div class="panel-head ph-nutr">🍽️ Human Digestion — Summary</div>
+    <div class="panel-body">
+      <div class="flow">
+        <div class="flow-step">Mouth</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Oesophagus</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Stomach</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Small Intestine</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Large Intestine</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .2rem">Key enzymes and secretions:</div>
+      <div class="fact"><div class="dot" style="background:var(--nutr)"></div><div><span class="green">Mouth:</span> Salivary amylase → starch to maltose (pH 7)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--nutr)"></div><div><span class="green">Stomach:</span> HCl (pH 2) + Pepsin → protein to peptides</div></div>
+      <div class="fact"><div class="dot" style="background:var(--nutr)"></div><div><span class="green">Small intestine:</span> Bile (emulsifies fats); Trypsin, Lipase, Amylase (pancreatic); Villi absorb nutrients</div></div>
+      <div class="fact"><div class="dot" style="background:var(--nutr)"></div><div><span class="green">Large intestine:</span> Water reabsorption; faeces formation</div></div>
+    </div>
+  </div>
+
+  <!-- ── Aerobic vs Anaerobic ── -->
+  <div class="panel span2 ph-resp">
+    <div class="panel-head ph-resp">💨 Respiration — Aerobic vs Anaerobic</div>
+    <div class="panel-body">
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th class="green">Aerobic</th>
+          <th class="orange">Anaerobic</th>
+        </tr>
+        <tr><td>Oxygen needed?</td><td class="green">Yes</td><td class="orange">No</td></tr>
+        <tr><td>Location</td><td class="green">Mitochondria (+ Cytoplasm for glycolysis)</td><td class="orange">Cytoplasm only</td></tr>
+        <tr><td>End products</td><td class="green">CO₂ + H₂O</td><td class="orange">Lactic acid (muscles) OR Ethanol + CO₂ (yeast)</td></tr>
+        <tr><td>ATP yield</td><td class="green hi">38 ATP per glucose</td><td class="orange hi">2 ATP per glucose</td></tr>
+        <tr><td>Complete oxidation?</td><td class="green">Yes (complete)</td><td class="orange">No (partial)</td></tr>
+        <tr><td>Common in</td><td class="green">All higher organisms</td><td class="orange">Yeast, muscle cells under exertion</td></tr>
+      </table>
+      <div style="margin-top:.7rem">
+        <div class="eq resp">C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 38 ATP  <span style="color:var(--muted)">(Aerobic)</span></div>
+        <div class="eq resp">C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + 2 ATP        <span style="color:var(--muted)">(Yeast — Fermentation)</span></div>
+        <div class="eq resp">C₆H₁₂O₆ → 2CH₃CHOHCOOH + 2 ATP           <span style="color:var(--muted)">(Muscle cells)</span></div>
+      </div>
+      <div style="margin-top:.5rem">
+        <div class="atp-row"><div class="atp-label green">Aerobic (38)</div><div class="atp-bar"><div class="atp-fill" style="width:100%;background:linear-gradient(90deg,#22c55e,#06b6d4)"></div></div></div>
+        <div class="atp-row"><div class="atp-label orange">Anaerobic (2)</div><div class="atp-bar"><div class="atp-fill" style="width:5.3%;background:#f97316"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Stages of Respiration ── -->
+  <div class="panel ph-resp">
+    <div class="panel-head ph-resp">⚡ Stages of Aerobic Respiration</div>
+    <div class="panel-body">
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.3rem">STAGE 1 — Glycolysis (Cytoplasm)</div>
+      <div class="eq resp">Glucose (6C) → 2 Pyruvate (3C) + 2 ATP + 2 NADH<br><span style="color:var(--muted)">No O₂ needed · Common to aerobic + anaerobic</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">STAGE 2 — Krebs Cycle (Mitochondrial Matrix)</div>
+      <div class="eq resp">Pyruvate → Acetyl CoA → 2 ATP + CO₂ + NADH + FADH₂</div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">STAGE 3 — ETC (Inner Mitochondrial Membrane)</div>
+      <div class="eq resp">NADH + FADH₂ + O₂ → H₂O + 34 ATP<br><span style="color:var(--muted)">O₂ = final electron acceptor · Max energy here</span></div>
+    </div>
+  </div>
+
+  <!-- ── Breathing System ── -->
+  <div class="panel ph-resp">
+    <div class="panel-head ph-resp">🫁 Human Respiratory System</div>
+    <div class="panel-body">
+      <div class="flow">
+        <div class="flow-step">Nose</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Pharynx</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Larynx</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Trachea</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Bronchi</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Alveoli</div>
+      </div>
+      <div class="fact" style="margin-top:.4rem"><div class="dot" style="background:var(--resp)"></div><div>~300 million alveoli per lung; total area ≈ <span class="orange">70 m²</span></div></div>
+      <div class="fact"><div class="dot" style="background:var(--resp)"></div><div>Walls 1 cell thick; O₂ diffuses IN; CO₂ diffuses OUT (passive diffusion)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--resp)"></div><div>Haemoglobin (Hb) + O₂ ⇌ Oxyhaemoglobin (HbO₂)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--resp)"></div><div>Breathing rate: ~15–18 breaths/min at rest</div></div>
+    </div>
+  </div>
+
+  <!-- ── Xylem vs Phloem ── -->
+  <div class="panel span2 ph-trans">
+    <div class="panel-head ph-trans">🌱 Transport in Plants — Xylem vs Phloem</div>
+    <div class="panel-body">
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th class="blue">Xylem</th>
+          <th class="green">Phloem</th>
+        </tr>
+        <tr><td>Transports</td><td class="blue hi">Water + Dissolved Minerals</td><td class="green hi">Food (Sucrose, Amino acids)</td></tr>
+        <tr><td>Direction</td><td class="blue">Unidirectional: Roots → Stem → Leaves</td><td class="green">Bidirectional: Source ↔ Sink</td></tr>
+        <tr><td>Driving force</td><td class="blue">Transpiration pull (Cohesion-Tension) + Root pressure</td><td class="green">Active transport (needs ATP) — Translocation</td></tr>
+        <tr><td>Cell type</td><td class="blue">Dead cells; hollow; no cytoplasm</td><td class="green">Living: Sieve tubes + Companion cells</td></tr>
+        <tr><td>Process name</td><td class="blue">Ascent of Sap</td><td class="green">Translocation</td></tr>
+        <tr><td>Energy needed?</td><td class="blue">No (passive)</td><td class="green">Yes (active)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Human Circulation ── -->
+  <div class="panel ph-trans">
+    <div class="panel-head ph-trans">❤️ Human Circulatory System</div>
+    <div class="panel-body">
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.4rem">DOUBLE CIRCULATION (heart pumped twice per circuit):</div>
+      <div class="eq trans">Pulmonary: Right ventricle → Lungs → Left atrium<br>(Deoxygenated → Oxygenated)</div>
+      <div class="eq trans">Systemic:  Left ventricle → Body → Right atrium<br>(Oxygenated → Deoxygenated)</div>
+      <div class="fact"><div class="dot" style="background:var(--trans)"></div><div><span class="blue">Arteries:</span> Carry blood AWAY from heart; thick walls; high pressure; NO valves</div></div>
+      <div class="fact"><div class="dot" style="background:var(--trans)"></div><div><span class="blue">Veins:</span> Carry blood TO heart; thin walls; low pressure; HAVE valves</div></div>
+      <div class="fact"><div class="dot" style="background:var(--trans)"></div><div><span class="blue">Capillaries:</span> Exchange site; 1 cell thick walls; no valves</div></div>
+      <div class="fact"><div class="dot" style="background:var(--trans)"></div><div><span class="blue">Heartbeat:</span> ~70 beats/min; Left ventricle has thickest walls</div></div>
+    </div>
+  </div>
+
+  <!-- ── Blood Components ── -->
+  <div class="panel ph-trans">
+    <div class="panel-head ph-trans">🩸 Blood — Composition & Functions</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Component</th><th>%</th><th class="blue">Function</th></tr>
+        <tr><td>Plasma</td><td class="hi">55%</td><td>Carries nutrients, hormones, CO₂, plasma proteins (fibrinogen, antibodies)</td></tr>
+        <tr><td>RBC (Erythrocytes)</td><td class="hi">40%</td><td>Haemoglobin carries O₂ as oxyhaemoglobin; no nucleus in mature human RBC</td></tr>
+        <tr><td>WBC (Leucocytes)</td><td class="hi">~1%</td><td>Immune defence; phagocytosis; antibody production</td></tr>
+        <tr><td>Platelets (Thrombocytes)</td><td class="hi">&lt;1%</td><td>Blood clotting; no nucleus; fragments of megakaryocytes</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Nephron / Urine formation ── -->
+  <div class="panel ph-excr">
+    <div class="panel-head ph-excr">🫘 Urine Formation — 3 Steps</div>
+    <div class="panel-body">
+      <div class="flow" style="flex-direction:column;align-items:flex-start;gap:.5rem">
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div class="flow-step" style="background:rgba(168,85,247,.15);border-color:var(--excr);color:var(--excr)">1. Ultrafiltration</div>
+          <div style="font-size:.75rem;color:var(--muted)">Glomerulus + Bowman's capsule; High pressure; Small molecules filtered out</div>
+        </div>
+        <div style="margin-left:10px;font-size:.72rem;font-family:'DM Mono',monospace;color:var(--muted)">↓</div>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div class="flow-step" style="background:rgba(168,85,247,.15);border-color:var(--excr);color:var(--excr)">2. Reabsorption</div>
+          <div style="font-size:.75rem;color:var(--muted)">Proximal tubule + Loop of Henle; ALL glucose + amino acids; most water reabsorbed</div>
+        </div>
+        <div style="margin-left:10px;font-size:.72rem;font-family:'DM Mono',monospace;color:var(--muted)">↓</div>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div class="flow-step" style="background:rgba(168,85,247,.15);border-color:var(--excr);color:var(--excr)">3. Secretion</div>
+          <div style="font-size:.75rem;color:var(--muted)">Distal tubule + Collecting duct; H⁺, K⁺, NH₃ secreted; ADH regulates water</div>
+        </div>
+      </div>
+      <div style="margin-top:.7rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)">
+        ~180 L filtrate/day → only 1.5–1.8 L urine (99%+ reabsorbed!)<br>
+        Urine: 95% water · 2% urea · 3% salts/uric acid/creatinine
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Excretion organs ── -->
+  <div class="panel ph-excr">
+    <div class="panel-head ph-excr">🗑️ Organs of Excretion in Humans</div>
+    <div class="panel-body">
+      <div class="org-row">
+        <div class="org-name">Kidneys</div>
+        <div class="org-waste">Urea, uric acid, creatinine, salts</div>
+        <div class="org-note">Via urine through ureter → bladder → urethra</div>
+      </div>
+      <div class="org-row">
+        <div class="org-name">Lungs</div>
+        <div class="org-waste">CO₂ + H₂O vapour</div>
+        <div class="org-note">Exhaled through alveolar diffusion</div>
+      </div>
+      <div class="org-row">
+        <div class="org-name">Skin (Sweat glands)</div>
+        <div class="org-waste">Water, NaCl, traces of urea</div>
+        <div class="org-note">Also helps in thermoregulation</div>
+      </div>
+      <div class="org-row">
+        <div class="org-name">Liver</div>
+        <div class="org-waste">Bile pigments (bilirubin)</div>
+        <div class="org-note">Broken-down RBCs; urea cycle converts NH₃ → urea</div>
+      </div>
+      <div class="fact" style="margin-top:.5rem"><div class="dot" style="background:var(--excr)"></div><div><span class="purple">Dialysis:</span> Semi-permeable cellophane tube; urea diffuses out into isotonic fluid; RBC + proteins retained.</div></div>
+    </div>
+  </div>
+
+  <!-- ── Comparison All 4 life processes ── -->
+  <div class="panel span2 ph-cyan">
+    <div class="panel-head ph-cyan">📊 Life Processes — Big Picture Comparison</div>
+    <div class="panel-body">
+      <table>
+        <tr>
+          <th>Process</th>
+          <th>What it does</th>
+          <th>Key organ / site</th>
+          <th>Output</th>
+        </tr>
+        <tr><td class="green hi">Nutrition</td><td>Obtains energy-rich molecules</td><td>Chloroplast (plants) · Digestive system (animals)</td><td class="green">Glucose, amino acids, fats</td></tr>
+        <tr><td class="orange hi">Respiration</td><td>Releases energy from food as ATP</td><td>Mitochondria (aerobic) · Cytoplasm (anaerobic)</td><td class="orange">ATP + CO₂ + H₂O</td></tr>
+        <tr><td class="blue hi">Transportation</td><td>Moves materials to/from cells</td><td>Heart + Blood vessels (animals) · Xylem + Phloem (plants)</td><td class="blue">Nutrients, O₂, hormones delivered; CO₂, waste removed</td></tr>
+        <tr><td class="purple hi">Excretion</td><td>Removes metabolic wastes</td><td>Kidneys · Lungs · Skin (animals) · Stomata (plants)</td><td class="purple">Urine, CO₂, sweat, bile pigments</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Memory tricks ── -->
+  <div class="panel span2 ph-grey">
+    <div class="panel-head ph-grey">🎯 Exam Tips &amp; Memory Tricks</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.5rem">
+      <div class="trick"><strong>NRTE Mnemonic</strong><p>Life Processes: <b>N</b>utrition → <b>R</b>espiration → <b>T</b>ransportation → <b>E</b>xcretion. All essential — no organism survives without all four.</p></div>
+      <div class="trick"><strong>38 vs 2 ATP</strong><p>Aerobic = 38 ATP (mitochondria + cytoplasm). Anaerobic = 2 ATP (cytoplasm only). Aerobic is 19× more efficient.</p></div>
+      <div class="trick"><strong>Xylem = Dead, Phloem = Living</strong><p>Xylem cells are dead (hollow) — no cytoplasm. Phloem uses living sieve tubes + companion cells. Phloem needs ATP; Xylem does not.</p></div>
+      <div class="trick"><strong>180 L → 1.8 L</strong><p>Kidneys filter 180 L/day but produce only 1.8 L urine. 99%+ is reabsorbed. Always mention this in 3-mark excretion questions.</p></div>
+      <div class="trick"><strong>Pulmonary vs Systemic</strong><p>Pulmonary: Heart → Lungs → Heart (short loop, O₂ pick-up). Systemic: Heart → Body → Heart (long loop, O₂ delivery). Blood passes through the heart TWICE per cycle.</p></div>
+      <div class="trick"><strong>Glycolysis = Both</strong><p>Glycolysis is the FIRST step in BOTH aerobic AND anaerobic. It occurs in the cytoplasm and does NOT require oxygen. Common starting point!</p></div>
+      <div class="trick"><strong>Amoeba digestion order</strong><p>Engulf (pseudopodia) → Food vacuole → Lysosomes add enzymes → Digestion → Diffusion into cytoplasm → Egestion. All inside ONE cell!</p></div>
+      <div class="trick"><strong>Left ventricle = Thickest</strong><p>Left ventricle pumps blood to the entire body (systemic) → needs highest pressure → thickest muscular walls. Right ventricle only pumps to the lungs.</p></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
