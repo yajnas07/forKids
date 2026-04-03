@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Acids, Bases & Salts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0b1120; --card:#161f30; --card2:#1c2840;
+    --border:#1e2f48; --text:#dde6f0; --muted:#6b82a0;
+    --acid:#f87171; --acid-bg:rgba(248,113,113,.08);
+    --base:#60a5fa; --base-bg:rgba(96,165,250,.08);
+    --neutral:#34d399; --neutral-bg:rgba(52,211,153,.08);
+    --salt:#fbbf24; --salt-bg:rgba(251,191,36,.08);
+    --purple:#c084fc; --purple-bg:rgba(192,132,252,.08);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; padding:1.2rem; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 30% at 10% 5%, rgba(248,113,113,.05) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 90% 95%, rgba(96,165,250,.05) 0%, transparent 50%);
+  }
+
+  header { text-align:center; padding:1rem 0 1.5rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.5rem,4vw,2.4rem); font-weight:800;
+    background:linear-gradient(135deg,#f87171,#fbbf24,#60a5fa);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.75rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1rem; max-width:1100px; margin:0 auto; }
+
+  /* ── panel ── */
+  .panel {
+    background:var(--card); border-radius:16px;
+    border:1px solid var(--border);
+    overflow:hidden;
+  }
+  .panel-head {
+    display:flex; align-items:center; gap:.6rem;
+    padding:.8rem 1rem; font-family:'Syne',sans-serif;
+    font-weight:800; font-size:.95rem;
+    border-bottom:1px solid var(--border);
+  }
+  .panel-body { padding:.8rem 1rem; }
+
+  /* acid panel */
+  .ph-acid .panel-head  { background:var(--acid-bg);   color:var(--acid); }
+  .ph-base .panel-head  { background:var(--base-bg);   color:var(--base); }
+  .ph-neut .panel-head  { background:var(--neutral-bg);color:var(--neutral); }
+  .ph-salt .panel-head  { background:var(--salt-bg);   color:var(--salt); }
+  .ph-purp .panel-head  { background:var(--purple-bg); color:var(--purple); }
+  .ph-grey .panel-head  { background:rgba(107,130,160,.08); color:#94a3b8; }
+
+  /* ── comparison table ── */
+  table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  th { font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; padding:.5rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.45rem .6rem; border-top:1px solid var(--border); line-height:1.4; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.02); }
+  .hi { color:var(--salt); font-family:'DM Mono',monospace; }
+  .red { color:var(--acid); } .blue { color:var(--base); } .green { color:var(--neutral); }
+
+  /* ── chem equation ── */
+  .eq {
+    font-family:'DM Mono',monospace; font-size:.78rem;
+    background:var(--card2); border-left:3px solid;
+    border-radius:0 8px 8px 0; padding:.5rem .8rem;
+    margin:.35rem 0; line-height:1.7; color:#a5f3d0;
+  }
+  .eq.acid  { border-color:var(--acid);   color:#fca5a5; }
+  .eq.base  { border-color:var(--base);   color:#93c5fd; }
+  .eq.salt  { border-color:var(--salt);   color:#fde68a; }
+  .eq.neut  { border-color:var(--neutral);color:#a7f3d0; }
+  .eq.purp  { border-color:var(--purple); color:#e9d5ff; }
+
+  /* ── fact list ── */
+  .fact { display:flex; gap:.5rem; font-size:.82rem; padding:.3rem 0; line-height:1.5; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  /* ── pH strip ── */
+  .ph-strip {
+    width:100%; height:24px; border-radius:99px;
+    background:linear-gradient(to right,#dc2626,#ea580c,#f97316,#f59e0b,#eab308,#84cc16,#10b981,#22d3ee,#3b82f6,#6366f1,#8b5cf6,#a855f7,#7c3aed);
+    margin:.6rem 0 .3rem; position:relative;
+  }
+  .ph-labels { display:flex; justify-content:space-between; font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); }
+  .ph-zones { display:flex; gap:.4rem; margin-top:.5rem; flex-wrap:wrap; }
+  .ph-zone { flex:1; min-width:80px; border-radius:8px; padding:.4rem .5rem; font-size:.73rem; font-family:'DM Mono',monospace; }
+  .pz-a { background:rgba(220,38,38,.1); color:#fca5a5; }
+  .pz-n { background:rgba(16,185,129,.1); color:#6ee7b7; }
+  .pz-b { background:rgba(59,130,246,.1); color:#93c5fd; }
+
+  /* ── salt table ── */
+  .salt-row { display:flex; align-items:flex-start; gap:.6rem; padding:.4rem 0; border-top:1px solid var(--border); font-size:.8rem; }
+  .salt-row:first-child { border-top:none; }
+  .salt-name { font-weight:700; color:var(--text); min-width:110px; }
+  .salt-formula { font-family:'DM Mono',monospace; color:var(--salt); font-size:.75rem; min-width:90px; }
+  .salt-use { color:var(--muted); font-size:.75rem; }
+  .nature-pill { font-size:.6rem; font-family:'DM Mono',monospace; padding:.1rem .4rem; border-radius:99px; display:inline-block; margin-top:.2rem; }
+  .n-acid { background:rgba(248,113,113,.12); color:#f87171; }
+  .n-base { background:rgba(96,165,250,.12);  color:#60a5fa; }
+  .n-neut { background:rgba(52,211,153,.12);  color:#34d399; }
+
+  /* ── indicator table ── */
+  .ind-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.4rem; padding:.35rem 0; border-top:1px solid var(--border); font-size:.78rem; }
+  .ind-row.head { font-family:'Syne',sans-serif; font-weight:700; font-size:.7rem; color:var(--muted); border-top:none; }
+
+  /* ── memory tricks ── */
+  .trick { background:var(--card2); border-radius:10px; padding:.6rem .8rem; margin:.35rem 0; font-size:.8rem; }
+  .trick strong { color:var(--salt); font-family:'Syne',sans-serif; }
+  .trick p { color:var(--muted); font-size:.75rem; margin-top:.2rem; }
+
+  /* span 2 cols */
+  .span2 { grid-column:1/-1; }
+
+  @media(max-width:640px) { .grid { grid-template-columns:1fr; } .span2 { grid-column:1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>📋 Cheat Sheet</h1>
+  <p>Acids, Bases &amp; Salts · Class X CBSE · Quick Revision</p>
+</header>
+
+<div class="grid">
+
+  <!-- ── Acids vs Bases comparison ── -->
+  <div class="panel span2">
+    <div class="panel-head ph-grey">⚖️ Acids vs Bases — Quick Comparison</div>
+    <div class="panel-body">
+      <table>
+        <tr>
+          <th>Property</th>
+          <th class="red">Acids</th>
+          <th class="blue">Bases</th>
+        </tr>
+        <tr><td>Ion produced</td><td class="red hi">H⁺ (H₃O⁺)</td><td class="blue hi">OH⁻</td></tr>
+        <tr><td>pH</td><td class="red">Less than 7</td><td class="blue">Greater than 7</td></tr>
+        <tr><td>Taste</td><td class="red">Sour</td><td class="blue">Bitter</td></tr>
+        <tr><td>Blue litmus</td><td class="red">Turns red</td><td class="blue">No change</td></tr>
+        <tr><td>Red litmus</td><td class="red">No change</td><td class="blue">Turns blue</td></tr>
+        <tr><td>Examples</td><td class="red">HCl, H₂SO₄, CH₃COOH</td><td class="blue">NaOH, Ca(OH)₂, NH₄OH</td></tr>
+        <tr><td>Reaction product</td><td colspan="2" style="color:var(--neutral);font-family:'DM Mono',monospace">Acid + Base → Salt + Water (Neutralisation)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── pH Scale ── -->
+  <div class="panel span2 ph-neut">
+    <div class="panel-head ph-neut">📊 pH Scale at a Glance</div>
+    <div class="panel-body">
+      <div class="ph-strip"></div>
+      <div class="ph-labels">
+        <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+        <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+      </div>
+      <div class="ph-zones">
+        <div class="ph-zone pz-a"><strong>Acidic (0–6)</strong><br>pH 1 → Gastric acid<br>pH 2.5 → Vinegar<br>pH 3 → Lemon juice<br>pH 6 → Milk</div>
+        <div class="ph-zone pz-n"><strong>Neutral (7)</strong><br>pH 7 → Pure water<br>pH 7 → NaCl solution<br>[H⁺] = [OH⁻]</div>
+        <div class="ph-zone pz-b"><strong>Basic (8–14)</strong><br>pH 7.4 → Blood<br>pH 10 → Milk of magnesia<br>pH 11 → Ammonia<br>pH 13 → NaOH</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Key Reactions ── -->
+  <div class="panel ph-acid">
+    <div class="panel-head ph-acid">🔥 Key Reactions of Acids</div>
+    <div class="panel-body">
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.3rem">Acid + Metal</div>
+      <div class="eq acid">Zn + H₂SO₄ → ZnSO₄ + H₂↑<br><span style="color:var(--muted)">(pop sound with burning splint)</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">Acid + Metal Carbonate</div>
+      <div class="eq acid">Na₂CO₃ + 2HCl → 2NaCl + H₂O + CO₂↑<br><span style="color:var(--muted)">(lime water turns milky)</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">Acid + Metal Bicarbonate</div>
+      <div class="eq acid">NaHCO₃ + HCl → NaCl + H₂O + CO₂↑</div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">Acid + Metal Oxide</div>
+      <div class="eq acid">CuO + H₂SO₄ → CuSO₄ + H₂O<br><span style="color:var(--muted)">(black → blue)</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:.5rem 0 .3rem">Neutralisation</div>
+      <div class="eq acid">HCl + NaOH → NaCl + H₂O + Heat</div>
+    </div>
+  </div>
+
+  <!-- ── Indicators ── -->
+  <div class="panel ph-grey">
+    <div class="panel-head ph-grey">🧪 Indicators</div>
+    <div class="panel-body">
+      <div class="ind-row head"><span>Indicator</span><span>In Acid</span><span>In Base</span></div>
+      <div class="ind-row"><span>Litmus (Red)</span><span class="red">No change</span><span class="blue">Turns blue</span></div>
+      <div class="ind-row"><span>Litmus (Blue)</span><span class="red">Turns red</span><span class="blue">No change</span></div>
+      <div class="ind-row"><span>Phenolphthalein</span><span class="red">Colourless</span><span class="blue">Pink/Red</span></div>
+      <div class="ind-row"><span>Methyl orange</span><span class="red">Red/Pink</span><span class="blue">Yellow</span></div>
+      <div class="ind-row"><span>Universal</span><span class="red">Red→Yellow</span><span class="blue">Green→Violet</span></div>
+      <div style="margin-top:.6rem;font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace">Universal indicator shows full pH range in colour.</div>
+    </div>
+  </div>
+
+  <!-- ── Important Salts ── -->
+  <div class="panel span2 ph-salt">
+    <div class="panel-head ph-salt">🧂 Important Salts — Names, Formulas & Uses</div>
+    <div class="panel-body">
+      <div class="salt-row">
+        <div class="salt-name">Common Salt</div>
+        <div><div class="salt-formula">NaCl</div><span class="nature-pill n-neut">Neutral</span></div>
+        <div class="salt-use">Food, preservation, electrolysis (chlor-alkali process)</div>
+      </div>
+      <div class="salt-row">
+        <div class="salt-name">Washing Soda</div>
+        <div><div class="salt-formula">Na₂CO₃·10H₂O</div><span class="nature-pill n-base">Basic</span></div>
+        <div class="salt-use">Glass/soap/paper industry, water softening, removes grease</div>
+      </div>
+      <div class="salt-row">
+        <div class="salt-name">Baking Soda</div>
+        <div><div class="salt-formula">NaHCO₃</div><span class="nature-pill n-base">Weakly Basic</span></div>
+        <div class="salt-use">Baking powder, antacid for acidity, fire extinguisher</div>
+      </div>
+      <div class="salt-row">
+        <div class="salt-name">Bleaching Powder</div>
+        <div><div class="salt-formula">Ca(OCl)Cl</div><span class="nature-pill n-base">Basic</span></div>
+        <div class="salt-use">Disinfecting water, bleaching cotton and linen</div>
+      </div>
+      <div class="salt-row">
+        <div class="salt-name">Plaster of Paris</div>
+        <div><div class="salt-formula">CaSO₄·½H₂O</div><span class="nature-pill n-neut">Neutral</span></div>
+        <div class="salt-use">Casts/moulds, chalk, dental models — sets hard with water</div>
+      </div>
+      <div class="salt-row">
+        <div class="salt-name">Gypsum</div>
+        <div><div class="salt-formula">CaSO₄·2H₂O</div><span class="nature-pill n-neut">Neutral</span></div>
+        <div class="salt-use">Heated at 373K → Plaster of Paris; used in cement</div>
+      </div>
+      <div class="salt-row">
+        <div class="salt-name">Blue Vitriol</div>
+        <div><div class="salt-formula">CuSO₄·5H₂O</div><span class="nature-pill n-acid">Acidic</span></div>
+        <div class="salt-use">Fungicide, electroplating; turns white (anhydrous) on heating</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Chlor-Alkali ── -->
+  <div class="panel ph-base">
+    <div class="panel-head ph-base">⚡ Chlor-Alkali Process</div>
+    <div class="panel-body">
+      <div class="eq base">2NaCl(aq) + 2H₂O →<br>2NaOH + Cl₂↑ + H₂↑</div>
+      <div style="margin:.5rem 0;font-size:.8rem">
+        <div class="fact"><div class="dot" style="background:var(--acid)"></div><div><span class="red">Anode (+)</span> → Cl₂ gas (yellow-green)</div></div>
+        <div class="fact"><div class="dot" style="background:var(--base)"></div><div><span class="blue">Cathode (−)</span> → H₂ gas (colourless)</div></div>
+        <div class="fact"><div class="dot" style="background:var(--neutral)"></div><div><span class="green">Solution</span> → NaOH remains</div></div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.5rem">Cl₂ → bleaching powder, PVC<br>H₂ → fuel, Haber process<br>NaOH → soap, detergents</div>
+    </div>
+  </div>
+
+  <!-- ── Water of Crystallisation ── -->
+  <div class="panel ph-purp">
+    <div class="panel-head ph-purp">💧 Water of Crystallisation</div>
+    <div class="panel-body">
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:.5rem">Fixed water molecules in crystal formula unit.</div>
+      <div class="eq purp">CuSO₄·5H₂O → CuSO₄ + 5H₂O<br>(Blue) heat⟶ (White powder)</div>
+      <div class="eq purp">Na₂CO₃·10H₂O → Na₂CO₃ + 10H₂O<br>(Washing soda → Anhydrous)</div>
+      <div class="eq purp">CaSO₄·2H₂O → CaSO₄·½H₂O + 1½H₂O<br>(Gypsum 373K → Plaster of Paris)</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:.4rem;font-family:'DM Mono',monospace">Adding water to anhydrous CuSO₄ reverses it → blue again ✓</div>
+    </div>
+  </div>
+
+  <!-- ── Memory Tricks ── -->
+  <div class="panel ph-salt span2">
+    <div class="panel-head ph-salt">🎯 Exam Tips & Memory Tricks</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.5rem">
+      <div class="trick"><strong>ABHS Rule</strong><p>Acid + Base → Salt + H₂O (neutralisation is always exothermic)</p></div>
+      <div class="trick"><strong>Pop vs Milky</strong><p>H₂ → pop sound | CO₂ → lime water milky | Cl₂ → bleaches damp litmus</p></div>
+      <div class="trick"><strong>Blue→White→Blue</strong><p>CuSO₄·5H₂O heated → white. Add water → blue again. Water of crystallisation!</p></div>
+      <div class="trick"><strong>All Alkalis = Bases</strong><p>NOT all bases = alkalis. Cu(OH)₂ = base, insoluble ∴ NOT alkali.</p></div>
+      <div class="trick"><strong>pH each unit = ×10</strong><p>pH 4 has 10× more H⁺ than pH 5. pH 1 has 1000× more H⁺ than pH 4.</p></div>
+      <div class="trick"><strong>Natural Acids Mnemonic</strong><p>Lemon Citric, Vinegar Acetic, Ant Formic, Curd Lactic, Tomato Oxalic</p></div>
+      <div class="trick"><strong>POP sets hard</strong><p>CaSO₄·½H₂O + 1½H₂O → CaSO₄·2H₂O (Gypsum). Expands slightly — good for casts.</p></div>
+      <div class="trick"><strong>Chlor-Alkali mnemonic</strong><p>ClAO: Cl₂ at Anode, H₂ at cathOde, NaOH in sOlution</p></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

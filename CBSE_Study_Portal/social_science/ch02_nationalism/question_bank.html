@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Nationalism in India</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0a04; --card:#1a1208; --card2:#221a0a;
+    --border:#3a2e1a; --text:#e8d8b0; --muted:#8a7a5a;
+    --gold:#f5c842; --orange:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --purple:#d946ef; --red:#ef4444;
+    --correct:#22c55e; --wrong:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(245,200,66,.04) 0%,transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:900; color:var(--gold); }
+  header p  { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  /* dashboard */
+  .dash { display:flex; justify-content:center; gap:.9rem; flex-wrap:wrap; padding:.8rem 1rem 1.2rem; }
+  .dcard { background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.6rem 1.2rem; text-align:center; min-width:84px; }
+  .dval { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; }
+  .dlbl { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+
+  /* filters */
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:0 1rem 1.2rem; }
+  nav button { font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  nav button:hover { color:var(--text); }
+  nav button.active { border-color:var(--gold); color:var(--gold); background:rgba(245,200,66,.08); }
+
+  /* question list */
+  main { max-width:800px; margin:0 auto; padding:0 1rem 4rem; }
+
+  .q-card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:1rem; overflow:hidden; transition:box-shadow .2s;
+    animation:slideIn .3s ease both; }
+  .q-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.5); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-header { display:flex; align-items:flex-start; gap:.7rem; padding:1rem 1.1rem .7rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:.68rem; min-width:28px; height:28px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.45; flex:1; }
+  .q-meta { display:flex; gap:.35rem; flex-wrap:wrap; padding:0 1.1rem .7rem 4rem; }
+
+  .badge { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .48rem; border-radius:2px; }
+  .b-mcq    { background:rgba(56,189,248,.12);  color:var(--blue); }
+  .b-short  { background:rgba(34,197,94,.12);   color:var(--green); }
+  .b-long   { background:rgba(245,200,66,.12);  color:var(--gold); }
+  .b-assert { background:rgba(217,70,239,.12);  color:var(--purple); }
+  .b-1m { background:rgba(148,163,184,.08); color:#94a3b8; }
+  .b-2m { background:rgba(245,200,66,.1);   color:#fde68a; }
+  .b-3m { background:rgba(249,115,22,.1);   color:#fed7aa; }
+  .b-5m { background:rgba(239,68,68,.12);   color:#fca5a5; }
+
+  .strip-ncm  { border-left:4px solid var(--orange); }
+  .strip-cdm  { border-left:4px solid var(--blue); }
+  .strip-lead { border-left:4px solid var(--green); }
+  .strip-grp  { border-left:4px solid var(--purple); }
+  .strip-sym  { border-left:4px solid var(--gold); }
+  .strip-gen  { border-left:4px solid #64748b; }
+
+  /* MCQ */
+  .mcq-body { padding:0 1.1rem .6rem; }
+  .mcq-opts { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; }
+  @media(max-width:480px){ .mcq-opts { grid-template-columns:1fr; } }
+  .opt-btn { display:flex; align-items:center; gap:.55rem; background:var(--card2);
+    border:1.5px solid var(--border); border-radius:8px; padding:.55rem .75rem;
+    cursor:pointer; transition:all .16s; text-align:left; color:var(--text);
+    font-family:'Lato',sans-serif; font-size:.82rem; font-weight:600; }
+  .opt-btn:hover:not(:disabled) { border-color:#5a4a2a; background:#281f0d; }
+  .opt-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; }
+  .opt-btn.correct { border-color:var(--correct); background:rgba(34,197,94,.1); color:#4ade80; }
+  .opt-btn.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,.08); color:#fca5a5; }
+  .feedback { font-size:.76rem; font-family:'DM Mono',monospace; padding:.35rem .7rem;
+    border-radius:6px; margin:.25rem 0 .5rem; display:none; }
+  .feedback.correct { background:rgba(34,197,94,.08);  color:#4ade80; display:block; }
+  .feedback.wrong   { background:rgba(239,68,68,.08); color:#f87171; display:block; }
+
+  /* answer reveal */
+  .ans-reveal { overflow:hidden; max-height:0; transition:max-height .38s ease; }
+  .ans-reveal.open { max-height:700px; }
+  .ans-body { padding:.75rem 1.1rem 1rem; border-top:1px solid var(--border); }
+  .ans-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--green); margin-bottom:.4rem; }
+  .ans-text { font-size:.84rem; color:var(--text); line-height:1.7; }
+  .ans-text strong { color:var(--gold); }
+  .ans-text em { color:#93c5fd; font-style:normal; }
+  .ans-date { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--orange);
+    background:rgba(249,115,22,.08); border:1px solid rgba(249,115,22,.15);
+    border-radius:3px; padding:.15rem .5rem; display:inline-block; margin-bottom:.4rem; }
+  .tip { font-size:.74rem; color:var(--gold); background:rgba(245,200,66,.06);
+    border-left:3px solid var(--gold); border-radius:0 6px 6px 0;
+    padding:.38rem .65rem; margin-top:.5rem; }
+
+  .show-btn { display:inline-flex; align-items:center; gap:.35rem; font-family:'Playfair Display',serif;
+    font-weight:700; font-size:.74rem; padding:.38rem .9rem; border-radius:3px;
+    border:1px solid var(--border); background:transparent; color:var(--muted);
+    cursor:pointer; transition:all .18s; margin:.15rem 0 .7rem 1.1rem; }
+  .show-btn:hover { color:var(--text); border-color:#5a4a2a; }
+  .show-btn.active { color:var(--green); border-color:var(--green); background:rgba(34,197,94,.06); }
+
+  .reset-bar { text-align:center; padding:1rem; }
+  .reset-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem;
+    padding:.55rem 1.6rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .reset-btn:hover { border-color:var(--red); color:var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Nationalism in India · History Ch.2 · Class X CBSE · 28 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval">28</div><div class="dlbl">Total</div></div>
+  <div class="dcard"><div class="dval" id="d-att" style="color:var(--gold)">0</div><div class="dlbl">Attempted</div></div>
+  <div class="dcard"><div class="dval" id="d-cor" style="color:var(--correct)">0</div><div class="dlbl">Correct</div></div>
+  <div class="dcard"><div class="dval" id="d-sc" style="color:var(--purple)">0%</div><div class="dlbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filter('all',this)">All (28)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All</button></div>
+
+<script>
+const Q = [
+  // MCQ
+  {id:1,type:'mcq',topic:'ncm',marks:1,
+   q:'Why did Mahatma Gandhi call off the Non-Cooperation Movement in February 1922?',
+   opts:['The British agreed to grant independence','The Chauri Chaura incident of violence','The Khilafat issue was resolved','Round Table Conference was called'],
+   ans:1, date:'February 1922',
+   explain:'At Chauri Chaura, Gorakhpur (UP), a violent mob burned a police station killing 22 policemen. Gandhi felt Indians were not ready for non-violent struggle and immediately called off the NCM.'},
+
+  {id:2,type:'mcq',topic:'cdm',marks:1,
+   q:'The Dandi March was approximately how long in miles?',
+   opts:['100 miles','180 miles','240 miles','300 miles'],
+   ans:2, date:'March 12 – April 5, 1930',
+   explain:'Gandhi marched 240 miles from Sabarmati Ashram, Ahmedabad to Dandi on the Gujarat coast with 78 followers over 24 days to make salt and defy the salt law.'},
+
+  {id:3,type:'mcq',topic:'ncm',marks:1,
+   q:'Which of the following correctly explains "Satyagraha"?',
+   opts:['Armed resistance against the British','Truth-force or soul-force — non-violent moral resistance','Complete boycott of all government services','A form of guerrilla warfare'],
+   ans:1,
+   explain:'Satyagraha (Satya = truth, Agraha = insistence) is Gandhi\'s concept of non-violent resistance through moral force. The oppressor must be converted through the protester\'s suffering, not by physical force.'},
+
+  {id:4,type:'mcq',topic:'sym',marks:1,
+   q:'Who painted the famous image of Bharat Mata?',
+   opts:['Rabindranath Tagore','Bankim Chandra Chattopadhyay','Abanindranath Tagore','Ravi Varma'],
+   ans:2,
+   explain:'Abanindranath Tagore painted Bharat Mata as a serene, sari-clad ascetic figure. Bankim Chandra Chattopadhyay wrote about Bharat Mata in his literary works. Note: different Tagores!'},
+
+  {id:5,type:'mcq',topic:'grp',marks:1,
+   q:'Why did Dalits largely stay away from the Civil Disobedience Movement?',
+   opts:['They supported British rule','Congress did not strongly support Dalit demands','They were too poor to participate','The British gave them special privileges'],
+   ans:1,
+   explain:'Ambedkar argued that Congress was reluctant to address caste discrimination for fear of alienating upper-caste Hindus. Dalits felt the movement would not address their fundamental social oppression.'},
+
+  {id:6,type:'mcq',topic:'cdm',marks:1,
+   q:'At which session of the Indian National Congress was Purna Swaraj declared?',
+   opts:['Calcutta Session 1928','Lahore Session 1929','Karachi Session 1931','Allahabad Session 1930'],
+   ans:1, date:'December 1929',
+   explain:'The Lahore Session of Congress, December 1929, presided by Jawaharlal Nehru, declared Purna Swaraj (complete independence) as its goal. January 26, 1930 was declared Independence Day.'},
+
+  {id:7,type:'mcq',topic:'ncm',marks:1,
+   q:'The Khilafat Movement was led by:',
+   opts:['Gandhi and Nehru','Muhammad Ali and Shaukat Ali','Ambedkar and Bose','Tilak and Gokhale'],
+   ans:1,
+   explain:'Muhammad Ali and Shaukat Ali (the Ali brothers) led the Khilafat Movement. Gandhi allied with them to forge Hindu-Muslim unity against British rule in the Non-Cooperation Movement.'},
+
+  {id:8,type:'mcq',topic:'grp',marks:1,
+   q:'The Gudem Hills rebellion in Andhra Pradesh was led by:',
+   opts:['Alluri Sitaram Raju','Sardar Vallabhbhai Patel','Birsa Munda','Baba Ramchandra'],
+   ans:0,
+   explain:'Alluri Sitaram Raju led the tribal rebellion in the Gudem Hills of Andhra using guerrilla warfare. He connected tribal grievances (forest laws) to the broader nationalist struggle.'},
+
+  // ASSERTION-REASON
+  {id:9,type:'assert',topic:'ncm',marks:1,
+   q:'Assertion (A): Mahatma Gandhi called off the Non-Cooperation Movement in 1922.\nReason (R): A violent mob burned a police station at Chauri Chaura, killing 22 policemen.',
+   opts:['Both A and R true; R is correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains A. Gandhi\'s decision to call off NCM was directly triggered by the Chauri Chaura violence — he felt the people were not disciplined enough for non-violent resistance.'},
+
+  {id:10,type:'assert',topic:'cdm',marks:1,
+   q:'Assertion (A): Salt was chosen as the symbol for the Civil Disobedience Movement.\nReason (R): Salt was a basic necessity that every Indian — rich or poor — used, making it a universal symbol of colonial injustice.',
+   opts:['Both A and R true; R is correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R gives the correct explanation. The universality of salt — needed by every Indian regardless of class, religion or region — made it an ideal symbol to unite all sections against the salt tax.'},
+
+  {id:11,type:'assert',topic:'grp',marks:1,
+   q:'Assertion (A): Women participated more prominently in the Civil Disobedience Movement than in the Non-Cooperation Movement.\nReason (R): Gandhi specifically invited women to join CDM as it required courage but no physical strength.',
+   opts:['Both A and R true; R is correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:1,
+   explain:'A is true — women did participate more in CDM. But R (the reason given) is not the standard historical explanation. The main reason was that CDM activities like making salt and picketing shops suited women\'s participation in the public sphere.'},
+
+  {id:12,type:'assert',topic:'sym',marks:1,
+   q:'Assertion (A): The song Vande Mataram became controversial among some sections.\nReason (R): Some Muslims felt it seemed to worship a Hindu goddess and therefore conflicted with Islamic beliefs.',
+   opts:['Both A and R true; R is correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true, and R correctly explains the controversy. Vande Mataram was perceived by some Muslims as deifying the nation/motherland as a Hindu goddess, which conflicted with Islamic monotheism.'},
+
+  // SHORT ANSWER
+  {id:13,type:'short',topic:'ncm',marks:3,
+   q:'Explain why the Non-Cooperation Movement was launched in 1920. What were its main features?',
+   date:'1920–1922',
+   ans:'The NCM was launched for two main reasons:\n<strong>1. Jallianwala Bagh (1919):</strong> General Dyer fired on unarmed crowd in Amritsar. Hundreds killed. Nationwide outrage at British injustice.\n<strong>2. Khilafat Issue:</strong> Muslims feared British dismemberment of Ottoman Caliphate. Gandhi allied with Khilafat leaders to forge Hindu-Muslim unity.\n\n<strong>Main features:</strong>\n• Surrender of titles given by British\n• Boycott of courts, schools, government services\n• Boycott of foreign cloth — bonfires lit\n• Picketing of liquor shops\n• Adoption of khadi as alternative',
+   tip:'Board questions often ask "why launched" and "what did people do" — cover both for 3 marks.'},
+
+  {id:14,type:'short',topic:'cdm',marks:3,
+   q:'Describe the Dandi March. Why was salt chosen as the symbol of the Civil Disobedience Movement?',
+   date:'March 12 – April 5, 1930',
+   ans:'<strong>Dandi March:</strong> On March 12, 1930, Gandhi left Sabarmati Ashram with 78 followers on foot. He marched 240 miles to Dandi on the Gujarat coast, arriving April 5. He made salt from seawater, defying the British salt law — this began the Civil Disobedience Movement.\n\n<strong>Why salt?</strong>\n• Salt was a <strong>universal necessity</strong> — needed by every Indian, rich or poor\n• British heavily taxed salt and made independent production illegal\n• Making salt was a simple, powerful act of defiance accessible to all\n• It united all classes, regions and religions behind one symbol',
+   tip:'Numbers to remember: 240 miles, 78 followers, March 12 to April 5.'},
+
+  {id:15,type:'short',topic:'grp',marks:3,
+   q:'How did different social groups participate in the Civil Disobedience Movement? Mention any three groups.',
+   ans:'<strong>1. Peasants and farmers:</strong> Rich peasants (Patidars of Gujarat, Jats of UP) joined strongly. The Great Depression had crashed crop prices but revenues remained high — they couldn\'t pay taxes or rents.\n\n<strong>2. Women:</strong> Participated in large numbers for the first time. Made salt, picketed foreign cloth and liquor shops, courted arrest. CDM shifted women from domestic to public political sphere.\n\n<strong>3. Merchants and industrialists:</strong> Hurt by foreign trade competition. Many supported CDM by financing Congress and refusing to buy or sell British goods.',
+   tip:'For 3 marks — name the group, reason they joined, and what they did.'},
+
+  {id:16,type:'short',topic:'grp',marks:3,
+   q:'Why did Dalits and many Muslims stay away from the Civil Disobedience Movement?',
+   ans:'<strong>Dalits:</strong> Led by Ambedkar, Dalits felt Congress did not strongly support their demands for an end to caste discrimination. Congress feared alienating upper-caste Hindus who formed its main support base. Ambedkar sought a separate electorate at the Round Table Conference.\n\n<strong>Muslims:</strong> After the Khilafat Movement ended, Hindu-Muslim unity broke down. Communal tensions grew through the 1920s. Many Muslim leaders were suspicious of Congress\'s neutrality on communal issues. The Congress-League divide widened.',
+   tip:'The absence of groups is as important as presence for board exams.'},
+
+  {id:17,type:'short',topic:'lead',marks:2,
+   q:'What was the Poona Pact of 1932? What was its significance?',
+   date:'September 1932',
+   ans:'<strong>Background:</strong> Ambedkar demanded a <em>separate electorate</em> for Dalits (untouchables) at the Round Table Conferences — a constituency where only Dalits could vote.\n\nGandhi strongly opposed this, fearing it would divide Hindu society permanently. He went on a fast unto death in prison.\n\n<strong>Poona Pact:</strong> A compromise was reached — instead of a separate electorate, <strong>reserved seats</strong> for Dalits within the general Hindu electorate were provided. More seats were reserved than originally proposed.\n\n<strong>Significance:</strong> Dalits remained part of the Hindu electorate but had guaranteed representation.',
+   tip:'Separate electorate ≠ reserved seats. Know the difference — it comes in 3-mark questions.'},
+
+  {id:18,type:'short',topic:'sym',marks:2,
+   q:'Explain the significance of khadi and the charkha in the Indian independence movement.',
+   ans:'<strong>Khadi</strong> (hand-spun cloth) was promoted by Gandhi as:\n• A symbol of <strong>economic self-reliance</strong> — rejecting British mill cloth\n• A <strong>political statement</strong> — boycotting British textile industry\n• A source of <strong>income for village workers</strong>\n\n<strong>Charkha</strong> (spinning wheel):\n• Placed on the Congress flag — symbol of national identity\n• Spinning daily was seen as a moral and political act\n• Connected the educated elite to the village poor',
+   tip:'Three dimensions: economic, political, symbolic — cover all three for full marks.'},
+
+  {id:19,type:'short',topic:'ncm',marks:2,
+   q:'What was the Rowlatt Act? Why did it anger Indians?',
+   date:'1919',
+   ans:'The Rowlatt Act (1919) was a law passed by the British that allowed the government to <strong>arrest and imprison any person without trial or jury</strong> on mere suspicion of sedition.\n\nIndians called it the <strong>"Black Act"</strong> because:\n• It violated the basic principle of justice — innocent until proven guilty\n• It gave unlimited powers to an already oppressive colonial state\n• Gandhi called for a nationwide hartal on April 6, 1919 in protest\n• The government\'s violent response to peaceful protests led to Jallianwala Bagh',
+   tip:'Rowlatt Act → Hartal → Jallianwala Bagh — the chain of events matters.'},
+
+  {id:20,type:'short',topic:'cdm',marks:2,
+   q:'What was the Gandhi-Irwin Pact? What were its terms?',
+   date:'March 1931',
+   ans:'<strong>Gandhi-Irwin Pact</strong> was an agreement between Gandhi and Viceroy Lord Irwin in March 1931.\n\n<strong>Terms:</strong>\n• Gandhi agreed to <strong>suspend the Civil Disobedience Movement</strong>\n• Gandhi agreed to attend the <strong>2nd Round Table Conference</strong> in London\n• British agreed to <strong>release all political prisoners</strong> arrested during CDM\n\n<strong>Outcome:</strong> The RTC in London was a failure — Gandhi was the only Congress representative and his demands were rejected. He returned and relaunched CDM in 1932.',
+   tip:'Pact suspended, not ended CDM. CDM was relaunched 1932 and finally withdrawn 1934.'},
+
+  // LONG ANSWER
+  {id:21,type:'long',topic:'ncm',marks:5,
+   q:'Compare and contrast the Non-Cooperation Movement (1920–22) and the Civil Disobedience Movement (1930–34). What were the main differences in their methods, participation and outcomes?',
+   ans:'<strong>Methods:</strong>\n<em>NCM</em> focused on <strong>boycott</strong> — refusing to participate in British institutions (courts, schools, councils, foreign goods).\n<em>CDM</em> focused on <strong>actively breaking unjust laws</strong> — making salt, violating forest laws, refusing to pay revenue.\n\n<strong>Key Symbol:</strong>\n<em>NCM</em> — khadi and bonfires of foreign cloth.\n<em>CDM</em> — <strong>Salt (Dandi March)</strong> — chosen for its universality and symbolic power.\n\n<strong>Participation:</strong>\n<em>NCM</em> — More urban-based initially; Muslim participation through Khilafat; limited women\'s role.\n<em>CDM</em> — Wider rural participation (Depression-hit peasants); <strong>women played prominent role</strong>; but Dalits and many Muslims stayed away.\n\n<strong>Why called off:</strong>\n<em>NCM</em> — <strong>Chauri Chaura violence</strong> (Feb 1922) — Gandhi called it off unilaterally.\n<em>CDM</em> — Gandhi-Irwin Pact (1931); finally withdrawn 1934.\n\n<strong>Demand:</strong>\n<em>NCM</em> — Swaraj (self-rule, possibly within Empire).\n<em>CDM</em> — <strong>Purna Swaraj</strong> (full independence), declared at Lahore 1929.\n\n<strong>Outcome:</strong> Both movements failed to achieve immediate goals but built mass consciousness. CDM showed the British that India could not be governed without Indian consent.',
+   tip:'For 5 marks — cover at least 5 points of comparison. Use a table in your answer book.'},
+
+  {id:22,type:'long',topic:'grp',marks:5,
+   q:'Describe how different social groups participated in the Indian national movement. Why did some groups participate more actively than others?',
+   ans:'<strong>1. Peasants and farmers:</strong> Joined strongly during CDM (1930s) — hit by Great Depression. Patidars (Gujarat) and Jats (UP) couldn\'t pay revenue. Begar (forced labour) was also a grievance. Earlier: Champaran (1917), Kheda (1918) Satyagrahas.\n\n<strong>2. Women:</strong> NCM saw limited participation. CDM transformed women\'s role — they made salt, picketed shops, courted arrest. First mass entry of women into public political life in India.\n\n<strong>3. Tribals:</strong> Forest laws restricted traditional rights. Alluri Sitaram Raju led guerrilla rebellion in Andhra (Gudem Hills) connecting local to national struggle.\n\n<strong>4. Industrial workers:</strong> Nagpur mill workers struck (1920). But Congress maintained distance — didn\'t want class war; needed industrialist support.\n\n<strong>5. Dalits:</strong> Ambedkar led them separately. Congress\'s failure to champion Dalit rights kept them at the margins. Poona Pact (1932) created reserved seats as compromise.\n\n<strong>6. Muslims:</strong> Strong in NCM (Khilafat alliance). Withdrew from CDM as Hindu-Muslim unity broke down in 1920s.\n\n<strong>Why variation?</strong> Each group had specific grievances. When national movement aligned with local grievance (Depression + CDM for peasants; forest laws + NCM for tribals), participation increased. When Congress failed to address specific demands (Dalits, workers), groups remained peripheral.',
+   tip:'Name each group, their specific reason, and whether they joined or stayed away. Cover all 6 groups for full marks.'},
+
+  {id:23,type:'long',topic:'sym',marks:5,
+   q:'How did Indian nationalists create a sense of collective identity? Discuss the role of symbols, imagery and ideas in the growth of nationalism.',
+   ans:'<strong>1. Bharat Mata:</strong> Abanindranath Tagore painted Bharat Mata as an ascetic mother figure. This gave the nation a human, divine form — something to love and sacrifice for. Bankim Chandra\'s writings inspired this imagery.\n\n<strong>2. Vande Mataram:</strong> Bankim Chandra\'s song became the nationalist anthem. However, it created controversy — some Muslims saw it as worshipping a Hindu goddess. Shows how symbols can unite and divide.\n\n<strong>3. Khadi and charkha:</strong> Gandhi\'s khadi programme gave nationalism an economic dimension. Spinning the charkha united the educated class with rural poor. The Congress flag with the charkha was a shared national symbol.\n\n<strong>4. Maps of India:</strong> Nationalist cartography presented India as a unified territory. The image of one India from Kashmir to Kanyakumari created a geographic sense of nationhood.\n\n<strong>5. Folk heroes and history:</strong> Figures like Shivaji and Rana Pratap were celebrated to instil pride in the national past. Folk songs and literature in regional languages spread nationalist ideas to ordinary people.\n\n<strong>6. Reinterpretation of history:</strong> Indians began writing their own history — countering British narratives. This cultural nationalism complemented political resistance.\n\n<strong>The challenge:</strong> A unified national identity had to overcome regional, religious, caste and class divisions. Not all symbols worked for all groups — Vande Mataram divided, khadi united. This complexity is central to understanding Indian nationalism.',
+   tip:'For 5 marks: name at least 5 symbols/ideas, explain each briefly, and conclude with the "challenge of unity" — board examiners love this nuance.'},
+
+  {id:24,type:'long',topic:'lead',marks:5,
+   q:'Write a detailed note on Mahatma Gandhi\'s role in the Indian independence movement. How did his ideas and methods shape the nature of the national struggle?',
+   ans:'<strong>Background:</strong> Gandhi arrived from South Africa in 1915 where he had developed Satyagraha. His political mentor was Gokhale. He spent a year travelling India to understand her people before acting.\n\n<strong>Key movements led:</strong>\n• <em>Champaran (1917)</em> — indigo farmers\' rights\n• <em>Kheda (1918)</em> — revenue remission for farmers\n• <em>Non-Cooperation Movement (1920–22)</em> — first mass movement\n• <em>Civil Disobedience (1930–34)</em> — Dandi March, salt satyagraha\n• <em>Quit India (1942)</em> — "Do or Die"\n\n<strong>Key ideas:</strong>\n• <em>Satyagraha</em> — truth-force; win by moral example, not violence\n• <em>Non-violence (Ahimsa)</em> — the oppressor must be morally transformed\n• <em>Swaraj</em> — self-rule as both political and personal freedom\n• <em>Khadi/self-reliance</em> — economic independence from British\n\n<strong>How he transformed nationalism:</strong>\n1. Made it a <strong>mass movement</strong> — brought peasants, women, workers, tribals into the struggle\n2. Connected <strong>local grievances</strong> to national goals\n3. Used <strong>symbolic action</strong> (salt, spinning) — accessible and powerful\n4. Allied Hindu-Muslim unity through <strong>Khilafat</strong>\n5. Gave movement <strong>moral legitimacy</strong> — British could not easily justify violent suppression of non-violent protesters\n\n<strong>Limitations:</strong> Gandhi\'s caution about social reform (especially Dalit rights) alienated some sections. His calling off of NCM after Chauri Chaura was criticised.',
+   tip:'Cover: background, movements, ideas, contribution, and limitations. A balanced answer scores better.'},
+
+  {id:25,type:'short',topic:'gen',marks:2,
+   q:'Name any four things that Indians boycotted during the Non-Cooperation Movement.',
+   ans:'During the Non-Cooperation Movement (1920–22), Indians boycotted:\n1. <strong>British-made goods</strong> — foreign cloth burned in bonfires\n2. <strong>Government schools and colleges</strong> — students left institutions\n3. <strong>British courts</strong> — lawyers gave up legal practice\n4. <strong>Legislative councils</strong> — refused to contest or participate\n5. <strong>Civil services and army</strong> — refused to join or resigned\n6. <strong>Liquor shops</strong> — picketed and shamed buyers',
+   tip:'Any 4 with brief explanation. "Boycott" questions are common 2-mark questions.'},
+
+  {id:26,type:'short',topic:'cdm',marks:2,
+   q:'What was the significance of January 26, 1930 in Indian history?',
+   date:'January 26, 1930',
+   ans:'January 26, 1930 was declared <strong>Independence Day</strong> by the Indian National Congress after the Lahore Session (1929). Across India, the tricolour was hoisted and people took a pledge to work for Purna Swaraj.\n\nThis date was chosen to celebrate every year until independence was actually achieved. After independence, this same date became <strong>Republic Day (1950)</strong> — when India\'s Constitution came into effect.',
+   tip:'Two facts: Independence Day (1930) AND Republic Day (1950) — same date. Common 2-mark question.'},
+
+  {id:27,type:'short',topic:'ncm',marks:2,
+   q:'What was the Jallianwala Bagh massacre? How did it impact the Indian independence movement?',
+   date:'April 13, 1919',
+   ans:'On April 13, 1919, General Dyer ordered troops to <strong>fire on an unarmed crowd</strong> gathered peacefully at Jallianwala Bagh, Amritsar (Punjab) — a walled garden with few exits. Hundreds were killed and thousands wounded.\n\n<strong>Impact:</strong>\n• Shook Indians\' faith in British justice permanently\n• <strong>Rabindranath Tagore renounced his knighthood</strong> in protest\n• Triggered calls for non-cooperation\n• United Indians across regions in outrage\n• Directly contributed to launch of NCM (1920)',
+   tip:'Always mention Tagore renouncing knighthood — examiners look for this detail.'},
+
+  {id:28,type:'short',topic:'gen',marks:2,
+   q:'Explain "Begar" and how it was related to the Indian peasant\'s participation in the nationalist movement.',
+   ans:'<strong>Begar</strong> was a form of <strong>forced labour</strong> — peasants were compelled to work for landlords (zamindars) without any wages or payment.\n\nIn Awadh (UP), peasants suffered from begar as well as high rents and arbitrary evictions. When NCM was launched (1920), Awadh peasants joined it — but they also wanted freedom from local landlords, not just the British.\n\nThis shows how <strong>local economic grievances merged with national political goals</strong> — a key characteristic of mass nationalism in India.',
+   tip:'Begar = unpaid forced labour. Shows that nationalism meant different things to different groups.'},
+];
+
+const state = {};
+let currentFilter = 'all';
+
+const topicStrip = {ncm:'strip-ncm',cdm:'strip-cdm',lead:'strip-lead',grp:'strip-grp',sym:'strip-sym',gen:'strip-gen'};
+const topicBg = {ncm:'rgba(249,115,22,.12)',cdm:'rgba(56,189,248,.12)',lead:'rgba(34,197,94,.12)',grp:'rgba(217,70,239,.12)',sym:'rgba(245,200,66,.12)',gen:'rgba(100,116,139,.12)'};
+const topicCol = {ncm:'#fb923c',cdm:'#38bdf8',lead:'#4ade80',grp:'#e879f9',sym:'#f5c842',gen:'#94a3b8'};
+const typeBadge = {mcq:'b-mcq MCQ',short:'b-short Short Answer',long:'b-long Long Answer',assert:'b-assert Assertion–Reason'};
+const markBadge = m => { const c={1:'b-1m',2:'b-2m',3:'b-3m',5:'b-5m'}[m]||'b-1m'; return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`; };
+
+function getVisible() { return currentFilter==='all'?Q:Q.filter(q=>q.type===currentFilter); }
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function renderMCQ(q) {
+  const s = state[q.id]||{};
+  const done = s.chosen !== undefined;
+  return `<div class="mcq-body">
+    <div class="mcq-opts">
+      ${q.opts.map((o,i)=>{
+        let cls='';
+        if(done){ if(i===q.ans)cls='correct'; else if(i===s.chosen&&i!==q.ans)cls='wrong'; }
+        return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+          <span class="opt-lbl">${String.fromCharCode(65+i)}</span>${o}</button>`;
+      }).join('')}
+    </div>
+    ${done?`<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+      ${s.chosen===q.ans?'✓ Correct!':'✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}</div>
+      <div class="ans-body" style="border-top:1px solid var(--border);padding:.6rem 0 .3rem">
+        ${q.date?`<div class="ans-date">📅 ${q.date}</div>`:''}
+        <div class="ans-lbl">💡 Explanation</div>
+        <div class="ans-text">${q.explain}</div>
+      </div>`:''}
+  </div>`;
+}
+
+function renderShortLong(q) {
+  const s = state[q.id]||{};
+  const open = s.open;
+  let ansHtml = `${q.date?`<div class="ans-date">📅 ${q.date}</div>`:''}
+    <div class="ans-lbl">✅ Model Answer</div>
+    <div class="ans-text">${(q.ans||'').replace(/\n/g,'<br>')}</div>
+    ${q.tip?`<div class="tip">🎯 Exam tip: ${q.tip}</div>`:''}`;
+  return `<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+    ${open?'▲ Hide Answer':'▼ Show Model Answer'}
+  </button>
+  <div class="ans-reveal ${open?'open':''}">
+    <div class="ans-body">${ansHtml}</div>
+  </div>`;
+}
+
+function render() {
+  const list = getVisible();
+  const el = document.getElementById('qlist');
+  el.innerHTML = list.map((q,i)=>{
+    const tb = typeBadge[q.type].split(' ');
+    return `<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert'?renderMCQ(q):renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id,idx) {
+  const q=Q.find(x=>x.id===id); if(!q||state[id]?.chosen!==undefined)return;
+  if(!state[id])state[id]={};
+  state[id].chosen=idx;
+  updateDash();
+  const visible=getVisible(), i=visible.findIndex(x=>x.id===id);
+  const tb=typeBadge[q.type].split(' ');
+  const newHtml=`<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta"><span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>${markBadge(q.marks)}</div>
+    ${renderMCQ(q)}
+  </div>`;
+  const el=document.getElementById('qcard-'+id);
+  const tmp=document.createElement('div'); tmp.innerHTML=newHtml;
+  el.replaceWith(tmp.firstElementChild);
+}
+
+function toggleAns(id) {
+  if(!state[id])state[id]={};
+  state[id].open=!state[id].open;
+  if(!state[id].viewed){state[id].viewed=true;updateDash();}
+  const btn=document.querySelector(`#qcard-${id} .show-btn`);
+  const rev=document.querySelector(`#qcard-${id} .ans-reveal`);
+  if(btn&&rev){
+    const open=state[id].open;
+    btn.classList.toggle('active',open);
+    btn.textContent=open?'▲ Hide Answer':'▼ Show Model Answer';
+    rev.classList.toggle('open',open);
+  }
+}
+
+function updateDash() {
+  const att=Object.keys(state).length;
+  const cor=Q.filter(q=>state[q.id]?.chosen===q.ans).length;
+  const mcqTotal=Q.filter(q=>q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-att').textContent=att;
+  document.getElementById('d-cor').textContent=cor;
+  document.getElementById('d-sc').textContent=mcqTotal>0?Math.round((cor/mcqTotal)*100)+'%':'—';
+}
+
+function resetAll(){for(const k in state)delete state[k];updateDash();render();}
+render();
+</script>
+</body>
+</html>

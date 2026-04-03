@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Acids, Bases & Salts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --acid: #ff4d4d;
+    --base: #3b82f6;
+    --neutral: #10b981;
+    --salt: #f59e0b;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263148;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+    --correct: #10b981;
+    --wrong: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── starfield bg ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(255,77,77,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(59,130,246,.07) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── header ── */
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .back-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .78rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: .3rem .9rem;
+    margin-bottom: 1rem;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff4d4d 0%, #f59e0b 50%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p {
+    color: var(--muted);
+    font-size: .88rem;
+    margin-top: .3rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── score dashboard ── */
+  .dashboard {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0 1rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .dash-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: .7rem 1.4rem;
+    text-align: center;
+    min-width: 90px;
+  }
+  .dash-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+  .dash-lbl {
+    font-size: .72rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-top: .1rem;
+  }
+
+  /* ── filter tabs ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: 0 1rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  nav button {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .8rem;
+    padding: .45rem 1.1rem;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .3px;
+  }
+  nav button:hover { color: var(--text); border-color: #64748b; }
+  nav button.active { border-color: var(--salt); color: var(--salt); background: rgba(245,158,11,.1); }
+
+  /* ── question list ── */
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 1rem 5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+    transition: box-shadow .2s;
+    animation: slideIn .35s ease both;
+  }
+  .q-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    padding: 1.1rem 1.2rem .8rem;
+    cursor: pointer;
+  }
+  .q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    font-weight: 500;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .q-text {
+    font-size: .93rem;
+    font-weight: 600;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .q-meta {
+    display: flex;
+    gap: .4rem;
+    flex-wrap: wrap;
+    padding: 0 1.2rem .8rem 4rem;
+  }
+  .badge {
+    font-size: .68rem;
+    font-family: 'DM Mono', monospace;
+    padding: .15rem .55rem;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+  .badge-mcq     { background: rgba(59,130,246,.15); color: #60a5fa; }
+  .badge-short   { background: rgba(16,185,129,.15); color: #34d399; }
+  .badge-long    { background: rgba(245,158,11,.15); color: #fbbf24; }
+  .badge-assert  { background: rgba(168,85,247,.15); color: #c084fc; }
+  .badge-1m { background: rgba(148,163,184,.1); color: var(--muted); }
+  .badge-2m { background: rgba(245,158,11,.1);  color: #fcd34d; }
+  .badge-3m { background: rgba(255,77,77,.1);   color: #fca5a5; }
+  .badge-5m { background: rgba(239,68,68,.15);  color: #f87171; }
+
+  /* ── topic colour strip ── */
+  .strip-acid    { border-left: 4px solid var(--acid); }
+  .strip-base    { border-left: 4px solid var(--base); }
+  .strip-ph      { border-left: 4px solid var(--neutral); }
+  .strip-react   { border-left: 4px solid var(--salt); }
+  .strip-salt    { border-left: 4px solid #a855f7; }
+  .strip-general { border-left: 4px solid #64748b; }
+
+  /* ── MCQ options ── */
+  .mcq-body { padding: 0 1.2rem .5rem 1.2rem; }
+  .mcq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: .6rem; }
+  @media(max-width:480px) { .mcq-opts { grid-template-columns: 1fr; } }
+  .opt-btn {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: var(--card2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: .6rem .8rem;
+    cursor: pointer;
+    transition: all .18s;
+    text-align: left;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: #64748b; background: #2d3f57; }
+  .opt-btn .opt-label {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    color: var(--muted);
+    min-width: 18px;
+  }
+  .opt-btn.correct  { border-color: var(--correct); background: rgba(16,185,129,.12); color: #6ee7b7; }
+  .opt-btn.wrong    { border-color: var(--wrong);   background: rgba(239,68,68,.1);   color: #fca5a5; }
+  .opt-btn.reveal   { border-color: var(--correct); background: rgba(16,185,129,.08); color: #6ee7b7; }
+
+  /* ── answer reveal (short/long) ── */
+  .ans-reveal {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .4s ease;
+  }
+  .ans-reveal.open { max-height: 600px; }
+  .ans-body {
+    padding: .8rem 1.2rem 1.1rem 1.2rem;
+    border-top: 1px solid var(--border);
+  }
+  .ans-label {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    color: var(--neutral);
+    margin-bottom: .4rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .ans-text {
+    font-size: .88rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .ans-text strong { color: #fcd34d; }
+  .ans-text em { color: #93c5fd; font-style: normal; }
+  .chemical {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .5rem .8rem;
+    font-size: .82rem;
+    margin: .5rem 0;
+    color: #34d399;
+    line-height: 1.8;
+  }
+  .hint {
+    font-size: .78rem;
+    color: #fb923c;
+    background: rgba(251,146,60,.08);
+    border-left: 3px solid #fb923c;
+    border-radius: 0 6px 6px 0;
+    padding: .4rem .7rem;
+    margin-top: .6rem;
+  }
+
+  /* ── show-answer btn ── */
+  .show-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .78rem;
+    padding: .4rem 1rem;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    margin: .2rem 0 .8rem 1.2rem;
+  }
+  .show-btn:hover { color: var(--text); border-color: #64748b; }
+  .show-btn.active { color: var(--neutral); border-color: var(--neutral); background: rgba(16,185,129,.08); }
+
+  /* ── result feedback ── */
+  .feedback {
+    font-size: .8rem;
+    font-family: 'DM Mono', monospace;
+    padding: .4rem .8rem;
+    border-radius: 8px;
+    margin: .3rem 0 .6rem;
+    display: none;
+  }
+  .feedback.correct { background: rgba(16,185,129,.1); color: #34d399; display: block; }
+  .feedback.wrong   { background: rgba(239,68,68,.1);  color: #f87171; display: block; }
+
+  /* ── reset ── */
+  .reset-bar {
+    text-align: center;
+    padding: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  .reset-btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    padding: .6rem 1.8rem;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .reset-btn:hover { border-color: var(--acid); color: var(--acid); }
+
+  /* ── empty state ── */
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: .88rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="back-chip">📘 Class X · CBSE · Science</div>
+  <h1>Question Bank</h1>
+  <p>Chapter 2 — Acids, Bases &amp; Salts &nbsp;|&nbsp; 30 Questions</p>
+</header>
+
+<!-- score dashboard -->
+<div class="dashboard">
+  <div class="dash-card">
+    <div class="dash-val" id="d-total">30</div>
+    <div class="dash-lbl">Total</div>
+  </div>
+  <div class="dash-card">
+    <div class="dash-val" id="d-attempted" style="color:var(--salt)">0</div>
+    <div class="dash-lbl">Attempted</div>
+  </div>
+  <div class="dash-card">
+    <div class="dash-val" id="d-correct" style="color:var(--correct)">0</div>
+    <div class="dash-lbl">Correct</div>
+  </div>
+  <div class="dash-card">
+    <div class="dash-val" id="d-score" style="color:#a855f7">0%</div>
+    <div class="dash-lbl">Score</div>
+  </div>
+</div>
+
+<!-- filter nav -->
+<nav>
+  <button class="active" onclick="filter('all',this)">All (30)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+
+<div class="reset-bar">
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button>
+</div>
+
+<script>
+const Q = [
+  // ───── MCQ ─────
+  {
+    id:1, type:'mcq', topic:'acid', marks:1,
+    q: 'Which of the following correctly describes the nature of an acidic solution?',
+    opts:['Contains more OH⁻ ions than H⁺ ions','Contains more H⁺ ions than OH⁻ ions','Has pH greater than 7','Turns red litmus to blue'],
+    ans:1,
+    explain:'An acidic solution has a higher concentration of H⁺ (or H₃O⁺) ions than OH⁻ ions, giving it a pH below 7.'
+  },
+  {
+    id:2, type:'mcq', topic:'ph', marks:1,
+    q: 'The pH of a solution is 3. If water is added to it, the pH will:',
+    opts:['Decrease','Increase towards 7','Stay the same','Become greater than 7'],
+    ans:1,
+    explain:'Diluting an acid with water reduces H⁺ concentration, so pH increases (moves towards 7) but never exceeds 7 for an acid.'
+  },
+  {
+    id:3, type:'mcq', topic:'base', marks:1,
+    q: 'Which of the following is NOT an alkali?',
+    opts:['NaOH','Ca(OH)₂','Cu(OH)₂','KOH'],
+    ans:2,
+    explain:'Alkalis are bases soluble in water. Cu(OH)₂ is insoluble in water, so it is a base but NOT an alkali.'
+  },
+  {
+    id:4, type:'mcq', topic:'react', marks:1,
+    q: 'When zinc reacts with dilute H₂SO₄, the gas evolved is:',
+    opts:['Oxygen','Carbon dioxide','Hydrogen','Sulphur dioxide'],
+    ans:2,
+    explain:'Zn + H₂SO₄ → ZnSO₄ + H₂↑. Hydrogen gas is evolved and burns with a "pop" sound with a burning splint.'
+  },
+  {
+    id:5, type:'mcq', topic:'salt', marks:1,
+    q: 'The chemical name of baking soda is:',
+    opts:['Sodium carbonate','Sodium hydrogen carbonate','Calcium carbonate','Sodium chloride'],
+    ans:1,
+    explain:'Baking soda is NaHCO₃ — Sodium Hydrogen Carbonate (also called sodium bicarbonate). Washing soda is Na₂CO₃.'
+  },
+  {
+    id:6, type:'mcq', topic:'ph', marks:1,
+    q: 'Human blood has a pH of approximately:',
+    opts:['6.0','7.0','7.4','8.0'],
+    ans:2,
+    explain:'Blood has a pH of ~7.4, making it slightly basic. This is tightly regulated — even small deviations cause serious illness.'
+  },
+  {
+    id:7, type:'mcq', topic:'acid', marks:1,
+    q: 'Acid rain has a pH:',
+    opts:['Greater than 7','Equal to 7','Less than 7 but above 5.6','Less than 5.6'],
+    ans:3,
+    explain:'Normal rain has pH ~5.6 (due to dissolved CO₂). Acid rain has pH below 5.6 due to dissolved SO₂ and NOₓ from industrial emissions.'
+  },
+  {
+    id:8, type:'mcq', topic:'react', marks:1,
+    q: 'The reaction between an acid and a base to form salt and water is called:',
+    opts:['Decomposition','Displacement','Neutralisation','Combination'],
+    ans:2,
+    explain:'Acid + Base → Salt + Water. This exothermic reaction is called neutralisation. Heat is released in the process.'
+  },
+  {
+    id:9, type:'mcq', topic:'salt', marks:1,
+    q: 'Plaster of Paris is obtained by heating gypsum at:',
+    opts:['100°C','120°C','373 K','423 K'],
+    ans:2,
+    explain:'Gypsum (CaSO₄·2H₂O) is heated at 373 K (100°C) to get Plaster of Paris (CaSO₄·½H₂O). At 423 K it becomes dead burnt plaster.'
+  },
+  {
+    id:10, type:'mcq', topic:'base', marks:1,
+    q: 'Which gas is produced when sodium hydroxide reacts with aluminium?',
+    opts:['Oxygen','Nitrogen','Hydrogen','Chlorine'],
+    ans:2,
+    explain:'2NaOH + 2Al + 2H₂O → 2NaAlO₂ + 3H₂↑. This is unique — NaOH (a base) can dissolve aluminium releasing hydrogen gas.'
+  },
+
+  // ───── ASSERTION–REASON ─────
+  {
+    id:11, type:'assert', topic:'acid', marks:1,
+    q: 'Assertion (A): Dry HCl gas does not change the colour of dry blue litmus paper.\nReason (R): Acids produce H⁺ ions only in the presence of water.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'Dry HCl has no water to ionise, so no H⁺ ions are produced and litmus does not change. R correctly explains A.'
+  },
+  {
+    id:12, type:'assert', topic:'salt', marks:1,
+    q: 'Assertion (A): Sodium carbonate solution is basic in nature.\nReason (R): Na₂CO₃ is a salt formed from a strong base (NaOH) and a weak acid (H₂CO₃).',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'Salts from strong base + weak acid undergo hydrolysis to give a basic solution. Na₂CO₃ fully explains why its solution has pH > 7.'
+  },
+  {
+    id:13, type:'assert', topic:'ph', marks:1,
+    q: 'Assertion (A): A solution with pH = 1 is a stronger acid than pH = 4.\nReason (R): Lower pH means higher concentration of H⁺ ions.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'pH = –log[H⁺]. Lower pH = higher [H⁺] = stronger acid. pH 1 has 1000× more H⁺ ions than pH 4.'
+  },
+  {
+    id:14, type:'assert', topic:'react', marks:1,
+    q: 'Assertion (A): When CO₂ is passed through lime water it turns milky, but excess CO₂ clears it.\nReason (R): Excess CO₂ converts CaCO₃ to soluble Ca(HCO₃)₂.',
+    opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+    ans:0,
+    explain:'CO₂ + Ca(OH)₂ → CaCO₃↓ + H₂O (milky). Excess CO₂: CaCO₃ + H₂O + CO₂ → Ca(HCO₃)₂ (soluble → clear).'
+  },
+
+  // ───── SHORT ANSWER (2–3 marks) ─────
+  {
+    id:15, type:'short', topic:'acid', marks:2,
+    q: 'Why do acids conduct electricity in aqueous solution but not in dry/molten state for all acids?',
+    ans: '<strong>Acids conduct electricity in aqueous solution</strong> because they dissociate to produce <em>H⁺ (H₃O⁺) ions and anions</em> which act as charge carriers.\n\nIn <strong>dry state</strong>, covalent acids like HCl do not ionise — no free ions are present, so no conduction occurs.\n\nExample: HCl (g) → no ions; HCl (aq) → H⁺ + Cl⁻',
+    hint: 'Think about what carries charge in a solution — ions! Dry acids are covalent molecules with no ions.'
+  },
+  {
+    id:16, type:'short', topic:'base', marks:2,
+    q: 'Differentiate between a base and an alkali with one example each.',
+    ans: '<strong>Base:</strong> Any substance that releases OH⁻ ions or accepts H⁺ ions. May or may not dissolve in water.\nExample: <em>Cu(OH)₂</em> — insoluble base.\n\n<strong>Alkali:</strong> A base that is <em>soluble in water</em> and produces OH⁻ ions in solution.\nExample: <em>NaOH</em> — dissolves in water → Na⁺ + OH⁻.\n\nKey: All alkalis are bases, but not all bases are alkalis.',
+    hint: 'The key difference is SOLUBILITY in water.'
+  },
+  {
+    id:17, type:'short', topic:'salt', marks:2,
+    q: 'What happens when baking soda is heated? Write the equation and state one use of the product.',
+    ans: 'On heating, baking soda (NaHCO₃) decomposes:',
+    chemical: '2NaHCO₃ → Na₂CO₃ + H₂O + CO₂↑',
+    ans2: '<strong>Use of Na₂CO₃ (Washing Soda):</strong> Used in glass, soap and paper industries; also softens hard water by precipitating Ca²⁺ and Mg²⁺ salts.\n\nThe CO₂ released makes baking soda useful as a leavening agent in cooking.',
+    hint: 'Remember — baking soda decomposes to washing soda on heating.'
+  },
+  {
+    id:18, type:'short', topic:'react', marks:2,
+    q: 'What is a universal indicator? How does it differ from litmus?',
+    ans: '<strong>Universal indicator</strong> is a mixture of several indicators (methyl orange, phenolphthalein, etc.) that shows <em>a range of colours</em> corresponding to different pH values (0–14).\n\n<strong>Litmus</strong> only tells you acid (red) or base (blue) — it cannot measure the strength.\n\nUniversal indicator gives: Red (pH 0–3) → Orange/Yellow (4–6) → Green (pH 7) → Blue/Violet (8–14).',
+    hint: 'Litmus is binary (red or blue). Universal indicator gives a full pH spectrum in colour.'
+  },
+  {
+    id:19, type:'short', topic:'salt', marks:2,
+    q: 'What is water of crystallisation? Explain with an example.',
+    ans: '<strong>Water of crystallisation</strong> is the fixed number of water molecules present in each formula unit of a crystalline salt.\n\nExample: <em>CuSO₄·5H₂O</em> (Blue vitriol) contains 5 water molecules per formula unit — these give it its characteristic blue colour.',
+    chemical: 'CuSO₄·5H₂O → CuSO₄ + 5H₂O\n(Blue crystals)     (White powder on heating)',
+    ans2: 'Adding water restores the blue colour, confirming the role of water of crystallisation.',
+    hint: 'The dot (·) in the formula means "associated water". CuSO₄·5H₂O is the most asked example.'
+  },
+  {
+    id:20, type:'short', topic:'ph', marks:2,
+    q: 'A farmer finds that the soil in his field is too acidic. What should he add to the soil and why?',
+    ans: 'The farmer should add <strong>slaked lime (Ca(OH)₂)</strong> or <strong>quick lime (CaO)</strong> to the soil.',
+    chemical: 'Ca(OH)₂ + 2HCl → CaCl₂ + 2H₂O',
+    ans2: 'This is a <em>neutralisation reaction</em>. The base neutralises the excess acid in the soil, raising the pH to a level suitable for crops (pH 6–7).\n\nNote: Chalk (CaCO₃) is also used as it is cheaper and reacts with soil acids slowly.',
+    hint: 'To fix acidic soil → add a BASE. To fix basic soil → add organic matter / acid.'
+  },
+
+  // ───── LONG ANSWER (5 marks) ─────
+  {
+    id:21, type:'long', topic:'react', marks:5,
+    q: 'Explain in detail the reactions of acids with metals, metal carbonates, metal bicarbonates, metal oxides and bases. Give one equation for each.',
+    ans: '<strong>1. Acid + Metal → Salt + Hydrogen gas</strong>',
+    chemical: 'Zn + H₂SO₄ → ZnSO₄ + H₂↑\n(Pop sound with burning splint)',
+    ans2: '<strong>2. Acid + Metal Carbonate → Salt + Water + CO₂</strong>',
+    chemical2: 'Na₂CO₃ + 2HCl → 2NaCl + H₂O + CO₂↑\n(Lime water turns milky)',
+    ans3: '<strong>3. Acid + Metal Bicarbonate → Salt + Water + CO₂</strong>',
+    chemical3: 'NaHCO₃ + HCl → NaCl + H₂O + CO₂↑\n(Brisk effervescence)',
+    ans4: '<strong>4. Acid + Metal Oxide → Salt + Water</strong>',
+    chemical4: 'CuO + H₂SO₄ → CuSO₄ + H₂O\n(Black CuO → blue CuSO₄)',
+    ans5: '<strong>5. Acid + Base (Neutralisation) → Salt + Water</strong>',
+    chemical5: 'HCl + NaOH → NaCl + H₂O\n(Exothermic; heat evolved)',
+    hint: 'Board exam often asks for 5 reactions — memorise one example for each type.'
+  },
+  {
+    id:22, type:'long', topic:'salt', marks:5,
+    q: 'Describe the preparation, properties and uses of (a) Washing Soda and (b) Baking Soda.',
+    ans: '<strong>A. Washing Soda (Na₂CO₃·10H₂O)</strong>\n\n<em>Preparation:</em> Solvay process — NaCl + NH₃ + CO₂ + H₂O → NaHCO₃; then NaHCO₃ heated → Na₂CO₃; recrystallised.',
+    chemical: 'Na₂CO₃ + 10H₂O → Na₂CO₃·10H₂O',
+    ans2: '<em>Properties:</em> Strongly basic, soluble in water, used to soften water (precipitates Ca²⁺/Mg²⁺).\n<em>Uses:</em> Glass, paper, soap industry; removes grease; water softening.\n\n<strong>B. Baking Soda (NaHCO₃)</strong>\n\n<em>Preparation:</em> Saturated NaCl + NH₃ + CO₂ → NaHCO₃ (precipitates out)',
+    chemical2: 'NaCl + NH₃ + CO₂ + H₂O → NaHCO₃↓ + NH₄Cl',
+    ans3: '<em>Properties:</em> Mildly basic, decomposes on heating to release CO₂.\n<em>Uses:</em> Baking powder component; antacid for acidity; fire extinguisher; soda water.',
+    hint: 'Compare and contrast both — their formulas, nature (strongly vs mildly basic) and uses. 5-mark questions need all of these.'
+  },
+  {
+    id:23, type:'long', topic:'acid', marks:5,
+    q: 'What is the role of water in showing acidic or basic behaviour? Explain with HCl and NaOH as examples.',
+    ans: '<strong>Water is essential for acidic/basic character.</strong> Acids and bases ionise only in aqueous solution — water facilitates the release of H⁺ and OH⁻ ions.\n\n<em>HCl in water:</em>',
+    chemical: 'HCl + H₂O → H₃O⁺ + Cl⁻\n(hydronium ion)',
+    ans2: 'Dry HCl does NOT change litmus — no ionisation without water.\n\n<em>NaOH in water:</em>',
+    chemical2: 'NaOH(s) → Na⁺(aq) + OH⁻(aq)',
+    ans3: 'The OH⁻ ions produced make the solution basic.\n\n<strong>H₃O⁺ (Hydronium ion)</strong> is the actual species in acidic solutions — bare H⁺ ions cannot exist in water.\n\nConclusion: Without water, neither HCl nor NaOH show their characteristic acidic/basic behaviour.',
+    hint: 'Always mention the hydronium ion H₃O⁺ — bare H⁺ does not exist free in water.'
+  },
+  {
+    id:24, type:'long', topic:'salt', marks:5,
+    q: 'Write about the chlor-alkali process — what is it, what are the products, and what are their uses?',
+    ans: '<strong>Chlor-Alkali Process:</strong> Electrolysis of concentrated NaCl solution (brine).',
+    chemical: '2NaCl(aq) + 2H₂O → 2NaOH(aq) + Cl₂↑ + H₂↑',
+    ans2: '<strong>Products and their uses:</strong>\n\n<em>1. Chlorine (Cl₂)</em> — evolved at anode\n• Water purification and disinfection\n• Manufacturing of PVC, bleaching powder, HCl\n\n<em>2. Hydrogen (H₂)</em> — evolved at cathode\n• Fuel; manufacturing of NH₃ (Haber process)\n• Hydrogenation of oils → ghee/vanaspati\n\n<em>3. Sodium Hydroxide (NaOH)</em> — remains in solution\n• Soap and detergent manufacturing\n• Paper and textile industry\n• De-greasing metals',
+    hint: 'Remember: Cl₂ at ANODE, H₂ at CATHODE, NaOH in solution. "Chlor-Alkali" = Cl₂ + Alkali (NaOH).'
+  },
+
+  // ───── MORE SHORT ─────
+  {
+    id:25, type:'short', topic:'general', marks:3,
+    q: 'Why do metal carbonates and metal bicarbonates react with acids to give CO₂, but metal oxides do not?',
+    ans: '<strong>Metal carbonates and bicarbonates</strong> contain the CO₃²⁻ and HCO₃⁻ ions. When acid reacts with them, unstable carbonic acid (H₂CO₃) forms first, which immediately decomposes:',
+    chemical: 'H₂CO₃ → H₂O + CO₂↑',
+    ans2: '<strong>Metal oxides</strong> (e.g., CuO, MgO) are basic oxides. They react with acids to form salt + water only — no CO₂ is released because there is no carbonate group.',
+    chemical2: 'CuO + H₂SO₄ → CuSO₄ + H₂O',
+    hint: 'CO₂ comes from the carbonate/bicarbonate group — if there\'s no -CO₃, there\'s no CO₂.'
+  },
+  {
+    id:26, type:'short', topic:'salt', marks:2,
+    q: 'What is bleaching powder? How is it prepared? Give its chemical formula.',
+    ans: '<strong>Bleaching powder</strong> is Calcium Oxychloride with formula <em>Ca(OCl)Cl</em> or CaOCl₂.\n\n<strong>Preparation:</strong> Dry slaked lime is treated with chlorine gas.',
+    chemical: 'Ca(OH)₂ + Cl₂ → Ca(OCl)Cl + H₂O',
+    ans2: '<strong>Uses:</strong> Disinfecting drinking water, bleaching cotton and linen fabric, as an oxidising agent in chemical industries.',
+    hint: 'Bleaching powder = slaked lime + Cl₂. Remember it is a mixture, not a pure compound.'
+  },
+  {
+    id:27, type:'short', topic:'react', marks:2,
+    q: 'A solution turns red litmus blue and has a pH of 11. Identify the nature of solution and name a substance with this pH.',
+    ans: 'The solution is <strong>strongly basic (alkaline)</strong>.\n\n• Turns red litmus → blue ✓ (property of bases)\n• pH = 11 > 7 → basic ✓\n\nSubstance with pH ≈ 11: <em>Household ammonia (NH₄OH solution)</em> or dilute limewater.\n\nConclusion: High concentration of OH⁻ ions is present in the solution.',
+    hint: 'pH > 7 = basic; pH < 7 = acidic; pH = 7 = neutral. At pH 11, OH⁻ concentration is high.'
+  },
+  {
+    id:28, type:'short', topic:'general', marks:3,
+    q: 'Name the acid present in: (a) Vinegar (b) Lemon (c) Tomato (d) Ant sting (e) Curd',
+    ans: '<strong>Natural acids in everyday life:</strong>\n\n(a) Vinegar → <em>Acetic acid (CH₃COOH)</em>\n(b) Lemon → <em>Citric acid</em>\n(c) Tomato → <em>Oxalic acid</em>\n(d) Ant sting → <em>Formic acid (Methanoic acid, HCOOH)</em>\n(e) Curd → <em>Lactic acid</em>',
+    hint: 'Board exams love asking these! Make a memory card: Vinegar=Acetic, Lemon=Citric, Ant=Formic, Curd=Lactic.'
+  },
+  {
+    id:29, type:'short', topic:'salt', marks:2,
+    q: 'What is the common name, chemical name and formula of: (a) Common salt (b) Washing soda (c) Baking soda (d) Plaster of Paris?',
+    ans: '<strong>(a) Common salt</strong>\nChemical name: Sodium Chloride | Formula: NaCl\n\n<strong>(b) Washing soda</strong>\nChemical name: Sodium Carbonate decahydrate | Formula: Na₂CO₃·10H₂O\n\n<strong>(c) Baking soda</strong>\nChemical name: Sodium Hydrogen Carbonate | Formula: NaHCO₃\n\n<strong>(d) Plaster of Paris</strong>\nChemical name: Calcium Sulphate hemihydrate | Formula: CaSO₄·½H₂O',
+    hint: 'This is a must-memorise table for board exams. All four appear in 1-mark or 2-mark questions every year.'
+  },
+  {
+    id:30, type:'long', topic:'general', marks:5,
+    q: 'Draw and explain the pH scale. How is pH important in our daily life? Give at least four examples.',
+    ans: '<strong>The pH Scale:</strong> Ranges from 0 to 14. It measures the concentration of H⁺ ions in a solution.\n• pH < 7 → Acidic (more H⁺)\n• pH = 7 → Neutral\n• pH > 7 → Basic (more OH⁻)\n\n<strong>Importance of pH in daily life:</strong>\n\n<em>1. Digestion:</em> Stomach maintains pH 1–2 (HCl) for enzyme activity. Excess acid → heartburn → treated with antacids (Mg(OH)₂).\n\n<em>2. Tooth decay:</em> Bacteria produce acid from sugar → pH drops below 5.5 → enamel dissolves. Toothpaste (basic) neutralises this.\n\n<em>3. Soil pH:</em> Crops need pH 6–7. Acidic soil → add lime; basic soil → add organic acids.\n\n<em>4. Acid rain:</em> pH below 5.6 damages marble buildings (CaCO₃ + H₂SO₄ → corrosion), kills aquatic life.\n\n<em>5. Blood pH:</em> Must stay at 7.4. Deviations by even 0.2 units can be life-threatening.',
+    hint: 'For 5-mark pH question: define scale + draw + give MINIMUM 4 real-life examples with explanation.'
+  }
+];
+
+// ── state ──
+const state = {};
+let currentFilter = 'all';
+
+function getVisible() {
+  if (currentFilter === 'all') return Q;
+  return Q.filter(q => q.type === currentFilter);
+}
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function topicStrip(t) {
+  const m = {acid:'strip-acid',base:'strip-base',ph:'strip-ph',react:'strip-react',salt:'strip-salt',general:'strip-general'};
+  return m[t] || 'strip-general';
+}
+function typeBadge(t) {
+  const m = {mcq:'badge-mcq MCQ',short:'badge-short Short Answer',long:'badge-long Long Answer',assert:'badge-assert Assertion–Reason'};
+  return m[t] || t;
+}
+function markBadge(m) {
+  const c = m===1?'badge-1m':m===2?'badge-2m':m===3?'badge-3m':'badge-5m';
+  return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`;
+}
+function numColor(t) {
+  const m = {acid:'rgba(255,77,77,.15)',base:'rgba(59,130,246,.15)',ph:'rgba(16,185,129,.15)',react:'rgba(245,158,11,.15)',salt:'rgba(168,85,247,.15)',general:'rgba(100,116,139,.15)'};
+  return m[t] || m.general;
+}
+function numTextColor(t) {
+  const m = {acid:'#f87171',base:'#60a5fa',ph:'#34d399',react:'#fbbf24',salt:'#c084fc',general:'#94a3b8'};
+  return m[t] || m.general;
+}
+
+function renderMCQ(q) {
+  const s = state[q.id] || {};
+  const done = s.chosen !== undefined;
+  return `
+    <div class="mcq-body">
+      <div class="mcq-opts">
+        ${q.opts.map((o,i) => {
+          let cls = '';
+          if (done) {
+            if (i === q.ans) cls = 'correct';
+            else if (i === s.chosen && i !== q.ans) cls = 'wrong';
+          }
+          return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+            <span class="opt-label">${String.fromCharCode(65+i)}</span>
+            ${o}
+          </button>`;
+        }).join('')}
+      </div>
+      ${done ? `<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+        ${s.chosen===q.ans ? '✓ Correct!' : '✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}
+      </div>
+      <div class="ans-body" style="border-top:1px solid var(--border);padding:.7rem 0 .3rem">
+        <div class="ans-label">💡 Explanation</div>
+        <div class="ans-text">${q.explain}</div>
+      </div>` : ''}
+    </div>`;
+}
+
+function renderShortLong(q) {
+  const s = state[q.id] || {};
+  const open = s.open;
+  let ansHtml = `<div class="ans-label">✅ Model Answer</div><div class="ans-text">`;
+  ansHtml += (q.ans||'').replace(/\n/g,'<br>');
+  if (q.chemical) ansHtml += `</div><div class="chemical">${q.chemical}</div><div class="ans-text">`;
+  if (q.ans2) ansHtml += q.ans2.replace(/\n/g,'<br>');
+  if (q.chemical2) ansHtml += `</div><div class="chemical">${q.chemical2}</div><div class="ans-text">`;
+  if (q.ans3) ansHtml += q.ans3.replace(/\n/g,'<br>');
+  if (q.chemical3) ansHtml += `</div><div class="chemical">${q.chemical3}</div><div class="ans-text">`;
+  if (q.ans4) ansHtml += q.ans4.replace(/\n/g,'<br>');
+  if (q.chemical4) ansHtml += `</div><div class="chemical">${q.chemical4}</div><div class="ans-text">`;
+  if (q.ans5) ansHtml += q.ans5.replace(/\n/g,'<br>');
+  if (q.chemical5) ansHtml += `</div><div class="chemical">${q.chemical5}</div><div class="ans-text">`;
+  ansHtml += '</div>';
+  if (q.hint) ansHtml += `<div class="hint">🎯 Exam tip: ${q.hint}</div>`;
+  return `
+    <button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+      ${open ? '▲ Hide Answer' : '▼ Show Model Answer'}
+    </button>
+    <div class="ans-reveal ${open?'open':''}">
+      <div class="ans-body">${ansHtml}</div>
+    </div>`;
+}
+
+function render() {
+  const list = getVisible();
+  const el = document.getElementById('qlist');
+  if (!list.length) { el.innerHTML = '<div class="empty">No questions in this category.</div>'; return; }
+  el.innerHTML = list.map((q,i) => {
+    const tb = typeBadge(q.type).split(' ');
+    const cls = tb[0]; const lbl = tb.slice(1).join(' ');
+    return `<div class="q-card ${topicStrip(q.topic)}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${numColor(q.topic)};color:${numTextColor(q.topic)}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${cls}">${lbl}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert' ? renderMCQ(q) : renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id, idx) {
+  const q = Q.find(x => x.id===id);
+  if (!q || state[id]?.chosen !== undefined) return;
+  if (!state[id]) state[id] = {};
+  state[id].chosen = idx;
+  // update score
+  updateDash();
+  // re-render just this card
+  const el = document.getElementById('qcard-'+id);
+  const visible = getVisible();
+  const i = visible.findIndex(x => x.id===id);
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = `<div class="q-card ${topicStrip(q.topic)}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${numColor(q.topic)};color:${numTextColor(q.topic)}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta">
+      <span class="badge ${typeBadge(q.type).split(' ')[0]}">${typeBadge(q.type).split(' ').slice(1).join(' ')}</span>
+      ${markBadge(q.marks)}
+    </div>
+    ${renderMCQ(q)}
+  </div>`;
+  el.replaceWith(tempDiv.firstElementChild);
+}
+
+function toggleAns(id) {
+  if (!state[id]) state[id] = {};
+  state[id].open = !state[id].open;
+  if (!state[id].viewed) { state[id].viewed = true; updateDash(); }
+  const btn = document.querySelector(`#qcard-${id} .show-btn`);
+  const rev = document.querySelector(`#qcard-${id} .ans-reveal`);
+  if (btn && rev) {
+    const open = state[id].open;
+    btn.classList.toggle('active', open);
+    btn.textContent = open ? '▲ Hide Answer' : '▼ Show Model Answer';
+    rev.classList.toggle('open', open);
+  }
+}
+
+function updateDash() {
+  const attempted = Object.keys(state).length;
+  const correct = Q.filter(q => state[q.id]?.chosen === q.ans).length;
+  const mcqTotal = Q.filter(q => q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-attempted').textContent = attempted;
+  document.getElementById('d-correct').textContent = correct;
+  const pct = mcqTotal > 0 ? Math.round((correct / mcqTotal) * 100) : 0;
+  document.getElementById('d-score').textContent = pct + '%';
+}
+
+function resetAll() {
+  for (const k in state) delete state[k];
+  updateDash();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

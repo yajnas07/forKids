@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Lab — Acids, Bases & Salts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#07101f; --bench:#0d1928; --card:#111d2e; --card2:#162235;
+    --border:#1a2d45; --text:#dde6f5; --muted:#5a7a9a;
+    --acid:#ef4444; --base:#3b82f6; --neutral:#10b981;
+    --salt:#f59e0b; --purple:#a855f7;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:800;
+    background:linear-gradient(135deg,#34d399,#60a5fa,#a855f7);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-size:.78rem; font-family:'DM Mono',monospace; margin-top:.3rem; }
+
+  /* ── lab bench ── */
+  .lab {
+    max-width:900px; margin:1rem auto; padding:0 .8rem 3rem;
+    display:grid; grid-template-columns:1fr 1fr; gap:1rem;
+  }
+  @media(max-width:600px){ .lab{ grid-template-columns:1fr; } }
+
+  /* reagent shelf */
+  .shelf {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:1rem; grid-column:1/-1;
+  }
+  .shelf h2 { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; color:var(--muted); margin-bottom:.8rem; }
+  .reagents { display:flex; flex-wrap:wrap; gap:.5rem; }
+  .reagent {
+    display:flex; flex-direction:column; align-items:center; gap:.3rem;
+    cursor:pointer; padding:.5rem .6rem; border-radius:12px;
+    border:1.5px solid var(--border); background:var(--card2);
+    transition:all .2s; user-select:none; min-width:72px;
+  }
+  .reagent:hover { transform:translateY(-2px); }
+  .reagent.selected { box-shadow:0 0 0 2px var(--neutral); }
+  .reagent .vial { width:28px; height:44px; border-radius:3px 3px 8px 8px; border:2px solid; position:relative; overflow:hidden; }
+  .reagent .vial-liq { position:absolute; bottom:0; left:0; right:0; height:65%; border-radius:0 0 6px 6px; }
+  .reagent .r-name { font-size:.65rem; font-family:'DM Mono',monospace; color:var(--muted); text-align:center; }
+  .reagent .r-formula { font-size:.6rem; font-family:'DM Mono',monospace; color:var(--muted); }
+
+  /* mixing area */
+  .mixer {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:1rem;
+  }
+  .mixer h2 { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; color:var(--muted); margin-bottom:.8rem; }
+  .slots { display:flex; align-items:center; gap:.5rem; margin-bottom:.8rem; flex-wrap:wrap; }
+  .slot {
+    width:80px; height:100px; border:2px dashed var(--border); border-radius:14px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:.7rem; color:var(--muted); font-family:'DM Mono',monospace;
+    cursor:pointer; transition:all .2s; text-align:center; padding:.3rem;
+    position:relative; overflow:hidden;
+  }
+  .slot.filled { border-style:solid; }
+  .slot .slot-liq { position:absolute; bottom:0; left:0; right:0; border-radius:0 0 12px 12px; transition:height .5s ease; }
+  .slot .slot-label { position:relative; z-index:2; font-weight:700; }
+  .slot .slot-formula { position:relative; z-index:2; font-size:.6rem; }
+  .plus { font-size:1.5rem; color:var(--muted); font-family:'Syne',sans-serif; }
+  .react-btn {
+    width:100%; padding:.6rem; border-radius:99px;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem;
+    border:none; cursor:pointer; transition:all .2s;
+    background:linear-gradient(135deg,var(--neutral),var(--base));
+    color:#fff; box-shadow:0 4px 16px rgba(16,185,129,.3);
+  }
+  .react-btn:hover { transform:scale(1.02); }
+  .react-btn:disabled { background:var(--border); color:var(--muted); box-shadow:none; transform:none; cursor:default; }
+  .clear-btn {
+    width:100%; padding:.45rem; border-radius:99px; margin-top:.5rem;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.78rem;
+    border:1.5px solid var(--border); background:transparent;
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .clear-btn:hover { border-color:#64748b; color:var(--text); }
+
+  /* observation panel */
+  .obs-panel {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:1rem;
+    display:flex; flex-direction:column; gap:.6rem;
+  }
+  .obs-panel h2 { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; color:var(--muted); }
+
+  /* result beaker */
+  .result-beaker-wrap { display:flex; justify-content:center; padding:.5rem 0; }
+  .big-beaker {
+    width:90px; height:110px; border:3px solid var(--border); border-top:none;
+    border-radius:0 0 18px 18px; position:relative; overflow:hidden;
+    transition:border-color .5s;
+  }
+  .big-liq {
+    position:absolute; bottom:0; left:0; right:0;
+    height:0%; border-radius:0 0 15px 15px;
+    transition:height .7s ease, background .7s ease;
+  }
+  /* bubbles */
+  @keyframes bbl { 0%{transform:translateY(0) scale(1);opacity:.7} 100%{transform:translateY(-70px) scale(1.5);opacity:0} }
+  .bbl { position:absolute; bottom:8px; width:7px; height:7px; background:rgba(255,255,255,.4); border-radius:50%; display:none; }
+  .bbl.go { display:block; animation:bbl 1s ease-in infinite; }
+  .bbl:nth-child(2){left:20%;animation-delay:.25s;width:5px;height:5px}
+  .bbl:nth-child(3){left:55%;animation-delay:.55s;width:9px;height:9px}
+  .bbl:nth-child(4){left:75%;animation-delay:.8s;width:6px;height:6px}
+
+  /* gas animation */
+  @keyframes rise { 0%{transform:translateY(0);opacity:.8} 100%{transform:translateY(-40px);opacity:0} }
+  .gas-particle { position:absolute; width:12px; height:12px; border-radius:50%; display:none; font-size:.65rem; text-align:center; line-height:12px; }
+  .gas-particle.go { display:block; animation:rise 1.2s ease-in infinite; }
+
+  .obs-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; }
+  .obs-equation { font-family:'DM Mono',monospace; font-size:.78rem; background:var(--card2);
+    border-radius:8px; padding:.5rem .7rem; color:#a5f3d0; line-height:1.7; }
+  .obs-react { color:var(--acid); }
+  .obs-prod  { color:var(--neutral); }
+  .obs-arrow { color:var(--salt); }
+  .obs-note  { font-size:.8rem; color:var(--muted); line-height:1.5; }
+  .obs-note strong { color:#fcd34d; }
+  .obs-ph { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.78rem;
+    background:var(--card2); border-radius:8px; padding:.3rem .6rem; }
+  .obs-ph .ph-dot { width:12px; height:12px; border-radius:50%; }
+
+  /* indicator strip */
+  .ind-strip { display:flex; gap:.4rem; flex-wrap:wrap; }
+  .ind-item { border-radius:8px; padding:.25rem .6rem; font-size:.7rem; font-family:'DM Mono',monospace; }
+
+  /* placeholder */
+  .placeholder { text-align:center; padding:1.5rem; color:var(--muted); font-family:'DM Mono',monospace; font-size:.8rem; }
+
+  /* history */
+  .history { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1rem; grid-column:1/-1; }
+  .history h2 { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; color:var(--muted); margin-bottom:.6rem; }
+  .hist-list { display:flex; flex-direction:column; gap:.4rem; max-height:160px; overflow-y:auto; }
+  .hist-item { display:flex; gap:.6rem; align-items:center; font-size:.78rem; padding:.35rem .6rem;
+    background:var(--card2); border-radius:8px; border:1px solid var(--border); }
+  .hist-eq { font-family:'DM Mono',monospace; color:#a5f3d0; }
+  .hist-obs { color:var(--muted); font-size:.72rem; }
+  .hist-empty { color:var(--muted); font-family:'DM Mono',monospace; font-size:.78rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔬 Virtual Chemistry Lab</h1>
+  <p>Acids, Bases &amp; Salts · Select two reagents and react!</p>
+</header>
+
+<div class="lab">
+
+  <!-- reagent shelf -->
+  <div class="shelf">
+    <h2>🧪 Reagent Shelf — Select a substance to add to the flask</h2>
+    <div class="reagents" id="reagent-shelf"></div>
+  </div>
+
+  <!-- mixer -->
+  <div class="mixer">
+    <h2>⚗️ Reaction Flask</h2>
+    <div class="slots">
+      <div class="slot" id="slot-a" onclick="removeSlot('a')">
+        <div class="slot-liq" id="slot-a-liq"></div>
+        <div class="slot-label" id="slot-a-lbl">Flask A</div>
+        <div class="slot-formula" id="slot-a-fml">empty</div>
+      </div>
+      <div class="plus">+</div>
+      <div class="slot" id="slot-b" onclick="removeSlot('b')">
+        <div class="slot-liq" id="slot-b-liq"></div>
+        <div class="slot-label" id="slot-b-lbl">Flask B</div>
+        <div class="slot-formula" id="slot-b-fml">empty</div>
+      </div>
+    </div>
+    <button class="react-btn" id="react-btn" onclick="doReaction()" disabled>⚗️ React!</button>
+    <button class="clear-btn" onclick="clearSlots()">✕ Clear</button>
+  </div>
+
+  <!-- observation -->
+  <div class="obs-panel" id="obs-panel">
+    <h2>🔭 Observations</h2>
+    <div class="result-beaker-wrap">
+      <div class="big-beaker" id="big-beaker">
+        <div class="big-liq" id="big-liq"></div>
+        <div class="bbl" id="b1"></div><div class="bbl" id="b2"></div>
+        <div class="bbl" id="b3"></div><div class="bbl" id="b4"></div>
+        <div class="gas-particle" id="gp1" style="left:30%;bottom:30%"></div>
+        <div class="gas-particle" id="gp2" style="left:55%;bottom:20%;animation-delay:.4s"></div>
+      </div>
+    </div>
+    <div id="obs-content"><div class="placeholder">Select two reagents and click React!</div></div>
+  </div>
+
+  <!-- history -->
+  <div class="history">
+    <h2>📝 Experiment Log</h2>
+    <div class="hist-list" id="hist-list"><div class="hist-empty">No experiments yet.</div></div>
+  </div>
+
+</div>
+
+<script>
+// ── REAGENTS ──
+const REAGENTS = [
+  { id:'hcl',   name:'HCl',       formula:'HCl(aq)',      color:'#ef4444', liq:'rgba(239,68,68,.35)',   cat:'acid', label:'Hydrochloric Acid' },
+  { id:'h2so4', name:'H₂SO₄',     formula:'H₂SO₄(aq)',    color:'#f97316', liq:'rgba(249,115,22,.35)',  cat:'acid', label:'Sulphuric Acid' },
+  { id:'hno3',  name:'HNO₃',      formula:'HNO₃(aq)',     color:'#eab308', liq:'rgba(234,179,8,.3)',    cat:'acid', label:'Nitric Acid' },
+  { id:'naoh',  name:'NaOH',      formula:'NaOH(aq)',     color:'#3b82f6', liq:'rgba(59,130,246,.35)',  cat:'base', label:'Sodium Hydroxide' },
+  { id:'caoh2', name:'Ca(OH)₂',   formula:'Ca(OH)₂(aq)',  color:'#60a5fa', liq:'rgba(96,165,250,.25)',  cat:'base', label:'Slaked Lime' },
+  { id:'na2co3',name:'Na₂CO₃',    formula:'Na₂CO₃(aq)',   color:'#6366f1', liq:'rgba(99,102,241,.3)',   cat:'salt', label:'Sodium Carbonate' },
+  { id:'nahco3',name:'NaHCO₃',    formula:'NaHCO₃(aq)',   color:'#8b5cf6', liq:'rgba(139,92,246,.3)',   cat:'salt', label:'Baking Soda' },
+  { id:'zn',    name:'Zn',        formula:'Zn(s)',         color:'#94a3b8', liq:'rgba(148,163,184,.25)', cat:'metal',label:'Zinc (metal)' },
+  { id:'cuo',   name:'CuO',       formula:'CuO(s)',        color:'#1e293b', liq:'rgba(30,41,59,.9)',     cat:'oxide', label:'Copper Oxide' },
+  { id:'limew', name:'Lime water', formula:'Ca(OH)₂(aq)', color:'#e2e8f0', liq:'rgba(226,232,240,.15)', cat:'base', label:'Lime Water' },
+  { id:'litmus',name:'Litmus',    formula:'Indicator',     color:'#a855f7', liq:'rgba(168,85,247,.3)',   cat:'ind',  label:'Litmus Indicator' },
+  { id:'univ',  name:'Universal', formula:'Indicator',     color:'#10b981', liq:'rgba(16,185,129,.3)',   cat:'ind',  label:'Universal Indicator' },
+];
+
+// ── REACTIONS ──
+// key: sorted pair of reagent ids
+const RXN = {
+  'hcl+naoh': {
+    eq: '<span class="obs-react">HCl</span> <span class="obs-arrow">+</span> <span class="obs-react">NaOH</span> <span class="obs-arrow">→</span> <span class="obs-prod">NaCl</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂O</span>',
+    title:'Neutralisation!', liqColor:'rgba(16,185,129,.45)', beakerColor:'#10b981',
+    phVal:7, phColor:'#10b981',
+    gas:null, bubble:false,
+    note:'<strong>Exothermic reaction</strong> — heat is released. The solution becomes neutral (pH 7). Universal indicator turns <strong>green</strong>. NaCl (common salt) + water are the products.',
+    litmus:'Red litmus → stays red | Blue litmus → stays blue (neutral)',
+    obs:'Slight warming felt. Colourless solution.'
+  },
+  'h2so4+naoh': {
+    eq: '<span class="obs-react">H₂SO₄</span> <span class="obs-arrow">+</span> <span class="obs-react">2NaOH</span> <span class="obs-arrow">→</span> <span class="obs-prod">Na₂SO₄</span> <span class="obs-arrow">+</span> <span class="obs-prod">2H₂O</span>',
+    title:'Neutralisation!', liqColor:'rgba(16,185,129,.45)', beakerColor:'#10b981',
+    phVal:7, phColor:'#10b981', gas:null, bubble:false,
+    note:'<strong>Neutralisation reaction.</strong> Sodium sulphate (Na₂SO₄) and water formed. Highly exothermic — significant heat released. Solution is neutral at stoichiometric amounts.',
+    litmus:'Neutral — no change in litmus', obs:'Strong heat evolved.'
+  },
+  'hcl+na2co3': {
+    eq: '<span class="obs-react">Na₂CO₃</span> <span class="obs-arrow">+</span> <span class="obs-react">2HCl</span> <span class="obs-arrow">→</span> <span class="obs-prod">2NaCl</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂O</span> <span class="obs-arrow">+</span> <span class="obs-prod">CO₂↑</span>',
+    title:'CO₂ Gas Evolved!', liqColor:'rgba(99,102,241,.4)', beakerColor:'#6366f1',
+    phVal:7, phColor:'#10b981', gas:'CO₂', bubble:true,
+    note:'<strong>Brisk effervescence</strong> of CO₂ gas! The gas turns lime water <strong>milky</strong> (standard test for CO₂). Na₂CO₃ is a metal carbonate reacting with acid.',
+    litmus:'Solution is neutral', obs:'Vigorous bubbling, colourless gas.'
+  },
+  'hcl+nahco3': {
+    eq: '<span class="obs-react">NaHCO₃</span> <span class="obs-arrow">+</span> <span class="obs-react">HCl</span> <span class="obs-arrow">→</span> <span class="obs-prod">NaCl</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂O</span> <span class="obs-arrow">+</span> <span class="obs-prod">CO₂↑</span>',
+    title:'CO₂ Gas Evolved!', liqColor:'rgba(139,92,246,.4)', beakerColor:'#8b5cf6',
+    phVal:7, phColor:'#10b981', gas:'CO₂', bubble:true,
+    note:'<strong>Effervescence</strong> of CO₂. Same reaction as carbonate but baking soda (bicarbonate) reacts more readily. This is why baking soda is used in cooking — CO₂ makes dough rise!',
+    litmus:'Neutral', obs:'Bubbling; colourless CO₂ gas.'
+  },
+  'h2so4+zn': {
+    eq: '<span class="obs-react">Zn</span> <span class="obs-arrow">+</span> <span class="obs-react">H₂SO₄</span> <span class="obs-arrow">→</span> <span class="obs-prod">ZnSO₄</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂↑</span>',
+    title:'Hydrogen Gas Evolved!', liqColor:'rgba(245,158,11,.35)', beakerColor:'#f59e0b',
+    phVal:3, phColor:'#f97316', gas:'H₂', bubble:true,
+    note:'<strong>Hydrogen gas (H₂)</strong> is evolved with vigorous fizzing. Test: burning splint near gas gives a characteristic <strong>"pop" sound</strong>. Zinc sulphate (ZnSO₄) — colourless solution — is formed.',
+    litmus:'Acidic — blue litmus turns red', obs:'Zinc dissolves, H₂ bubbles vigorously.'
+  },
+  'hcl+zn': {
+    eq: '<span class="obs-react">Zn</span> <span class="obs-arrow">+</span> <span class="obs-react">2HCl</span> <span class="obs-arrow">→</span> <span class="obs-prod">ZnCl₂</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂↑</span>',
+    title:'Hydrogen Gas Evolved!', liqColor:'rgba(239,68,68,.3)', beakerColor:'#ef4444',
+    phVal:3, phColor:'#f97316', gas:'H₂', bubble:true,
+    note:'<strong>H₂ gas evolved</strong> — burns with pop sound. Zinc chloride (ZnCl₂) solution formed. Metal + Acid → Salt + H₂ is a standard reaction type for CBSE.',
+    litmus:'Acidic — blue litmus turns red', obs:'Zinc dissolves, bubbling.'
+  },
+  'hcl+cuo': {
+    eq: '<span class="obs-react">CuO</span> <span class="obs-arrow">+</span> <span class="obs-react">2HCl</span> <span class="obs-arrow">→</span> <span class="obs-prod">CuCl₂</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂O</span>',
+    title:'Black → Blue-Green!', liqColor:'rgba(6,182,212,.45)', beakerColor:'#06b6d4',
+    phVal:5, phColor:'#eab308', gas:null, bubble:false,
+    note:'Black <strong>CuO dissolves</strong> in HCl to form a <strong>blue-green CuCl₂ solution</strong>. Metal oxide + acid → salt + water. No gas evolved. The colour change is dramatic and distinctive!',
+    litmus:'Slightly acidic', obs:'Black powder dissolves → blue-green solution.'
+  },
+  'h2so4+cuo': {
+    eq: '<span class="obs-react">CuO</span> <span class="obs-arrow">+</span> <span class="obs-react">H₂SO₄</span> <span class="obs-arrow">→</span> <span class="obs-prod">CuSO₄</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂O</span>',
+    title:'Black → Blue!', liqColor:'rgba(59,130,246,.45)', beakerColor:'#3b82f6',
+    phVal:5, phColor:'#eab308', gas:null, bubble:false,
+    note:'Black CuO dissolves to form <strong>characteristic blue CuSO₄ solution</strong>. This is the classic metal oxide + acid reaction. CuSO₄·5H₂O (Blue vitriol) can be crystallised from this solution.',
+    litmus:'Slightly acidic', obs:'Black CuO dissolves → beautiful blue CuSO₄.'
+  },
+  'hcl+caoh2': {
+    eq: '<span class="obs-react">Ca(OH)₂</span> <span class="obs-arrow">+</span> <span class="obs-react">2HCl</span> <span class="obs-arrow">→</span> <span class="obs-prod">CaCl₂</span> <span class="obs-arrow">+</span> <span class="obs-prod">2H₂O</span>',
+    title:'Neutralisation!', liqColor:'rgba(16,185,129,.4)', beakerColor:'#10b981',
+    phVal:7, phColor:'#10b981', gas:null, bubble:false,
+    note:'Neutralisation reaction. Slaked lime (base) + HCl → Calcium chloride + water. <strong>Heat is released.</strong> This is the principle behind using lime to neutralise acid spills.',
+    litmus:'Neutral', obs:'Colourless solution, warming.'
+  },
+  'h2so4+na2co3': {
+    eq: '<span class="obs-react">Na₂CO₃</span> <span class="obs-arrow">+</span> <span class="obs-react">H₂SO₄</span> <span class="obs-arrow">→</span> <span class="obs-prod">Na₂SO₄</span> <span class="obs-arrow">+</span> <span class="obs-prod">H₂O</span> <span class="obs-arrow">+</span> <span class="obs-prod">CO₂↑</span>',
+    title:'CO₂ Evolved!', liqColor:'rgba(99,102,241,.4)', beakerColor:'#6366f1',
+    phVal:7, phColor:'#10b981', gas:'CO₂', bubble:true,
+    note:'CO₂ gas evolved vigorously. Same as carbonate + HCl but with sulphuric acid. The CO₂ will turn lime water <strong>milky</strong>.',
+    litmus:'Neutral', obs:'Vigorous bubbling of CO₂.'
+  },
+  'hcl+limew': {
+    eq: '<span class="obs-react">Ca(OH)₂</span> <span class="obs-arrow">+</span> <span class="obs-react">2HCl</span> <span class="obs-arrow">→</span> <span class="obs-prod">CaCl₂</span> <span class="obs-arrow">+</span> <span class="obs-prod">2H₂O</span>',
+    title:'Clear stays clear', liqColor:'rgba(226,232,240,.15)', beakerColor:'#e2e8f0',
+    phVal:7, phColor:'#10b981', gas:null, bubble:false,
+    note:'Lime water (dilute Ca(OH)₂) + HCl → neutralisation. Lime water stays <strong>clear</strong> — no precipitate because CaCl₂ is soluble. (CO₂ would make it milky — not HCl!)',
+    litmus:'Neutral', obs:'Clear solution throughout.'
+  },
+  'na2co3+limew': {
+    eq: '<span class="obs-react">Na₂CO₃</span> <span class="obs-arrow">+</span> <span class="obs-react">Ca(OH)₂</span> <span class="obs-arrow">→</span> <span class="obs-prod">CaCO₃↓</span> <span class="obs-arrow">+</span> <span class="obs-prod">2NaOH</span>',
+    title:'White precipitate!', liqColor:'rgba(226,232,240,.5)', beakerColor:'#e2e8f0',
+    phVal:11, phColor:'#8b5cf6', gas:null, bubble:false,
+    note:'<strong>White precipitate of CaCO₃</strong> forms (insoluble). This is actually the same reaction that makes lime water <strong>milky with CO₂</strong>! The carbonate ion precipitates with calcium.',
+    litmus:'Basic — red litmus turns blue', obs:'Solution turns milky white.'
+  },
+  'hcl+litmus': {
+    eq: '<span class="obs-react">HCl(aq)</span> <span class="obs-arrow">+</span> <span class="obs-react">Litmus</span> <span class="obs-arrow">→</span> <span class="obs-prod">Litmus turns RED</span>',
+    title:'Red Litmus Test!', liqColor:'rgba(239,68,68,.5)', beakerColor:'#ef4444',
+    phVal:2, phColor:'#dc2626', gas:null, bubble:false,
+    note:'Litmus indicator turns <strong>RED</strong> in acidic solutions. HCl is a strong acid (pH ~1–2). Blue litmus → Red confirms acidity.',
+    litmus:'Blue litmus → RED ✓', obs:'Solution turns red/pink with litmus.'
+  },
+  'naoh+litmus': {
+    eq: '<span class="obs-react">NaOH(aq)</span> <span class="obs-arrow">+</span> <span class="obs-react">Litmus</span> <span class="obs-arrow">→</span> <span class="obs-prod">Litmus turns BLUE</span>',
+    title:'Blue Litmus Test!', liqColor:'rgba(59,130,246,.5)', beakerColor:'#3b82f6',
+    phVal:13, phColor:'#7c3aed', gas:null, bubble:false,
+    note:'Litmus indicator turns <strong>BLUE</strong> in basic solutions. NaOH is a strong base (pH ~13). Red litmus → Blue confirms basicity.',
+    litmus:'Red litmus → BLUE ✓', obs:'Solution turns blue with litmus.'
+  },
+  'hcl+univ': {
+    eq: '<span class="obs-react">HCl(aq)</span> <span class="obs-arrow">+</span> <span class="obs-react">Universal Indicator</span> <span class="obs-arrow">→</span> <span class="obs-prod">RED colour</span>',
+    title:'Universal — pH 1!', liqColor:'rgba(220,38,38,.5)', beakerColor:'#dc2626',
+    phVal:1, phColor:'#dc2626', gas:null, bubble:false,
+    note:'Universal indicator gives <strong>RED</strong> colour, showing pH ≈ 1. Strong acid. Unlike litmus, universal indicator can tell us the actual pH value.',
+    litmus:'Universal: RED → pH 0–3', obs:'Bright red solution.'
+  },
+  'naoh+univ': {
+    eq: '<span class="obs-react">NaOH(aq)</span> <span class="obs-arrow">+</span> <span class="obs-react">Universal Indicator</span> <span class="obs-arrow">→</span> <span class="obs-prod">VIOLET colour</span>',
+    title:'Universal — pH 13!', liqColor:'rgba(124,58,237,.55)', beakerColor:'#7c3aed',
+    phVal:13, phColor:'#7c3aed', gas:null, bubble:false,
+    note:'Universal indicator gives <strong>VIOLET/PURPLE</strong> colour — pH ≈ 13. Strong base. Full range: Red (pH 0–3) → Yellow (5–6) → Green (7) → Blue (8–10) → Violet (12–14).',
+    litmus:'Universal: VIOLET → pH 12–14', obs:'Violet/purple solution.'
+  },
+};
+
+function rxnKey(a, b) {
+  const pair = [a,b].sort();
+  const k1 = pair[0]+'+'+pair[1];
+  const k2 = pair[1]+'+'+pair[0];
+  return RXN[k1] ? k1 : RXN[k2] ? k2 : null;
+}
+
+// ── STATE ──
+let slots = {a:null, b:null};
+let history = [];
+
+// ── BUILD SHELF ──
+function buildShelf() {
+  const shelf = document.getElementById('reagent-shelf');
+  REAGENTS.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'reagent'; div.id = 'r-'+r.id;
+    div.innerHTML = `<div class="vial" style="border-color:${r.color}"><div class="vial-liq" style="background:${r.liq}"></div></div>
+      <div class="r-name" style="color:${r.color}">${r.name}</div>
+      <div class="r-formula">${r.formula}</div>`;
+    div.onclick = () => selectReagent(r.id);
+    shelf.appendChild(div);
+  });
+}
+
+function selectReagent(id) {
+  const r = REAGENTS.find(x=>x.id===id);
+  if (!slots.a) {
+    slots.a = r;
+    setSlot('a', r);
+  } else if (!slots.b && slots.a.id !== id) {
+    slots.b = r;
+    setSlot('b', r);
+  }
+  updateReactBtn();
+}
+
+function setSlot(which, r) {
+  document.getElementById(`slot-${which}-liq`).style.cssText = `height:65%;background:${r.liq}`;
+  document.getElementById(`slot-${which}-lbl`).textContent = r.name;
+  document.getElementById(`slot-${which}-fml`).textContent = r.formula;
+  document.getElementById(`slot-${which}`).style.borderColor = r.color;
+  document.getElementById(`slot-${which}`).classList.add('filled');
+}
+
+function removeSlot(which) {
+  slots[which] = null;
+  document.getElementById(`slot-${which}-liq`).style.cssText = 'height:0%';
+  document.getElementById(`slot-${which}-lbl`).textContent = `Flask ${which.toUpperCase()}`;
+  document.getElementById(`slot-${which}-fml`).textContent = 'empty';
+  document.getElementById(`slot-${which}`).style.borderColor = '';
+  document.getElementById(`slot-${which}`).classList.remove('filled');
+  document.getElementById('obs-content').innerHTML = '<div class="placeholder">Select two reagents and click React!</div>';
+  resetBeaker();
+  updateReactBtn();
+}
+
+function clearSlots() { removeSlot('a'); removeSlot('b'); }
+
+function updateReactBtn() {
+  document.getElementById('react-btn').disabled = !(slots.a && slots.b);
+}
+
+function resetBeaker() {
+  const liq = document.getElementById('big-liq');
+  liq.style.height = '0%'; liq.style.background = '';
+  document.getElementById('big-beaker').style.borderColor = 'var(--border)';
+  ['b1','b2','b3','b4'].forEach(id=>document.getElementById(id).classList.remove('go'));
+  ['gp1','gp2'].forEach(id=>document.getElementById(id).classList.remove('go'));
+}
+
+function doReaction() {
+  if (!slots.a || !slots.b) return;
+  const key = rxnKey(slots.a.id, slots.b.id);
+
+  if (!key) {
+    document.getElementById('obs-content').innerHTML = `
+      <div style="text-align:center;padding:1rem;color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem">
+        ⚠️ No observable reaction between ${slots.a.name} and ${slots.b.name} under these conditions.<br><br>
+        Try a different combination!
+      </div>`;
+    resetBeaker();
+    addHistory(slots.a.name + ' + ' + slots.b.name, 'No reaction observed');
+    return;
+  }
+
+  const rx = RXN[key];
+
+  // animate beaker
+  resetBeaker();
+  setTimeout(() => {
+    const liq = document.getElementById('big-liq');
+    liq.style.height = '70%';
+    liq.style.background = rx.liqColor;
+    document.getElementById('big-beaker').style.borderColor = rx.beakerColor;
+    if (rx.bubble) ['b1','b2','b3','b4'].forEach(id=>document.getElementById(id).classList.add('go'));
+    if (rx.gas) {
+      ['gp1','gp2'].forEach((id,i) => {
+        const el = document.getElementById(id);
+        el.textContent = rx.gas; el.style.color = '#a5f3d0';
+        el.classList.add('go');
+      });
+    }
+  }, 200);
+
+  // pH colour
+  const phColors = {
+    '#dc2626':'rgba(220,38,38,.3)','#f97316':'rgba(249,115,22,.3)',
+    '#eab308':'rgba(234,179,8,.3)','#10b981':'rgba(16,185,129,.3)',
+    '#3b82f6':'rgba(59,130,246,.3)','#6366f1':'rgba(99,102,241,.3)',
+    '#8b5cf6':'rgba(139,92,246,.3)','#7c3aed':'rgba(124,58,237,.3)',
+  };
+
+  document.getElementById('obs-content').innerHTML = `
+    <div class="obs-title" style="color:${rx.beakerColor}">${rx.title}</div>
+    <div class="obs-equation">${rx.eq}</div>
+    <div class="obs-note">${rx.note}</div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem">
+      <div class="obs-ph"><div class="ph-dot" style="background:${rx.phColor}"></div> pH ≈ ${rx.phVal}</div>
+      ${rx.gas ? `<div class="obs-ph" style="color:#a5f3d0">💨 Gas: ${rx.gas}</div>` : ''}
+    </div>
+    <div style="font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:.3rem">${rx.litmus}</div>
+  `;
+
+  addHistory(slots.a.name + ' + ' + slots.b.name, rx.obs);
+}
+
+function addHistory(eq, obs) {
+  history.unshift({eq, obs});
+  if (history.length > 8) history.pop();
+  const list = document.getElementById('hist-list');
+  list.innerHTML = history.map(h => `
+    <div class="hist-item">
+      <span class="hist-eq">${h.eq}</span>
+      <span class="hist-obs">→ ${h.obs}</span>
+    </div>`).join('');
+}
+
+buildShelf();
+</script>
+</body>
+</html>

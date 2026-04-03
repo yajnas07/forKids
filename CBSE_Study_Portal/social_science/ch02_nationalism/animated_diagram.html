@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nationalism in India — Animated Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0a04; --card:#1a1208; --card2:#221a0a;
+    --border:#3a2e1a; --text:#e8d8b0; --muted:#8a7a5a;
+    --gold:#f5c842; --orange:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --purple:#d946ef; --indigo:#818cf8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(245,200,66,.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 85%, rgba(56,189,248,.03) 0%, transparent 55%);
+  }
+
+  header { text-align:center; padding:2rem 1rem 1.2rem; border-bottom:1px solid var(--border); }
+  header h1 {
+    font-family:'Playfair Display',serif; font-size:clamp(1.5rem,4vw,2.4rem); font-weight:900;
+    color:var(--gold); letter-spacing:.5px;
+  }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.75rem; margin-top:.3rem; }
+
+  /* ── nav tabs ── */
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem; padding:1.2rem 1rem .6rem; }
+  nav button {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.8rem;
+    padding:.45rem 1.1rem; border-radius:4px;
+    border:1px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .22s;
+  }
+  nav button:hover { color:var(--text); border-color:#5a4a2a; }
+  nav button.a-ncm  { border-color:var(--orange); color:var(--orange); background:rgba(249,115,22,.08); }
+  nav button.a-cdm  { border-color:var(--blue);   color:var(--blue);   background:rgba(56,189,248,.08); }
+  nav button.a-time { border-color:var(--gold);   color:var(--gold);   background:rgba(245,200,66,.08); }
+  nav button.a-grp  { border-color:var(--purple); color:var(--purple); background:rgba(217,70,239,.08); }
+  nav button.a-sym  { border-color:var(--green);  color:var(--green);  background:rgba(34,197,94,.08); }
+
+  main { max-width:860px; margin:0 auto; padding:1rem 1rem 4rem; }
+  section { display:none; animation:fadeUp .35s ease; }
+  section.vis { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title {
+    font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:900;
+    margin-bottom:1.1rem; display:flex; align-items:center; gap:.5rem;
+  }
+
+  /* ── cards ── */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.9rem; margin-bottom:1.3rem; }
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; transition:transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  .card h3 { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; margin-bottom:.5rem; }
+  .card p, .card li { font-size:.83rem; color:var(--muted); line-height:1.65; }
+  .card ul { padding-left:1rem; }
+  .tag { display:inline-block; font-size:.65rem; font-family:'DM Mono',monospace;
+    padding:.12rem .5rem; border-radius:3px; margin-bottom:.45rem; }
+
+  /* ── timeline ── */
+  .timeline { position:relative; padding-left:2rem; }
+  .timeline::before {
+    content:''; position:absolute; left:.6rem; top:0; bottom:0;
+    width:2px; background:linear-gradient(to bottom, var(--gold), var(--blue), var(--green));
+    border-radius:2px;
+  }
+  .t-event {
+    position:relative; margin-bottom:1.1rem;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:.8rem 1rem;
+    cursor:pointer; transition:all .2s;
+    animation:slideIn .4s ease both;
+  }
+  .t-event:hover { border-color:#5a4a2a; transform:translateX(4px); }
+  .t-event::before {
+    content:''; position:absolute; left:-1.7rem; top:1rem;
+    width:12px; height:12px; border-radius:50%;
+    border:2px solid; background:var(--bg);
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+
+  .t-year { font-family:'DM Mono',monospace; font-size:.7rem; font-weight:500; margin-bottom:.3rem; }
+  .t-name { font-family:'Playfair Display',serif; font-weight:700; font-size:.95rem; margin-bottom:.3rem; }
+  .t-desc { font-size:.8rem; color:var(--muted); line-height:1.6; }
+  .t-detail {
+    max-height:0; overflow:hidden; transition:max-height .35s ease;
+    font-size:.8rem; color:var(--muted); line-height:1.65;
+  }
+  .t-event.open .t-detail { max-height:200px; margin-top:.5rem; padding-top:.5rem; border-top:1px solid var(--border); }
+  .t-toggle { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-top:.3rem; }
+
+  /* ── cause-effect ── */
+  .cause-effect {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.2rem; margin-bottom:1rem;
+  }
+  .cause-effect h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.8rem; }
+  .ce-row { display:flex; align-items:stretch; gap:.6rem; margin-bottom:.6rem; flex-wrap:wrap; }
+  .ce-box { flex:1; min-width:140px; border-radius:8px; padding:.6rem .8rem; font-size:.8rem; line-height:1.5; }
+  .ce-cause { background:rgba(249,115,22,.08); border:1px solid rgba(249,115,22,.2); }
+  .ce-cause h4 { color:var(--orange); font-size:.68rem; font-family:'DM Mono',monospace; margin-bottom:.3rem; }
+  .ce-arrow { display:flex; align-items:center; color:var(--gold); font-size:1.2rem; flex-shrink:0; padding-top:.2rem; }
+  .ce-effect { background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); }
+  .ce-effect h4 { color:var(--green); font-size:.68rem; font-family:'DM Mono',monospace; margin-bottom:.3rem; }
+
+  /* ── groups participation ── */
+  .grp-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.8rem; }
+  .grp-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem;
+    border-left:4px solid; transition:transform .2s;
+  }
+  .grp-card:hover { transform:translateY(-2px); }
+  .grp-card h3 { font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; margin-bottom:.4rem; }
+  .grp-card p { font-size:.78rem; color:var(--muted); line-height:1.6; }
+  .grp-why { font-size:.72rem; font-family:'DM Mono',monospace; margin-top:.4rem; padding:.3rem .5rem; border-radius:5px; }
+
+  /* ── symbols ── */
+  .sym-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.8rem; }
+  .sym-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1rem; text-align:center; transition:all .2s;
+  }
+  .sym-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .sym-icon { font-size:2rem; margin-bottom:.5rem; }
+  .sym-card h3 { font-family:'Playfair Display',serif; font-weight:700; font-size:.9rem; margin-bottom:.35rem; }
+  .sym-card p { font-size:.75rem; color:var(--muted); line-height:1.6; }
+
+  /* ── key concepts box ── */
+  .concept-bar { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.1rem; }
+  .cpill { font-size:.7rem; font-family:'DM Mono',monospace; padding:.2rem .65rem;
+    border-radius:3px; border:1px solid var(--border); color:var(--muted); background:var(--card); }
+
+  /* ── comparison table ── */
+  table { width:100%; border-collapse:collapse; font-size:.8rem; margin-top:.5rem; }
+  th { font-family:'DM Mono',monospace; font-size:.68rem; padding:.5rem .7rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.45rem .7rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.015); }
+  .hl { color:var(--gold); font-family:'DM Mono',monospace; }
+
+  /* highlight box */
+  .hbox {
+    border-left:3px solid; border-radius:0 8px 8px 0;
+    padding:.6rem .9rem; margin:.5rem 0; font-size:.82rem; line-height:1.6;
+  }
+  .hbox strong { display:block; font-family:'Playfair Display',serif; margin-bottom:.2rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Nationalism in India</h1>
+  <p>Class X · Social Science · History Chapter 2 · CBSE</p>
+</header>
+
+<nav>
+  <button onclick="show('ncm')" id="btn-ncm" class="a-ncm">🔥 Non-Cooperation</button>
+  <button onclick="show('cdm')" id="btn-cdm">🌊 Civil Disobedience</button>
+  <button onclick="show('time')" id="btn-time">📅 Timeline</button>
+  <button onclick="show('grp')" id="btn-grp">👥 Social Groups</button>
+  <button onclick="show('sym')" id="btn-sym">🏛️ Symbols & Ideas</button>
+</nav>
+
+<main>
+
+<!-- ══════════ NON-COOPERATION MOVEMENT ══════════ -->
+<section id="ncm" class="vis">
+  <div class="sec-title" style="color:var(--orange)">🔥 Non-Cooperation Movement (1920–22)</div>
+
+  <div class="concept-bar">
+    <span class="cpill">1920–1922</span>
+    <span class="cpill">Gandhi's first mass movement</span>
+    <span class="cpill">Boycott of British institutions</span>
+    <span class="cpill">Called off after Chauri Chaura</span>
+  </div>
+
+  <!-- Cause-Effect -->
+  <div class="cause-effect">
+    <h3>Why was it launched?</h3>
+    <div class="ce-row">
+      <div class="ce-box ce-cause"><h4>CAUSE 1</h4>Jallianwala Bagh Massacre (April 13, 1919) — General Dyer's troops fired on unarmed crowd at Amritsar. Hundreds killed.</div>
+      <div class="ce-arrow">→</div>
+      <div class="ce-box ce-effect"><h4>EFFECT</h4>Nationwide outrage. Indians lost faith in British justice. Gandhi called for non-cooperation.</div>
+    </div>
+    <div class="ce-row">
+      <div class="ce-box ce-cause"><h4>CAUSE 2</h4>Khilafat Issue — British defeated Ottoman Empire. Muslims feared Khalifa (Caliph) would lose power and Islam would be humiliated.</div>
+      <div class="ce-arrow">→</div>
+      <div class="ce-box ce-effect"><h4>EFFECT</h4>Gandhi allied with Khilafat leaders. Hindu-Muslim unity was forged. Both groups boycotted British together.</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="tag" style="background:rgba(249,115,22,.12);color:var(--orange)">PROGRAMME</span>
+      <h3>What did people do?</h3>
+      <ul>
+        <li>Surrendered titles given by British</li>
+        <li>Boycotted civil services, army, police</li>
+        <li>Boycotted British courts and schools</li>
+        <li>Boycotted foreign goods — burned cloth</li>
+        <li>Picketed liquor shops</li>
+        <li>Students left government schools</li>
+        <li>Lawyers gave up legal practice</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag" style="background:rgba(249,115,22,.12);color:var(--orange)">PARTICIPATION</span>
+      <h3>Who joined?</h3>
+      <ul>
+        <li>Middle-class in cities initially</li>
+        <li>Peasants in Awadh — against landlords</li>
+        <li>Tribal people in Andhra — forest laws</li>
+        <li>Workers in Assam tea plantations</li>
+        <li>Muslim communities (Khilafat)</li>
+        <li>Thousands of students nationwide</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag" style="background:rgba(239,68,68,.12);color:#f87171">WHY CALLED OFF</span>
+      <h3>Chauri Chaura, 1922</h3>
+      <p>Feb 5, 1922 — Gorakhpur district, UP. An angry mob attacked and burned a police station, killing 22 policemen.</p>
+      <br>
+      <p>Gandhi was deeply disturbed. He felt Indians were not yet ready for non-violent mass struggle. He called off the movement unilaterally — shocking many Congress leaders including Nehru.</p>
+    </div>
+  </div>
+
+  <div class="hbox" style="border-color:var(--orange);background:rgba(249,115,22,.06)">
+    <strong>Gandhi's concept of Satyagraha</strong>
+    Satyagraha = "truth-force" or "soul-force". Not passive resistance — an active, non-violent confrontation with injustice. The opponent must be convinced through suffering, not force. Gandhi believed truth ultimately always wins.
+  </div>
+</section>
+
+<!-- ══════════ CIVIL DISOBEDIENCE ══════════ -->
+<section id="cdm">
+  <div class="sec-title" style="color:var(--blue)">🌊 Civil Disobedience Movement (1930–34)</div>
+
+  <div class="concept-bar">
+    <span class="cpill">1930–1934</span>
+    <span class="cpill">Dandi March — Salt Satyagraha</span>
+    <span class="cpill">Break unjust laws openly</span>
+    <span class="cpill">Wider than NCM</span>
+  </div>
+
+  <div class="cause-effect">
+    <h3>From NCM to CDM — What changed?</h3>
+    <div class="ce-row">
+      <div class="ce-box ce-cause"><h4>CONTEXT</h4>1929 — Great Depression hit India. Peasants' incomes crashed. Revenue demands unchanged. Congress declared Purna Swaraj at Lahore Session.</div>
+      <div class="ce-arrow">→</div>
+      <div class="ce-box ce-effect"><h4>NEW APPROACH</h4>CDM meant breaking specific unjust laws. Salt tax chosen as the symbol — everyone needed salt, even the poorest. Universal symbol of oppression.</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">DANDI MARCH</span>
+      <h3>Salt Satyagraha, 1930</h3>
+      <p><strong style="color:var(--gold)">March 12 → April 5, 1930</strong></p>
+      <br>
+      <ul>
+        <li>Gandhi marched 240 miles on foot</li>
+        <li>Started with 78 followers from Sabarmati Ashram</li>
+        <li>Reached Dandi coast, Gujarat</li>
+        <li>Made salt from seawater — breaking salt law</li>
+        <li>News reached worldwide — massive media coverage</li>
+        <li>Triggered nationwide defiance of salt laws</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">PARTICIPATION</span>
+      <h3>Who joined CDM?</h3>
+      <ul>
+        <li>Rich peasants (Patidars of Gujarat, Jats of UP) — hit by Depression</li>
+        <li>Women — in huge numbers for first time</li>
+        <li>Merchants — hurt by foreign trade</li>
+        <li>Workers in some industries</li>
+        <li>But: untouchables largely stayed away</li>
+        <li>But: some Muslim leaders stayed away</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">GANDHI-IRWIN PACT</span>
+      <h3>March 1931</h3>
+      <ul>
+        <li>Gandhi agreed to suspend CDM</li>
+        <li>Gandhi to attend 2nd Round Table Conference in London</li>
+        <li>British to release political prisoners</li>
+        <li>RTC: Gandhi felt humiliated — demands rejected</li>
+        <li>Returned and relaunched CDM in 1932</li>
+        <li>Finally withdrawn in 1934</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:1rem">
+    <h3 style="font-family:'Playfair Display',serif;font-weight:700;margin-bottom:.8rem">NCM vs CDM — Key Differences</h3>
+    <table>
+      <tr><th>Feature</th><th style="color:var(--orange)">Non-Cooperation (1920)</th><th style="color:var(--blue)">Civil Disobedience (1930)</th></tr>
+      <tr><td>Method</td><td>Boycott British institutions</td><td>Break specific unjust laws</td></tr>
+      <tr><td>Symbol</td><td>Khadi, bonfire of cloth</td><td class="hl">Salt — Dandi March</td></tr>
+      <tr><td>Women's role</td><td>Limited</td><td class="hl">Very significant</td></tr>
+      <tr><td>Peasant involvement</td><td>Moderate</td><td class="hl">Strong (Depression effect)</td></tr>
+      <tr><td>Why called off</td><td class="hl">Chauri Chaura violence</td><td>Gandhi-Irwin Pact / 1934</td></tr>
+      <tr><td>Demand</td><td>Swaraj (self-rule)</td><td class="hl">Purna Swaraj (full independence)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ TIMELINE ══════════ -->
+<section id="time">
+  <div class="sec-title" style="color:var(--gold)">📅 Key Events Timeline</div>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;font-family:'DM Mono',monospace">Click any event to expand details →</p>
+
+  <div class="timeline">
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--orange)">
+      <div class="t-event-inner" style="--dot-color:var(--orange)"></div>
+      <div class="t-year" style="color:var(--orange)">1915</div>
+      <div class="t-name">Gandhi returns to India</div>
+      <div class="t-desc">Arrives from South Africa. Gokhale is his political mentor. Travels across India to understand the people before acting.</div>
+      <div class="t-detail">Gandhi spent a year observing India before joining any movement. He was deeply moved by the poverty of the masses. His experience with Satyagraha in South Africa shaped his approach in India.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid #ef4444">
+      <div class="t-year" style="color:#ef4444">1919</div>
+      <div class="t-name">Rowlatt Act & Jallianwala Bagh</div>
+      <div class="t-desc">Rowlatt Act allowed arrest without trial. Nationwide hartal on April 6. Jallianwala Bagh massacre on April 13 — General Dyer fires on crowd.</div>
+      <div class="t-detail">The Rowlatt Act was called the "Black Act" by Indians. The Jallianwala Bagh massacre became a turning point — Rabindranath Tagore renounced his knighthood in protest. Hunter Commission set up by British was seen as whitewash.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--orange)">
+      <div class="t-year" style="color:var(--orange)">1920</div>
+      <div class="t-name">Non-Cooperation Movement Launched</div>
+      <div class="t-desc">Gandhi allies with Khilafat leaders. Congress endorses NCM. Boycott of British goods, courts, schools begins across India.</div>
+      <div class="t-detail">The alliance between Gandhi and Khilafat leaders Muhammad Ali and Shaukat Ali was a historic Hindu-Muslim unity. The movement showed Indians could act together. Cities saw bonfires of foreign cloth.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid #ef4444">
+      <div class="t-year" style="color:#ef4444">1922</div>
+      <div class="t-name">Chauri Chaura — NCM Called Off</div>
+      <div class="t-desc">Violent mob burns police station killing 22 policemen in Gorakhpur, UP. Gandhi immediately suspends the movement.</div>
+      <div class="t-detail">Gandhi's decision was controversial. Nehru and other leaders felt betrayed — the movement was at its peak. But Gandhi was firm — violence by protesters would destroy the moral basis of the struggle. He himself was arrested and jailed for 6 years.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--gold)">
+      <div class="t-year" style="color:var(--gold)">1929</div>
+      <div class="t-name">Lahore Session — Purna Swaraj</div>
+      <div class="t-desc">Congress under Nehru declares complete independence (Purna Swaraj) as the goal. January 26 declared Independence Day.</div>
+      <div class="t-detail">The Lahore Session was a watershed. The demand shifted from self-rule within the British Empire to complete independence. January 26 was chosen to hoist the tricolour — later became Republic Day in 1950.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--blue)">
+      <div class="t-year" style="color:var(--blue)">1930</div>
+      <div class="t-name">Dandi March — Civil Disobedience Begins</div>
+      <div class="t-desc">Gandhi's 240-mile march to Dandi. Makes salt on April 5. CDM sweeps across India. Mass arrests follow.</div>
+      <div class="t-detail">The march began with 78 volunteers. By the time it ended, thousands had joined. The image of the old man in a dhoti picking up salt became iconic worldwide. Ambedkar called the march a "great drama" but questioned if it addressed untouchability.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--blue)">
+      <div class="t-year" style="color:var(--blue)">1931</div>
+      <div class="t-name">Gandhi-Irwin Pact & Round Table Conference</div>
+      <div class="t-desc">Gandhi suspends CDM, attends 2nd Round Table Conference in London. Demands not met. Returns and relaunches CDM in 1932.</div>
+      <div class="t-detail">The Round Table Conference was a failure for Gandhi — he was the only Congress representative while the British had invited many others including Ambedkar, princes, and communalists. He felt isolated. CDM was relaunched but could not regain momentum.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+    <div class="t-event" onclick="toggleEvent(this)" style="border-left:3px solid var(--green)">
+      <div class="t-year" style="color:var(--green)">1942</div>
+      <div class="t-name">Quit India Movement</div>
+      <div class="t-desc">"Do or Die" — Gandhi's August Kranti. British arrest all Congress leaders. Underground networks, youth, and local leaders sustain the movement.</div>
+      <div class="t-detail">The Quit India Movement was the most radical. In the absence of national leaders (all arrested), ordinary people took charge. Parallel governments were established in some areas. British promised independence after WWII. Ultimately led to 1947.</div>
+      <div class="t-toggle">▼ more</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ SOCIAL GROUPS ══════════ -->
+<section id="grp">
+  <div class="sec-title" style="color:var(--purple)">👥 Participation of Different Social Groups</div>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;font-family:'DM Mono',monospace">Different groups had different reasons to join — or not join — the movement.</p>
+
+  <div class="grp-grid">
+    <div class="grp-card" style="border-color:var(--orange)">
+      <h3 style="color:var(--orange)">🌾 Peasants & Farmers</h3>
+      <p>Hit hardest by the Great Depression (1930s). Prices fell, but revenues stayed high. Couldn't pay rent to zamindars or taxes to government.</p>
+      <div class="grp-why" style="background:rgba(249,115,22,.08);color:var(--orange)">Why they joined CDM strongly: Economic desperation + anti-colonial feeling</div>
+      <br>
+      <p><strong style="color:var(--text)">Key examples:</strong> Patidars of Gujarat, Jats of UP, Assam tea plantation workers in NCM.</p>
+    </div>
+
+    <div class="grp-card" style="border-color:var(--purple)">
+      <h3 style="color:var(--purple)">👩 Women</h3>
+      <p>CDM transformed women's participation in public life. They made salt, picketed foreign cloth and liquor shops, courted arrest.</p>
+      <div class="grp-why" style="background:rgba(217,70,239,.08);color:var(--purple)">Significance: Moved from domestic to public sphere. Changed social perception.</div>
+      <br>
+      <p><strong style="color:var(--text)">CBSE note:</strong> Women's role was more prominent in CDM than NCM. Board exams ask this distinction often.</p>
+    </div>
+
+    <div class="grp-card" style="border-color:var(--blue)">
+      <h3 style="color:var(--blue)">🏭 Industrial Workers</h3>
+      <p>Participated in NCM (Nagpur cotton mill workers struck 1920). Congress was cautious — didn't want to alienate industrialist donors.</p>
+      <div class="grp-why" style="background:rgba(56,189,248,.08);color:var(--blue)">Tension: Workers wanted class struggle; Congress wanted national unity above class conflict.</div>
+    </div>
+
+    <div class="grp-card" style="border-color:var(--green)">
+      <h3 style="color:var(--green)">🌲 Tribals (Adivasis)</h3>
+      <p>Forest laws restricted their traditional rights — couldn't graze cattle, collect firewood, or farm in forests. Saw colonial state as enemy.</p>
+      <div class="grp-why" style="background:rgba(34,197,94,.08);color:var(--green)">Alluri Sitaram Raju: Led tribal rebellion in Andhra using guerrilla warfare. Connected to NCM ideas.</div>
+    </div>
+
+    <div class="grp-card" style="border-color:var(--indigo)">
+      <h3 style="color:var(--indigo)">✊ Dalits (Untouchables)</h3>
+      <p>Largely stayed away from CDM. Congress reluctant to antagonise upper-caste Hindus by strongly supporting Dalit demands.</p>
+      <div class="grp-why" style="background:rgba(129,140,248,.08);color:var(--indigo)">Ambedkar founded Depressed Classes Association (1930). Demanded separate electorate. Poona Pact (1932) — reserved seats instead.</div>
+    </div>
+
+    <div class="grp-card" style="border-color:var(--gold)">
+      <h3 style="color:var(--gold)">☪️ Muslim Community</h3>
+      <p>United with Hindus in NCM via Khilafat. But after Khilafat ended, distrust grew. By CDM, many Muslim leaders did not participate.</p>
+      <div class="grp-why" style="background:rgba(245,200,66,.06);color:var(--gold)">Congress-Muslim League relations deteriorated through 1930s — separate electorates, representation became flashpoints.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SYMBOLS & IDEAS ══════════ -->
+<section id="sym">
+  <div class="sec-title" style="color:var(--green)">🏛️ Symbols, Imagery &amp; Ideas of Nationalism</div>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;font-family:'DM Mono',monospace">Nationalism needed shared symbols to unite a diverse country. Here's how identity was forged.</p>
+
+  <div class="sym-grid" style="margin-bottom:1.2rem">
+    <div class="sym-card">
+      <div class="sym-icon">🇮🇳</div>
+      <h3>Bharat Mata</h3>
+      <p>Bankim Chandra Chattopadhyay created the image. Abanindranath Tagore painted Bharat Mata as a sari-clad ascetic figure. Symbol of the motherland as a goddess.</p>
+    </div>
+    <div class="sym-card">
+      <div class="sym-icon">🎵</div>
+      <h3>Vande Mataram</h3>
+      <p>Song by Bankim Chandra — "Hail to the Motherland". Used at nationalist meetings. Some Muslims objected — it seemed to worship a Hindu goddess figure.</p>
+    </div>
+    <div class="sym-card">
+      <div class="sym-icon">🧵</div>
+      <h3>Khadi & Charkha</h3>
+      <p>Gandhi promoted khadi as symbol of self-reliance. Spinning wheel (charkha) on the Congress flag. Boycott of British mill cloth — economic and political statement.</p>
+    </div>
+    <div class="sym-card">
+      <div class="sym-icon">🗺️</div>
+      <h3>Mapping the Nation</h3>
+      <p>Maps of India began to appear in nationalist literature. The image of India as a unified territory was itself a powerful nationalist idea — "from Kashmir to Kanyakumari".</p>
+    </div>
+    <div class="sym-card">
+      <div class="sym-icon">🌸</div>
+      <h3>Folk Songs & Imagery</h3>
+      <p>Paintings by artists like Ravi Varma. Folk tales, songs collected and re-told. Local heroes became national symbols. Shivaji, Rana Pratap glorified.</p>
+    </div>
+    <div class="sym-card">
+      <div class="sym-icon">🤝</div>
+      <h3>Unity in Diversity</h3>
+      <p>The challenge was uniting Hindus, Muslims, Sikhs, untouchables, tribals, women, peasants, workers — all with different demands — into one national movement.</p>
+    </div>
+  </div>
+
+  <div class="hbox" style="border-color:var(--gold);background:rgba(245,200,66,.05)">
+    <strong>The Problem of Unity</strong>
+    Nationalism meant different things to different groups: for peasants it meant freedom from landlords; for tribals, freedom from forest laws; for women, freedom from patriarchy; for Dalits, freedom from caste oppression. Congress tried to hold all of these together while keeping the anti-British struggle as the central thread. This tension is a key theme of this chapter.
+  </div>
+</section>
+
+</main>
+
+<script>
+const activeClass = { ncm:'a-ncm', cdm:'a-cdm', time:'a-time', grp:'a-grp', sym:'a-sym' };
+function show(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('vis'));
+  document.querySelectorAll('nav button').forEach(b => { b.className = ''; });
+  document.getElementById(id).classList.add('vis');
+  document.getElementById('btn-'+id).className = activeClass[id];
+}
+function toggleEvent(el) {
+  el.classList.toggle('open');
+  const tog = el.querySelector('.t-toggle');
+  if (tog) tog.textContent = el.classList.contains('open') ? '▲ less' : '▼ more';
+}
+// set dot colors via CSS
+document.querySelectorAll('.t-event').forEach(ev => {
+  const col = ev.style.borderLeftColor;
+  ev.style.setProperty('--dot-color', col);
+});
+// add dots to timeline events
+document.querySelectorAll('.t-event').forEach(ev => {
+  const col = ev.style.borderLeftColor || '#f5c842';
+  const dot = document.createElement('div');
+  dot.style.cssText = `position:absolute;left:-1.75rem;top:1.05rem;width:11px;height:11px;border-radius:50%;border:2px solid ${col};background:#0e0a04;`;
+  ev.style.position = 'relative';
+  ev.prepend(dot);
+});
+</script>
+</body>
+</html>

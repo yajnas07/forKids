@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Nationalism in India</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#0e0a04; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(14,10,4,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f5c842; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#7a6a4a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #3a2e1a; background:rgba(20,15,5,.85);
+  color:#8a7a5a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f5c842; color:#f5c842; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#1a1208; border:1px solid #3a2e1a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:260px; font-size:.8rem; color:#d4c4a0;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#f5c842; font-size:.9rem; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <div>
+    <h1>Nationalism in India</h1>
+    <p>Class X · Social Science · History Ch.2 — hover nodes to explore</p>
+  </div>
+</div>
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = { id:'c', label:'Nationalism\nin India', x:0, y:0, r:62, color:'#3d2800', stroke:'#f5c842', textColor:'#f5c842', fontSize:14 };
+
+const BRANCHES = [
+  {
+    id:'ncm', label:'Non-\nCooperation\nMovement', x:-300, y:-220, r:46, color:'#2a1a00', stroke:'#f97316', textColor:'#fed7aa',
+    info:'1920–22. Gandhi\'s first mass movement. Launched after Jallianwala Bagh massacre (1919) and Khilafat issue. Aimed to make British rule impossible.',
+    children:[
+      { id:'n1', label:'Khilafat\nIssue', x:-490, y:-340, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'1919–20. Muslims feared British dismemberment of Ottoman Caliphate (Khalifa). Gandhi saw opportunity to unite Hindus and Muslims against British.' },
+      { id:'n2', label:'Jallianwala\nBagh 1919', x:-520, y:-200, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'April 13, 1919. General Dyer ordered troops to fire on peaceful crowd at Amritsar. Hundreds killed. Sparked nationwide outrage and united Indians.' },
+      { id:'n3', label:'Programme', x:-430, y:-80, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Surrender of titles, boycott of civil services, army, courts, legislature, foreign goods. Picketing of liquor shops. Students left schools/colleges.' },
+      { id:'n4', label:'Chauri\nChaura 1922', x:-280, y:-380, r:34, color:'#2a1a00', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Feb 1922. Violent mob burned police station in UP, killing 22 policemen. Gandhi called off the movement saying people were not ready for non-violence.' },
+    ]
+  },
+  {
+    id:'cdm', label:'Civil\nDisobedience\nMovement', x:300, y:-220, r:46, color:'#001a2a', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'1930–34. Launched with Dandi March. Aimed at breaking specific unjust laws — salt tax, forest laws, revenue payments. Wider participation than NCM.',
+    children:[
+      { id:'c1', label:'Dandi March\n1930', x:450, y:-370, r:34, color:'#001a2a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'March 12 – April 5, 1930. Gandhi marched 240 miles from Sabarmati to Dandi coast with 78 followers to make salt from seawater, defying salt law.' },
+      { id:'c2', label:'Salt Law\nDefiance', x:530, y:-220, r:34, color:'#001a2a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Salt was heavily taxed by British. Making salt was declared criminal. Breaking this law became the symbol of civil disobedience across India.' },
+      { id:'c3', label:'Gandhi-Irwin\nPact 1931', x:490, y:-80, r:34, color:'#001a2a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'March 1931. Gandhi agreed to attend Round Table Conference. British agreed to release political prisoners. CDM suspended. Gandhi represented Congress at 2nd RTC.' },
+      { id:'c4', label:'Who\nParticipated', x:300, y:-400, r:34, color:'#001a2a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Patidars (Gujarat), Jats (UP), rich peasants hit by Depression. Women in large numbers. Some industrialists supported. But untouchables, some Muslims stayed away.' },
+    ]
+  },
+  {
+    id:'leaders', label:'Key\nLeaders', x:-320, y:200, r:46, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:'Multiple leaders shaped the nationalist movement, each contributing uniquely to the struggle for independence.',
+    children:[
+      { id:'l1', label:'Mahatma\nGandhi', x:-530, y:120, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Central figure. Arrived from S.Africa 1915. Developed Satyagraha — truth-force. Led NCM, CDM, Quit India. Represented the masses. Wore khadi as symbol.' },
+      { id:'l2', label:'Jawaharlal\nNehru', x:-540, y:240, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Led youth wing of Congress. Lahore Session 1929 — declared Purna Swaraj (complete independence) as Congress goal. First PM of India.' },
+      { id:'l3', label:'Subhas\nChandra Bose', x:-440, y:360, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Radical nationalist. Founded INA (Indian National Army). "Give me blood, I will give you freedom." Resigned from Congress presidency 1939.' },
+      { id:'l4', label:'B.R.\nAmbedkar', x:-280, y:390, r:34, color:'#001a0e', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Led Dalit (untouchable) movement. Demanded separate electorate at Round Table Conferences. Poona Pact 1932 with Gandhi — reserved seats instead.' },
+    ]
+  },
+  {
+    id:'groups', label:'Different\nGroups', x:320, y:200, r:46, color:'#1a001a', stroke:'#d946ef', textColor:'#f5d0fe',
+    info:'Different social groups participated in the nationalist movement with varying degrees and for different reasons.',
+    children:[
+      { id:'g1', label:'Peasants\n& Farmers', x:510, y:110, r:34, color:'#1a001a', stroke:'#d946ef', textColor:'#f5d0fe',
+        info:'Indigo farmers of Champaran (1917), Kheda farmers (1918), Bardoli Satyagraha. Hit by Depression (1930s) — couldn\'t pay revenue. Joined CDM strongly.' },
+      { id:'g2', label:'Women', x:550, y:240, r:34, color:'#1a001a', stroke:'#d946ef', textColor:'#f5d0fe',
+        info:'Participated in large numbers in CDM — made salt, picketed foreign cloth shops, liquor shops. Changed perception of women\'s role in public life.' },
+      { id:'g3', label:'Tribals', x:'460', y:360, r:34, color:'#1a001a', stroke:'#d946ef', textColor:'#f5d0fe',
+        info:'Forest laws restricted traditional rights. Alluri Sitaram Raju (Andhra) led tribal rebellion. Guerrilla warfare. Connected colonial exploitation to nationalism.' },
+      { id:'g4', label:'Industrial\nWorkers', x:290, y:400, r:34, color:'#1a001a', stroke:'#d946ef', textColor:'#f5d0fe',
+        info:'Nagpur cotton mill workers went on strike 1920. Calcutta mill workers joined NCM. But Congress cautious — didn\'t want to alienate industrialist supporters.' },
+    ]
+  },
+  {
+    id:'symbols', label:'Symbols &\nIdeas', x:0, y:-300, r:46, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'The nationalist movement created powerful symbols and a shared sense of national identity cutting across regional and religious lines.',
+    children:[
+      { id:'s1', label:'Bharat Mata\nImage', x:-180, y:-430, r:32, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Bankim Chandra Chattopadhyay created Bharat Mata image. Abanindranath Tagore painted her as an ascetic figure. Symbol of the motherland.' },
+      { id:'s2', label:'Vande\nMataram', x:0, y:-460, r:32, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Song by Bankim Chandra — "Hail to the Motherland". Sung at nationalist gatherings. Muslims objected as it seemed to worship a Hindu goddess.' },
+      { id:'s3', label:'Khadi &\nCharkha', x:180, y:-430, r:32, color:'#1a0a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Gandhi promoted hand-spun khadi as symbol of self-reliance and rejection of British mill cloth. Charkha (spinning wheel) became symbol of nationalism.' },
+    ]
+  },
+  {
+    id:'events', label:'Key\nEvents', x:0, y:280, r:46, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'A chronological sweep of the most important events in the Indian nationalist movement.',
+    children:[
+      { id:'e1', label:'Rowlatt Act\n1919', x:-200, y:400, r:32, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Gave British power to arrest anyone without trial. Gandhi called hartal — nationwide strike. April 6, 1919. Shocked Indians into mass political action.' },
+      { id:'e2', label:'Lahore\nSession 1929', x:0, y:450, r:32, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Congress declared Purna Swaraj — complete independence — as goal. January 26, 1930 set as Independence Day (celebrated annually before 1947). Flag hoisted.' },
+      { id:'e3', label:'Quit India\n1942', x:200, y:400, r:32, color:'#0a001a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'"Do or Die" — Gandhi\'s call. August 8, 1942. Mass arrest of Congress leaders. Underground networks, local leaders, youth took over. British promise independence.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+// pan/zoom
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale,my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10, window.innerHeight-200)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${(found.info||'').replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.25,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // warm parchment grid
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(245,200,66,.03)';
+  ctx.lineWidth=1;
+  for(let x=-1200;x<1200;x+=70){ctx.beginPath();ctx.moveTo(x,-1200);ctx.lineTo(x,1200);ctx.stroke();}
+  for(let y=-1200;y<1200;y+=70){ctx.beginPath();ctx.moveTo(-1200,y);ctx.lineTo(1200,y);ctx.stroke();}
+  ctx.restore();
+
+  ctx.save(); ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2+(b.y-a.y)*.15, cy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?35:18;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    // inner ring for center
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

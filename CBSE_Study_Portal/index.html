@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class X CBSE Study Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#07101f; --card:#111d2e; --card2:#162235;
+    --border:#1a2d45; --text:#dde6f5; --muted:#5a7a9a;
+    --science:#10b981; --maths:#f59e0b; --sst:#a855f7;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 55% 40% at 15% 15%, rgba(16,185,129,.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 80%, rgba(168,85,247,.05) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 35% at 80% 15%, rgba(245,158,11,.05) 0%, transparent 55%);
+  }
+
+  /* ── header ── */
+  header {
+    text-align:center; padding:2.5rem 1rem 1.5rem; position:relative;
+    border-bottom:1px solid var(--border);
+  }
+  .logo { font-size:2.8rem; margin-bottom:.5rem; }
+  header h1 {
+    font-family:'Syne',sans-serif; font-size:clamp(1.6rem,4vw,2.6rem); font-weight:800;
+    background:linear-gradient(135deg,#10b981,#f59e0b,#a855f7);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    letter-spacing:-.5px;
+  }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.78rem; margin-top:.4rem; }
+
+  /* ── stats bar ── */
+  .stats {
+    display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;
+    padding:1.2rem 1rem; border-bottom:1px solid var(--border);
+  }
+  .stat {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:.6rem 1.2rem; text-align:center; min-width:90px;
+  }
+  .stat-val { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
+  .stat-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-top:.1rem; }
+
+  /* ── subject tabs ── */
+  .subj-tabs {
+    display:flex; justify-content:center; gap:.5rem; flex-wrap:wrap;
+    padding:1.5rem 1rem .5rem;
+  }
+  .subj-tab {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:.82rem;
+    padding:.5rem 1.4rem; border-radius:99px; border:2px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .subj-tab:hover { color:var(--text); border-color:#2a3f5f; }
+  .subj-tab.active-sci { border-color:var(--science); color:var(--science); background:rgba(16,185,129,.08); }
+  .subj-tab.active-mat { border-color:var(--maths);   color:var(--maths);   background:rgba(245,158,11,.08); }
+  .subj-tab.active-sst { border-color:var(--sst);     color:var(--sst);     background:rgba(168,85,247,.08); }
+
+  /* ── main grid ── */
+  main { max-width:1000px; margin:0 auto; padding:1rem 1rem 4rem; }
+
+  .subject-section { display:none; }
+  .subject-section.visible { display:block; }
+
+  .section-header {
+    display:flex; align-items:center; gap:.7rem;
+    margin:1rem 0 1rem; padding:.6rem .8rem;
+    border-radius:12px; border:1px solid var(--border);
+    background:var(--card);
+  }
+  .section-header h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; }
+  .section-header p  { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); margin-top:.15rem; }
+  .s-icon { font-size:1.5rem; }
+
+  /* ── chapter card ── */
+  .chapter {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; margin-bottom:1rem; overflow:hidden;
+    transition:box-shadow .2s;
+  }
+  .chapter:hover { box-shadow:0 6px 24px rgba(0,0,0,.4); }
+
+  .ch-header {
+    display:flex; align-items:center; gap:.8rem;
+    padding:.9rem 1.1rem; cursor:pointer; user-select:none;
+  }
+  .ch-num {
+    font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
+    min-width:32px; height:32px; border-radius:8px; display:flex;
+    align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .ch-info { flex:1; }
+  .ch-name { font-family:'Syne',sans-serif; font-weight:800; font-size:.95rem; }
+  .ch-tags { display:flex; gap:.3rem; flex-wrap:wrap; margin-top:.3rem; }
+  .ch-tag {
+    font-size:.62rem; font-family:'DM Mono',monospace;
+    padding:.12rem .45rem; border-radius:99px; border:1px solid var(--border);
+    color:var(--muted);
+  }
+  .ch-arrow { font-size:.85rem; color:var(--muted); transition:transform .25s; flex-shrink:0; }
+  .chapter.open .ch-arrow { transform:rotate(90deg); }
+
+  /* status badge */
+  .ch-status {
+    font-size:.65rem; font-family:'DM Mono',monospace;
+    padding:.15rem .55rem; border-radius:99px; flex-shrink:0;
+  }
+  .status-done   { background:rgba(16,185,129,.12); color:#34d399; border:1px solid rgba(16,185,129,.2); }
+  .status-wip    { background:rgba(245,158,11,.12);  color:#fbbf24; border:1px solid rgba(245,158,11,.2); }
+  .status-soon   { background:rgba(100,116,139,.1);  color:#64748b; border:1px solid var(--border); }
+
+  /* ── material links ── */
+  .ch-body {
+    max-height:0; overflow:hidden;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1);
+    border-top:0px solid var(--border);
+  }
+  .chapter.open .ch-body {
+    max-height:500px;
+    border-top:1px solid var(--border);
+  }
+  .material-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    gap:.5rem; padding:.9rem 1rem;
+  }
+  .mat-link {
+    display:flex; flex-direction:column; align-items:center; gap:.3rem;
+    padding:.7rem .5rem; border-radius:12px; border:1px solid var(--border);
+    background:var(--card2); text-decoration:none; color:var(--text);
+    transition:all .2s; text-align:center;
+  }
+  .mat-link:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.4); border-color:#253850; }
+  .mat-link.disabled { opacity:.35; pointer-events:none; cursor:default; }
+  .mat-icon { font-size:1.3rem; }
+  .mat-name { font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; }
+  .mat-type { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); }
+
+  /* ── coming soon section ── */
+  .coming-soon {
+    background:var(--card); border:1px dashed var(--border);
+    border-radius:16px; padding:1.5rem; text-align:center;
+    color:var(--muted); font-family:'DM Mono',monospace; font-size:.82rem;
+    margin-bottom:1rem;
+  }
+  .coming-soon strong { color:var(--text); font-family:'Syne',sans-serif; font-size:.9rem; display:block; margin-bottom:.3rem; }
+
+  /* ── how to use ── */
+  .how-to {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:1.2rem 1.4rem; margin-bottom:1.5rem;
+  }
+  .how-to h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem; margin-bottom:.7rem; color:var(--text); }
+  .how-step { display:flex; gap:.7rem; align-items:flex-start; margin-bottom:.5rem; font-size:.82rem; }
+  .step-num {
+    font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
+    min-width:22px; height:22px; border-radius:6px; background:var(--card2);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin-top:1px; color:var(--muted);
+  }
+  .how-step p { color:var(--muted); line-height:1.5; }
+  .how-step p strong { color:var(--text); }
+
+  /* ── footer ── */
+  footer {
+    text-align:center; padding:1.5rem; font-family:'DM Mono',monospace;
+    font-size:.68rem; color:var(--muted); border-top:1px solid var(--border);
+  }
+
+  @media(max-width:480px) {
+    .material-grid { grid-template-columns:repeat(3,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📚</div>
+  <h1>Class X · CBSE Study Portal</h1>
+  <p>Maths &nbsp;·&nbsp; Science &nbsp;·&nbsp; Social Science &nbsp;·&nbsp; All chapters in one place</p>
+</header>
+
+<!-- stats -->
+<div class="stats">
+  <div class="stat"><div class="stat-val" style="color:var(--science)">2</div><div class="stat-lbl">Chapters Ready</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--maths)">11</div><div class="stat-lbl">Materials Made</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--sst)">3</div><div class="stat-lbl">Subjects</div></div>
+  <div class="stat"><div class="stat-val" style="color:#60a5fa">∞</div><div class="stat-lbl">More Coming</div></div>
+</div>
+
+<!-- subject tabs -->
+<div class="subj-tabs">
+  <button class="subj-tab active-sci" onclick="showSubject('sci',this)">🔬 Science</button>
+  <button class="subj-tab" onclick="showSubject('mat',this)">📐 Maths</button>
+  <button class="subj-tab" onclick="showSubject('sst',this)">🌍 Social Science</button>
+</div>
+
+<main>
+
+  <!-- ═══ HOW TO USE ═══ -->
+  <div class="how-to">
+    <h3>💡 How to use this portal</h3>
+    <div class="how-step"><div class="step-num">1</div><p>Make sure this <strong>index.html</strong> and all the subject folders are in the same folder on your device.</p></div>
+    <div class="how-step"><div class="step-num">2</div><p>Click a <strong>chapter below</strong> to expand it, then click any material to open it.</p></div>
+    <div class="how-step"><div class="step-num">3</div><p>Each material opens in a <strong>new tab</strong> — you can keep multiple open at once.</p></div>
+    <div class="how-step"><div class="step-num">4</div><p>Everything works <strong>offline</strong> — no internet needed after downloading the folder.</p></div>
+  </div>
+
+  <!-- ═══ SCIENCE ═══ -->
+  <div class="subject-section visible" id="sec-sci">
+    <div class="section-header">
+      <div class="s-icon">🔬</div>
+      <div>
+        <h2 style="color:var(--science)">Science</h2>
+        <p>Physics · Chemistry · Biology</p>
+      </div>
+    </div>
+
+    <!-- Ch 2: Acids Bases Salts — DONE -->
+    <div class="chapter open" id="ch-acids">
+      <div class="ch-header" onclick="toggleChapter('ch-acids')">
+        <div class="ch-num" style="background:rgba(16,185,129,.12);color:#34d399">Ch.2</div>
+        <div class="ch-info">
+          <div class="ch-name">Acids, Bases &amp; Salts</div>
+          <div class="ch-tags">
+            <span class="ch-tag">Chemistry</span>
+            <span class="ch-tag">pH Scale</span>
+            <span class="ch-tag">Neutralisation</span>
+            <span class="ch-tag">Salts</span>
+          </div>
+        </div>
+        <span class="ch-status status-done">✓ Complete</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <a class="mat-link" href="science/ch02_acids/mindmap.html" target="_blank">
+            <div class="mat-icon">🧠</div>
+            <div class="mat-name">Mind Map</div>
+            <div class="mat-type">Visual web</div>
+          </a>
+          <a class="mat-link" href="science/ch02_acids/animated_diagram.html" target="_blank">
+            <div class="mat-icon">⚗️</div>
+            <div class="mat-name">Animated Diagram</div>
+            <div class="mat-type">Interactive</div>
+          </a>
+          <a class="mat-link" href="science/ch02_acids/cheatsheet.html" target="_blank">
+            <div class="mat-icon">📋</div>
+            <div class="mat-name">Cheat Sheet</div>
+            <div class="mat-type">Formulas</div>
+          </a>
+          <a class="mat-link" href="science/ch02_acids/flashcards.html" target="_blank">
+            <div class="mat-icon">🃏</div>
+            <div class="mat-name">Flashcards</div>
+            <div class="mat-type">40 cards</div>
+          </a>
+          <a class="mat-link" href="science/ch02_acids/question_bank.html" target="_blank">
+            <div class="mat-icon">📝</div>
+            <div class="mat-name">Question Bank</div>
+            <div class="mat-type">30 questions</div>
+          </a>
+          <a class="mat-link" href="science/ch02_acids/virtual_lab.html" target="_blank">
+            <div class="mat-icon">🔬</div>
+            <div class="mat-name">Virtual Lab</div>
+            <div class="mat-type">Mix chemicals</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Science chapters -->
+    <div class="chapter" id="ch-light">
+      <div class="ch-header" onclick="toggleChapter('ch-light')">
+        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.10</div>
+        <div class="ch-info">
+          <div class="ch-name">Light — Reflection &amp; Refraction</div>
+          <div class="ch-tags"><span class="ch-tag">Physics</span><span class="ch-tag">Optics</span><span class="ch-tag">Lenses</span></div>
+        </div>
+        <span class="ch-status status-soon">Coming soon</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">⚗️</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">🃏</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📝</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter" id="ch-elec">
+      <div class="ch-header" onclick="toggleChapter('ch-elec')">
+        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.12</div>
+        <div class="ch-info">
+          <div class="ch-name">Electricity</div>
+          <div class="ch-tags"><span class="ch-tag">Physics</span><span class="ch-tag">Circuits</span><span class="ch-tag">Ohm's Law</span></div>
+        </div>
+        <span class="ch-status status-soon">Coming soon</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">⚗️</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">🃏</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📝</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter" id="ch-life">
+      <div class="ch-header" onclick="toggleChapter('ch-life')">
+        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.6</div>
+        <div class="ch-info">
+          <div class="ch-name">Life Processes</div>
+          <div class="ch-tags"><span class="ch-tag">Biology</span><span class="ch-tag">Nutrition</span><span class="ch-tag">Respiration</span></div>
+        </div>
+        <span class="ch-status status-soon">Coming soon</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">⚗️</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">🃏</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📝</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MATHS ═══ -->
+  <div class="subject-section" id="sec-mat">
+    <div class="section-header">
+      <div class="s-icon">📐</div>
+      <div>
+        <h2 style="color:var(--maths)">Mathematics</h2>
+        <p>Algebra · Geometry · Trigonometry · Statistics</p>
+      </div>
+    </div>
+    <div class="coming-soon">
+      <strong>Maths chapters coming soon!</strong>
+      Real Numbers, Polynomials, Quadratic Equations, Triangles, Trigonometry, Statistics and more will be added as we work through them session by session.
+    </div>
+  </div>
+
+  <!-- ═══ SOCIAL SCIENCE ═══ -->
+  <div class="subject-section" id="sec-sst">
+    <div class="section-header">
+      <div class="s-icon">🌍</div>
+      <div>
+        <h2 style="color:var(--sst)">Social Science</h2>
+        <p>History · Geography · Civics · Economics</p>
+      </div>
+    </div>
+    <!-- Ch 2: Nationalism in India — DONE (Mind Map + Animated Diagram) -->
+    <div class="chapter open" id="ch-nationalism">
+      <div class="ch-header" onclick="toggleChapter('ch-nationalism')">
+        <div class="ch-num" style="background:rgba(168,85,247,.12);color:#c084fc">Ch.2</div>
+        <div class="ch-info">
+          <div class="ch-name">Nationalism in India</div>
+          <div class="ch-tags">
+            <span class="ch-tag">History</span>
+            <span class="ch-tag">Non-Cooperation</span>
+            <span class="ch-tag">Civil Disobedience</span>
+            <span class="ch-tag">Gandhi</span>
+          </div>
+        </div>
+        <span class="ch-status status-done">✓ Complete</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <a class="mat-link" href="social_science/ch02_nationalism/mindmap.html" target="_blank">
+            <div class="mat-icon">🧠</div>
+            <div class="mat-name">Mind Map</div>
+            <div class="mat-type">Visual web</div>
+          </a>
+          <a class="mat-link" href="social_science/ch02_nationalism/animated_diagram.html" target="_blank">
+            <div class="mat-icon">🎬</div>
+            <div class="mat-name">Animated Diagram</div>
+            <div class="mat-type">Interactive</div>
+          </a>
+          <a class="mat-link" href="social_science/ch02_nationalism/cheatsheet.html" target="_blank">
+            <div class="mat-icon">📋</div>
+            <div class="mat-name">Cheat Sheet</div>
+            <div class="mat-type">Formulas & facts</div>
+          </a>
+          <a class="mat-link" href="social_science/ch02_nationalism/flashcards.html" target="_blank">
+            <div class="mat-icon">🃏</div>
+            <div class="mat-name">Flashcards</div>
+            <div class="mat-type">36 cards</div>
+          </a>
+          <a class="mat-link" href="social_science/ch02_nationalism/question_bank.html" target="_blank">
+            <div class="mat-icon">📝</div>
+            <div class="mat-name">Question Bank</div>
+            <div class="mat-type">28 questions</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming SST chapters -->
+    <div class="chapter" id="ch-europe">
+      <div class="ch-header" onclick="toggleChapter('ch-europe')">
+        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.1</div>
+        <div class="ch-info">
+          <div class="ch-name">Rise of Nationalism in Europe</div>
+          <div class="ch-tags"><span class="ch-tag">History</span><span class="ch-tag">French Revolution</span><span class="ch-tag">Unification</span></div>
+        </div>
+        <span class="ch-status status-soon">Coming soon</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">🎬</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter" id="ch-power">
+      <div class="ch-header" onclick="toggleChapter('ch-power')">
+        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.1</div>
+        <div class="ch-info">
+          <div class="ch-name">Power Sharing</div>
+          <div class="ch-tags"><span class="ch-tag">Civics</span><span class="ch-tag">Democracy</span><span class="ch-tag">Belgium & Sri Lanka</span></div>
+        </div>
+        <span class="ch-status status-soon">Coming soon</span>
+        <span class="ch-arrow">▶</span>
+      </div>
+      <div class="ch-body">
+        <div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">🎬</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Class X · CBSE · Study Portal &nbsp;·&nbsp; Open index.html to navigate &nbsp;·&nbsp; Works fully offline
+</footer>
+
+<script>
+function showSubject(id, btn) {
+  document.querySelectorAll('.subject-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  document.querySelectorAll('.subj-tab').forEach(b => b.className = 'subj-tab');
+  btn.classList.add('active-' + id);
+}
+
+function toggleChapter(id) {
+  const ch = document.getElementById(id);
+  ch.classList.toggle('open');
+}
+</script>
+</body>
+</html>

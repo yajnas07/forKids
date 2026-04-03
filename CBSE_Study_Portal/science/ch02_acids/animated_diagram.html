@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acids, Bases & Salts — Class X Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --acid: #ff4d4d;
+    --acid-light: #fff0f0;
+    --base: #3b82f6;
+    --base-light: #eff6ff;
+    --neutral: #10b981;
+    --neutral-light: #ecfdf5;
+    --salt: #f59e0b;
+    --salt-light: #fffbeb;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263148;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── header ── */
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1rem;
+    position: relative;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff4d4d 0%, #f59e0b 50%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p {
+    color: var(--muted);
+    font-size: .95rem;
+    margin-top: .4rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── nav tabs ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: 1.5rem 1rem .5rem;
+  }
+  nav button {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    padding: .5rem 1.3rem;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .25s;
+    letter-spacing: .5px;
+  }
+  nav button:hover { border-color: #64748b; color: var(--text); }
+  nav button.active-acid  { border-color: var(--acid); color: var(--acid); background: rgba(255,77,77,.1); }
+  nav button.active-base  { border-color: var(--base); color: var(--base); background: rgba(59,130,246,.1); }
+  nav button.active-ph    { border-color: var(--neutral); color: var(--neutral); background: rgba(16,185,129,.1); }
+  nav button.active-react { border-color: var(--salt); color: var(--salt); background: rgba(245,158,11,.1); }
+  nav button.active-salt  { border-color: #a855f7; color: #a855f7; background: rgba(168,85,247,.1); }
+
+  /* ── main sections ── */
+  main { padding: 1.5rem 1rem 4rem; max-width: 900px; margin: 0 auto; }
+  section { display: none; animation: fadeUp .4s ease; }
+  section.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── section title ── */
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+  }
+
+  /* ── cards grid ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  .card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+  .card p, .card li { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+  .card ul { padding-left: 1.1rem; }
+  .card .tag {
+    display: inline-block;
+    font-size: .72rem;
+    font-family: 'DM Mono', monospace;
+    padding: .15rem .5rem;
+    border-radius: 99px;
+    margin-bottom: .5rem;
+    font-weight: 500;
+  }
+  .acid-tag  { background: rgba(255,77,77,.15); color: var(--acid); }
+  .base-tag  { background: rgba(59,130,246,.15); color: var(--base); }
+  .salt-tag  { background: rgba(245,158,11,.15); color: var(--salt); }
+  .neutral-tag { background: rgba(16,185,129,.15); color: var(--neutral); }
+
+  /* ── litmus demo ── */
+  .litmus-demo {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .litmus-demo h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .litmus-row { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+  .litmus-item { text-align: center; }
+  .litmus-item p { font-size: .8rem; color: var(--muted); margin-top: .4rem; font-family: 'DM Mono', monospace; }
+  .paper {
+    width: 60px; height: 100px;
+    border-radius: 8px;
+    margin: 0 auto;
+    position: relative;
+    transition: background 1s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4);
+    cursor: pointer;
+  }
+  .paper::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 5px;
+    background: rgba(255,255,255,.06);
+  }
+  .red-in-acid   { background: #dc2626; }
+  .red-in-base   { background: #1d4ed8; }
+  .blue-in-acid  { background: #dc2626; }
+  .blue-in-base  { background: #1d4ed8; }
+  .no-change     { background: #475569; }
+
+  .litmus-btn {
+    display: block;
+    margin: 1rem auto 0;
+    padding: .5rem 1.5rem;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 99px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .litmus-btn:hover { background: var(--border); }
+
+  /* ── pH scale ── */
+  .ph-scale-wrap {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .ph-scale-wrap h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1.2rem; }
+  .ph-track {
+    width: 100%;
+    height: 36px;
+    border-radius: 99px;
+    background: linear-gradient(to right,
+      #dc2626 0%,
+      #ea580c 10%,
+      #f97316 18%,
+      #f59e0b 25%,
+      #eab308 33%,
+      #84cc16 41%,
+      #10b981 50%,
+      #22d3ee 58%,
+      #3b82f6 66%,
+      #6366f1 75%,
+      #8b5cf6 83%,
+      #a855f7 91%,
+      #7c3aed 100%
+    );
+    position: relative;
+    box-shadow: 0 2px 12px rgba(0,0,0,.4);
+    cursor: pointer;
+  }
+  .ph-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    color: var(--muted);
+  }
+  .ph-pointer {
+    position: absolute;
+    top: -8px;
+    width: 4px;
+    height: 52px;
+    background: white;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: left .5s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 0 8px rgba(255,255,255,.6);
+  }
+  .ph-info {
+    margin-top: 1.2rem;
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 1rem;
+    min-height: 80px;
+    transition: all .3s;
+  }
+  .ph-info .ph-val { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+  .ph-info .ph-desc { font-size: .85rem; color: var(--muted); margin-top: .2rem; }
+  .ph-examples { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .6rem; }
+  .ph-ex { font-size: .75rem; font-family: 'DM Mono', monospace; background: var(--card); padding: .2rem .6rem; border-radius: 99px; color: var(--muted); }
+  .ph-slider-row { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+  .ph-slider-row label { font-family: 'DM Mono', monospace; font-size: .8rem; color: var(--muted); white-space: nowrap; }
+  input[type=range] {
+    flex: 1;
+    accent-color: var(--neutral);
+    cursor: pointer;
+  }
+
+  /* ── reactions ── */
+  .reaction-box {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  .reaction-box h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 1rem; }
+  .eq-display {
+    font-family: 'DM Mono', monospace;
+    font-size: .9rem;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: .6rem 0;
+    border: 1px solid var(--border);
+    line-height: 1.8;
+  }
+  .eq-display .reactant { color: #f87171; }
+  .eq-display .product  { color: #34d399; }
+  .eq-display .arrow    { color: var(--salt); margin: 0 .4rem; }
+  .eq-display .cond     { color: var(--muted); font-size: .78rem; }
+  .reaction-btns { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .rbtn {
+    padding: .4rem 1rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .rbtn:hover, .rbtn.active { background: var(--salt); color: #0f172a; border-color: var(--salt); }
+  .observation {
+    font-size: .85rem;
+    color: var(--neutral);
+    padding: .6rem .8rem;
+    background: rgba(16,185,129,.08);
+    border-left: 3px solid var(--neutral);
+    border-radius: 0 8px 8px 0;
+    margin-top: .6rem;
+  }
+
+  /* ── salts section ── */
+  .salt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .salt-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 1.1rem;
+    border: 1px solid var(--border);
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .salt-card:hover { transform: translateY(-3px); }
+  .salt-card h4 { font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
+  .salt-card .formula { font-family: 'DM Mono', monospace; font-size: .8rem; color: var(--salt); }
+  .salt-card p { font-size: .8rem; color: var(--muted); margin-top: .4rem; }
+  .salt-card .nature { font-size: .72rem; font-family: 'DM Mono', monospace; padding: .15rem .5rem; border-radius: 99px; display: inline-block; margin-top: .4rem; }
+  .acidic-salt { background: rgba(255,77,77,.12); color: #f87171; }
+  .basic-salt  { background: rgba(59,130,246,.12); color: #60a5fa; }
+  .neutral-salt{ background: rgba(16,185,129,.12); color: #34d399; }
+
+  /* ── concept badge ── */
+  .concept-pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.2rem; }
+  .pill {
+    font-size: .78rem;
+    font-family: 'DM Mono', monospace;
+    padding: .25rem .75rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--card);
+  }
+
+  /* ── neutralisation animation ── */
+  .neutralise-scene {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .beaker {
+    width: 80px; height: 90px;
+    border: 3px solid;
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .beaker-acid { border-color: #dc2626; }
+  .beaker-base { border-color: #2563eb; }
+  .beaker-result { border-color: #10b981; }
+  .liquid {
+    width: 100%;
+    height: 65%;
+    border-radius: 0 0 11px 11px;
+    position: relative;
+    transition: background 1s ease, height 1s ease;
+  }
+  .liq-acid   { background: rgba(220,38,38,.6); }
+  .liq-base   { background: rgba(37,99,235,.6); }
+  .liq-result { background: rgba(16,185,129,.6); }
+  .beaker-label {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    color: var(--muted);
+    margin-top: .3rem;
+  }
+  .plus-sign, .eq-sign {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--muted);
+  }
+  .neutralise-btn {
+    display: block;
+    margin: .5rem auto;
+    padding: .5rem 1.8rem;
+    background: linear-gradient(135deg, var(--acid), var(--base));
+    border: none;
+    color: white;
+    border-radius: 99px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  }
+  .neutralise-btn:hover { opacity: .9; transform: scale(1.04); }
+
+  /* bubble animation */
+  @keyframes bubble {
+    0%   { transform: translateY(0) scale(1); opacity: .7; }
+    100% { transform: translateY(-60px) scale(1.4); opacity: 0; }
+  }
+  .bubble {
+    position: absolute;
+    bottom: 10px;
+    width: 8px; height: 8px;
+    background: rgba(255,255,255,.5);
+    border-radius: 50%;
+    animation: bubble 1.2s ease-in infinite;
+  }
+  .bubble:nth-child(2) { left: 25%; animation-delay: .3s; width: 5px; height: 5px; }
+  .bubble:nth-child(3) { left: 60%; animation-delay: .6s; width: 10px; height: 10px; }
+
+  /* ── mobile ── */
+  @media (max-width: 520px) {
+    .neutralise-scene { gap: .3rem; }
+    .beaker { width: 60px; height: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Acids, Bases &amp; Salts</h1>
+  <p>Class X · CBSE Science · Chapter 2</p>
+</header>
+
+<nav>
+  <button onclick="show('acid')"  id="btn-acid"  class="active-acid">⚗️ Acids</button>
+  <button onclick="show('base')"  id="btn-base">🧪 Bases</button>
+  <button onclick="show('ph')"    id="btn-ph">📊 pH Scale</button>
+  <button onclick="show('react')" id="btn-react">🔥 Reactions</button>
+  <button onclick="show('salt')"  id="btn-salt">🧂 Salts</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════ ACIDS ═══════════════ -->
+<section id="acid" class="visible">
+  <div class="sec-title" style="color:var(--acid)">⚗️ Acids</div>
+
+  <div class="concept-pills">
+    <span class="pill">H⁺ ions in solution</span>
+    <span class="pill">Sour taste</span>
+    <span class="pill">pH &lt; 7</span>
+    <span class="pill">Turns blue litmus red</span>
+    <span class="pill">Reacts with metals → H₂ gas</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="tag acid-tag">STRONG ACID</span>
+      <h3>Hydrochloric Acid — HCl</h3>
+      <ul>
+        <li>Found in gastric juice (stomach)</li>
+        <li>Completely ionises in water</li>
+        <li>HCl → H⁺ + Cl⁻</li>
+        <li>Used in cleaning metals</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag acid-tag">STRONG ACID</span>
+      <h3>Sulphuric Acid — H₂SO₄</h3>
+      <ul>
+        <li>King of chemicals</li>
+        <li>Used in car batteries</li>
+        <li>Highly corrosive, dehydrating</li>
+        <li>H₂SO₄ → 2H⁺ + SO₄²⁻</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag acid-tag">WEAK ACID</span>
+      <h3>Acetic Acid — CH₃COOH</h3>
+      <ul>
+        <li>Found in vinegar (5–8%)</li>
+        <li>Partially ionises in water</li>
+        <li>Weak, organic acid</li>
+        <li>Used as food preservative</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag acid-tag">WEAK ACID</span>
+      <h3>Carbonic Acid — H₂CO₃</h3>
+      <ul>
+        <li>CO₂ dissolved in water</li>
+        <li>Present in fizzy drinks</li>
+        <li>H₂O + CO₂ ⇌ H₂CO₃</li>
+        <li>Gives soda water its tang</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="litmus-demo" id="litmus-acids">
+    <h3>🔴 Litmus Test — Acid</h3>
+    <div class="litmus-row">
+      <div class="litmus-item">
+        <div class="paper no-change" id="red-acid" title="Red litmus in acid"></div>
+        <p>Red litmus<br>in Acid</p>
+      </div>
+      <div class="litmus-item">
+        <div class="paper no-change" id="blue-acid" title="Blue litmus in acid"></div>
+        <p>Blue litmus<br>in Acid</p>
+      </div>
+    </div>
+    <button class="litmus-btn" onclick="testLitmus('acid')">▶ Run Litmus Test</button>
+    <p id="litmus-acid-result" style="text-align:center;margin-top:.8rem;font-size:.85rem;color:var(--muted);font-family:'DM Mono',monospace;"></p>
+  </div>
+</section>
+
+<!-- ═══════════════ BASES ═══════════════ -->
+<section id="base">
+  <div class="sec-title" style="color:var(--base)">🧪 Bases &amp; Alkalis</div>
+
+  <div class="concept-pills">
+    <span class="pill">OH⁻ ions in solution</span>
+    <span class="pill">Bitter taste</span>
+    <span class="pill">pH &gt; 7</span>
+    <span class="pill">Turns red litmus blue</span>
+    <span class="pill">Soapy/slippery feel</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="tag base-tag">STRONG BASE</span>
+      <h3>Sodium Hydroxide — NaOH</h3>
+      <ul>
+        <li>Common name: Caustic soda</li>
+        <li>Completely dissociates: NaOH → Na⁺ + OH⁻</li>
+        <li>Used in soap/paper making</li>
+        <li>Highly corrosive to skin</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag base-tag">STRONG BASE</span>
+      <h3>Calcium Hydroxide — Ca(OH)₂</h3>
+      <ul>
+        <li>Common name: Slaked lime</li>
+        <li>Used in whitewashing walls</li>
+        <li>Neutralises soil acidity</li>
+        <li>Used in water treatment</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag base-tag">WEAK BASE</span>
+      <h3>Ammonium Hydroxide — NH₄OH</h3>
+      <ul>
+        <li>NH₃ dissolved in water</li>
+        <li>Used in cleaning agents</li>
+        <li>Partially ionises in water</li>
+        <li>Pungent smell</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag base-tag">ALKALI NOTE</span>
+      <h3>Alkalis vs Bases</h3>
+      <ul>
+        <li>All alkalis are bases</li>
+        <li>Not all bases are alkalis</li>
+        <li>Alkali = base soluble in water</li>
+        <li>e.g., Cu(OH)₂ is a base but NOT an alkali</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="litmus-demo">
+    <h3>🔵 Litmus Test — Base</h3>
+    <div class="litmus-row">
+      <div class="litmus-item">
+        <div class="paper no-change" id="red-base"></div>
+        <p>Red litmus<br>in Base</p>
+      </div>
+      <div class="litmus-item">
+        <div class="paper no-change" id="blue-base"></div>
+        <p>Blue litmus<br>in Base</p>
+      </div>
+    </div>
+    <button class="litmus-btn" onclick="testLitmus('base')">▶ Run Litmus Test</button>
+    <p id="litmus-base-result" style="text-align:center;margin-top:.8rem;font-size:.85rem;color:var(--muted);font-family:'DM Mono',monospace;"></p>
+  </div>
+</section>
+
+<!-- ═══════════════ pH SCALE ═══════════════ -->
+<section id="ph">
+  <div class="sec-title" style="color:var(--neutral)">📊 pH Scale</div>
+
+  <div class="ph-scale-wrap">
+    <h3>Drag or use the slider to explore pH values</h3>
+    <div class="ph-track" id="ph-track">
+      <div class="ph-pointer" id="ph-pointer" style="left:58.33%"></div>
+    </div>
+    <div class="ph-labels">
+      <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+      <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+      <span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+    </div>
+    <div class="ph-slider-row">
+      <label>pH =</label>
+      <input type="range" min="0" max="14" step="0.5" value="7" id="ph-slider" oninput="updatePH(this.value)">
+      <label id="ph-val-label" style="min-width:2rem">7</label>
+    </div>
+    <div class="ph-info" id="ph-info">
+      <div class="ph-val" id="ph-val-display" style="color:var(--neutral)">pH 7</div>
+      <div class="ph-desc" id="ph-desc">Pure water — perfectly neutral</div>
+      <div class="ph-examples" id="ph-examples">
+        <span class="ph-ex">Pure Water</span>
+        <span class="ph-ex">Blood (≈7.4)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="tag acid-tag">ACIDIC (pH &lt; 7)</span>
+      <h3>Acidic Solutions</h3>
+      <ul>
+        <li>pH 1 — Gastric acid (HCl in stomach)</li>
+        <li>pH 2.5 — Lemon juice</li>
+        <li>pH 3 — Vinegar</li>
+        <li>pH 4.5 — Acid rain (&lt; 5.6)</li>
+        <li>pH 6 — Cow's milk</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag neutral-tag">NEUTRAL (pH = 7)</span>
+      <h3>Neutral Solutions</h3>
+      <ul>
+        <li>pH 7 — Pure distilled water</li>
+        <li>pH 7 — Common salt solution (NaCl)</li>
+        <li>Equal H⁺ and OH⁻ ions</li>
+        <li>Neither acidic nor basic</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag base-tag">BASIC (pH &gt; 7)</span>
+      <h3>Basic Solutions</h3>
+      <ul>
+        <li>pH 7.4 — Human blood</li>
+        <li>pH 8.5 — Sea water</li>
+        <li>pH 10 — Milk of magnesia</li>
+        <li>pH 11 — Household ammonia</li>
+        <li>pH 13 — Bleach / NaOH</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ REACTIONS ═══════════════ -->
+<section id="react">
+  <div class="sec-title" style="color:var(--salt)">🔥 Key Reactions</div>
+
+  <!-- Neutralisation animation -->
+  <div class="reaction-box">
+    <h3>Neutralisation Reaction</h3>
+    <div class="neutralise-scene">
+      <div>
+        <div class="beaker beaker-acid" id="beaker-a">
+          <div class="liquid liq-acid" id="liq-a">
+            <div class="bubble" style="left:40%"></div>
+            <div class="bubble"></div>
+            <div class="bubble"></div>
+          </div>
+        </div>
+        <div class="beaker-label">Acid (HCl)</div>
+      </div>
+      <div class="plus-sign">+</div>
+      <div>
+        <div class="beaker beaker-base" id="beaker-b">
+          <div class="liquid liq-base" id="liq-b"></div>
+        </div>
+        <div class="beaker-label">Base (NaOH)</div>
+      </div>
+      <div class="eq-sign">→</div>
+      <div>
+        <div class="beaker beaker-result" id="beaker-r">
+          <div class="liquid liq-result" id="liq-r" style="height:0%"></div>
+        </div>
+        <div class="beaker-label" id="result-label">Salt + Water</div>
+      </div>
+    </div>
+    <button class="neutralise-btn" onclick="animateNeutral()">⚗️ React!</button>
+    <div class="eq-display" style="margin-top:1rem">
+      <span class="reactant">HCl</span> <span class="arrow">+</span>
+      <span class="reactant">NaOH</span> <span class="arrow">→</span>
+      <span class="product">NaCl</span> <span class="arrow">+</span>
+      <span class="product">H₂O</span>
+      <br><span class="cond">Acid + Base → Salt + Water (Neutralisation)</span>
+    </div>
+    <div class="observation">🔬 Heat is released (exothermic). Universal indicator turns green at neutralisation (pH 7).</div>
+  </div>
+
+  <!-- Other reactions -->
+  <div class="reaction-box">
+    <h3>Select a Reaction Type</h3>
+    <div class="reaction-btns">
+      <button class="rbtn active" onclick="showReaction('metal', this)">Metal + Acid</button>
+      <button class="rbtn" onclick="showReaction('carbonate', this)">Carbonate + Acid</button>
+      <button class="rbtn" onclick="showReaction('bicarb', this)">Bicarbonate + Acid</button>
+      <button class="rbtn" onclick="showReaction('metal-oxide', this)">Metal Oxide + Acid</button>
+    </div>
+    <div id="reaction-display">
+      <div class="eq-display">
+        <span class="reactant">Zn</span> <span class="arrow">+</span>
+        <span class="reactant">H₂SO₄</span> <span class="arrow">→</span>
+        <span class="product">ZnSO₄</span> <span class="arrow">+</span>
+        <span class="product">H₂↑</span>
+      </div>
+      <div class="observation">🔬 Hydrogen gas is evolved. Burns with a 'pop' sound when tested with a burning splint.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SALTS ═══════════════ -->
+<section id="salt">
+  <div class="sec-title" style="color:#a855f7">🧂 Important Salts</div>
+
+  <div class="concept-pills">
+    <span class="pill">Acid + Base → Salt + Water</span>
+    <span class="pill">Ionic compounds</span>
+    <span class="pill">Crystalline structure</span>
+    <span class="pill">pH depends on parent</span>
+  </div>
+
+  <div class="salt-grid">
+    <div class="salt-card">
+      <h4>Common Salt</h4>
+      <div class="formula">NaCl</div>
+      <p>Sodium Chloride. Essential for life. Used in food, preservation, Cl₂ production.</p>
+      <span class="nature neutral-salt">Neutral · pH 7</span>
+    </div>
+    <div class="salt-card">
+      <h4>Washing Soda</h4>
+      <div class="formula">Na₂CO₃·10H₂O</div>
+      <p>Sodium Carbonate decahydrate. Used in glass, soap, paper industries. Softens hard water.</p>
+      <span class="nature basic-salt">Basic · pH &gt; 7</span>
+    </div>
+    <div class="salt-card">
+      <h4>Baking Soda</h4>
+      <div class="formula">NaHCO₃</div>
+      <p>Sodium Hydrogen Carbonate. Used in baking, fire extinguishers, antacids.</p>
+      <span class="nature basic-salt">Weakly Basic</span>
+    </div>
+    <div class="salt-card">
+      <h4>Bleaching Powder</h4>
+      <div class="formula">Ca(OCl)Cl</div>
+      <p>Calcium Oxychloride. Used for disinfecting water, bleaching cotton/linen.</p>
+      <span class="nature basic-salt">Basic</span>
+    </div>
+    <div class="salt-card">
+      <h4>Plaster of Paris</h4>
+      <div class="formula">CaSO₄·½H₂O</div>
+      <p>Calcium Sulphate hemihydrate. Used in casts, moulds, chalk. Sets hard on adding water.</p>
+      <span class="nature neutral-salt">Neutral</span>
+    </div>
+    <div class="salt-card">
+      <h4>Copper Sulphate</h4>
+      <div class="formula">CuSO₄·5H₂O</div>
+      <p>Blue vitriol. Used as fungicide, in electroplating. Loses water on heating → white powder.</p>
+      <span class="nature acidic-salt">Acidic · pH &lt; 7</span>
+    </div>
+  </div>
+
+  <div class="reaction-box" style="margin-top:1rem">
+    <h3>Water of Crystallisation</h3>
+    <div class="eq-display">
+      <span class="reactant">CuSO₄·5H₂O</span>
+      <span class="arrow"> —heat→ </span>
+      <span class="product">CuSO₄</span>
+      <span class="arrow"> + </span>
+      <span class="product">5H₂O</span>
+      <br>
+      <span class="cond">Blue crystals → White powder on heating</span>
+    </div>
+    <div class="observation">🔬 The 5 water molecules are called water of crystallisation. Adding water reverses it back to blue.</div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── Tab switching ──
+const tabMap = { acid:'acid', base:'base', ph:'ph', react:'react', salt:'salt' };
+const activeClass = { acid:'active-acid', base:'active-base', ph:'active-ph', react:'active-react', salt:'active-salt' };
+function show(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('nav button').forEach(b => { b.className = ''; });
+  document.getElementById(id).classList.add('visible');
+  document.getElementById('btn-'+id).className = 'active-'+id;
+}
+
+// ── Litmus ──
+function testLitmus(type) {
+  if (type === 'acid') {
+    document.getElementById('red-acid').className  = 'paper red-in-acid';
+    document.getElementById('blue-acid').className = 'paper blue-in-acid';
+    document.getElementById('litmus-acid-result').textContent =
+      'Red litmus → No change ✓ | Blue litmus → Turns RED ✓';
+  } else {
+    document.getElementById('red-base').className  = 'paper red-in-base';
+    document.getElementById('blue-base').className = 'paper blue-in-base';
+    document.getElementById('litmus-base-result').textContent =
+      'Red litmus → Turns BLUE ✓ | Blue litmus → No change ✓';
+  }
+}
+
+// ── pH Scale ──
+const phData = [
+  { ph:0,  color:'#dc2626', label:'pH 0 — Battery Acid',     desc:'Extremely strong acid', examples:['Battery acid','HCl (conc.)'] },
+  { ph:1,  color:'#dc2626', label:'pH 1 — Gastric Acid',     desc:'Strong acid — stomach HCl', examples:['Gastric juice','HCl (dilute)'] },
+  { ph:2,  color:'#ea580c', label:'pH 2 — Lemon Juice',      desc:'Strong acid', examples:['Lemon juice','Vinegar (dilute)'] },
+  { ph:2.5,color:'#ea580c', label:'pH 2.5 — Vinegar',        desc:'Weak acid', examples:['Vinegar','Fruit juices'] },
+  { ph:3,  color:'#f97316', label:'pH 3 — Carbonated Water', desc:'Weakly acidic', examples:['Soda water','Tomato juice'] },
+  { ph:4,  color:'#f59e0b', label:'pH 4 — Acid Rain',        desc:'Acid rain zone (below 5.6)', examples:['Acid rain','Beer'] },
+  { ph:5,  color:'#eab308', label:'pH 5 — Coffee',           desc:'Mildly acidic', examples:['Coffee','Rainwater'] },
+  { ph:6,  color:'#84cc16', label:"pH 6 — Cow's Milk",       desc:'Very mildly acidic', examples:["Cow's milk",'Saliva'] },
+  { ph:7,  color:'#10b981', label:'pH 7 — Pure Water',       desc:'Perfectly NEUTRAL', examples:['Pure water','Common salt solution'] },
+  { ph:7.5,color:'#22d3ee', label:'pH 7.5 — Sea Water',      desc:'Mildly basic', examples:['Sea water','Blood (7.4)'] },
+  { ph:8,  color:'#3b82f6', label:'pH 8 — Egg White',        desc:'Mildly basic', examples:['Egg white','Sea water'] },
+  { ph:9,  color:'#6366f1', label:'pH 9 — Baking Soda',      desc:'Weakly basic', examples:['Baking soda soln.','Borax'] },
+  { ph:10, color:'#8b5cf6', label:'pH 10 — Milk of Magnesia',desc:'Moderately basic', examples:['Milk of magnesia','Soap solution'] },
+  { ph:11, color:'#a855f7', label:'pH 11 — Ammonia',         desc:'Strong base', examples:['Household ammonia','Limewater'] },
+  { ph:12, color:'#9333ea', label:'pH 12 — Soapy Water',     desc:'Strong base', examples:['Soapy water','Ca(OH)₂'] },
+  { ph:13, color:'#7c3aed', label:'pH 13 — Bleach',          desc:'Very strong base', examples:['Bleach','NaOH (dilute)'] },
+  { ph:14, color:'#6d28d9', label:'pH 14 — NaOH',            desc:'Extremely strong base', examples:['NaOH (conc.)','KOH'] },
+];
+
+function updatePH(val) {
+  const v = parseFloat(val);
+  document.getElementById('ph-val-label').textContent = v;
+  document.getElementById('ph-slider').value = v;
+  const pct = (v / 14) * 100;
+  document.getElementById('ph-pointer').style.left = pct + '%';
+  const match = phData.reduce((a,b) => Math.abs(b.ph - v) < Math.abs(a.ph - v) ? b : a);
+  document.getElementById('ph-val-display').textContent = match.label;
+  document.getElementById('ph-val-display').style.color = match.color;
+  document.getElementById('ph-desc').textContent = match.desc;
+  const exEl = document.getElementById('ph-examples');
+  exEl.innerHTML = match.examples.map(e => `<span class="ph-ex">${e}</span>`).join('');
+}
+
+// ── Neutralisation animation ──
+let neutralDone = false;
+function animateNeutral() {
+  if (neutralDone) {
+    document.getElementById('liq-r').style.height = '0%';
+    document.getElementById('liq-r').style.background = 'rgba(16,185,129,.6)';
+    document.getElementById('result-label').textContent = 'Salt + Water';
+    neutralDone = false;
+    setTimeout(() => animateNeutral(), 100);
+    return;
+  }
+  const liqR = document.getElementById('liq-r');
+  const liqA = document.getElementById('liq-a');
+  const liqB = document.getElementById('liq-b');
+  liqA.style.height = '20%';
+  liqB.style.height = '20%';
+  setTimeout(() => {
+    liqR.style.height = '65%';
+    liqR.style.background = 'rgba(16,185,129,.7)';
+    document.getElementById('result-label').textContent = 'NaCl + H₂O ✓';
+  }, 600);
+  neutralDone = true;
+}
+
+// ── Reactions ──
+const reactions = {
+  metal: {
+    eq: `<span class="reactant">Zn</span> <span class="arrow">+</span> <span class="reactant">H₂SO₄</span> <span class="arrow">→</span> <span class="product">ZnSO₄</span> <span class="arrow">+</span> <span class="product">H₂↑</span>`,
+    obs: '🔬 Hydrogen gas evolved — burns with "pop" sound when a burning splint is brought near.'
+  },
+  carbonate: {
+    eq: `<span class="reactant">Na₂CO₃</span> <span class="arrow">+</span> <span class="reactant">2HCl</span> <span class="arrow">→</span> <span class="product">2NaCl</span> <span class="arrow">+</span> <span class="product">H₂O</span> <span class="arrow">+</span> <span class="product">CO₂↑</span>`,
+    obs: '🔬 CO₂ gas evolved — turns lime water milky (Ca(OH)₂ + CO₂ → CaCO₃↓ + H₂O).'
+  },
+  bicarb: {
+    eq: `<span class="reactant">NaHCO₃</span> <span class="arrow">+</span> <span class="reactant">HCl</span> <span class="arrow">→</span> <span class="product">NaCl</span> <span class="arrow">+</span> <span class="product">H₂O</span> <span class="arrow">+</span> <span class="product">CO₂↑</span>`,
+    obs: '🔬 Brisk effervescence of CO₂. Used in baking powder to make dough rise.'
+  },
+  'metal-oxide': {
+    eq: `<span class="reactant">CuO</span> <span class="arrow">+</span> <span class="reactant">H₂SO₄</span> <span class="arrow">→</span> <span class="product">CuSO₄</span> <span class="arrow">+</span> <span class="product">H₂O</span>`,
+    obs: '🔬 Black CuO dissolves → blue CuSO₄ solution forms. Metal oxides are basic oxides.'
+  }
+};
+function showReaction(key, btn) {
+  document.querySelectorAll('.rbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const r = reactions[key];
+  document.getElementById('reaction-display').innerHTML = `
+    <div class="eq-display">${r.eq}</div>
+    <div class="observation">${r.obs}</div>`;
+}
+
+// Initial pH
+updatePH(7);
+</script>
+</body>
+</html>

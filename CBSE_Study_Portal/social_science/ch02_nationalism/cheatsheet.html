@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Nationalism in India</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0a04; --card:#1a1208; --card2:#221a0a;
+    --border:#3a2e1a; --text:#e8d8b0; --muted:#8a7a5a;
+    --gold:#f5c842; --orange:#f97316; --blue:#38bdf8;
+    --green:#22c55e; --purple:#d946ef; --indigo:#818cf8; --red:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; padding:1.2rem; }
+
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 30% at 10% 5%, rgba(245,200,66,.04) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 90% 90%, rgba(56,189,248,.03) 0%, transparent 50%); }
+
+  header { text-align:center; padding:.8rem 0 1.4rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900;
+    color:var(--gold); letter-spacing:.3px; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:.9rem; max-width:1100px; margin:0 auto; }
+
+  .panel { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:.55rem; padding:.75rem 1rem;
+    border-bottom:1px solid var(--border); font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-ncm  .panel-head { background:rgba(249,115,22,.08); color:var(--orange); }
+  .ph-cdm  .panel-head { background:rgba(56,189,248,.08);  color:var(--blue); }
+  .ph-lead .panel-head { background:rgba(34,197,94,.08);   color:var(--green); }
+  .ph-grp  .panel-head { background:rgba(217,70,239,.08);  color:var(--purple); }
+  .ph-sym  .panel-head { background:rgba(245,200,66,.08);  color:var(--gold); }
+  .ph-evt  .panel-head { background:rgba(129,140,248,.08); color:var(--indigo); }
+  .ph-cmp  .panel-head { background:rgba(148,163,184,.08); color:#94a3b8; }
+
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { font-family:'DM Mono',monospace; font-size:.67rem; padding:.45rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.4rem .6rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.015); }
+  .hl { color:var(--gold); font-family:'DM Mono',monospace; font-size:.75rem; }
+  .or { color:var(--orange); } .bl { color:var(--blue); } .gr { color:var(--green); }
+  .pu { color:var(--purple); } .re { color:var(--red); }
+
+  .fact { display:flex; gap:.5rem; font-size:.8rem; padding:.28rem 0;
+    line-height:1.55; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  .timeline-strip { position:relative; padding-left:1.4rem; }
+  .timeline-strip::before { content:''; position:absolute; left:.45rem; top:4px; bottom:4px; width:2px;
+    background:linear-gradient(to bottom,var(--orange),var(--gold),var(--blue),var(--green));
+    border-radius:2px; }
+  .te { position:relative; padding:.35rem 0 .35rem .5rem; border-top:1px solid var(--border); }
+  .te:first-child { border-top:none; }
+  .te::before { content:''; position:absolute; left:-.9rem; top:.6rem; width:9px; height:9px;
+    border-radius:50%; border:2px solid var(--gold); background:var(--bg); }
+  .te-year { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--gold); font-weight:500; }
+  .te-event { font-size:.78rem; line-height:1.45; }
+  .te-note { font-size:.7rem; color:var(--muted); margin-top:.1rem; }
+
+  .leader-row { display:flex; gap:.6rem; align-items:flex-start; padding:.4rem 0; border-top:1px solid var(--border); }
+  .leader-row:first-child { border-top:none; }
+  .l-badge { font-family:'DM Mono',monospace; font-size:.62rem; padding:.1rem .4rem; border-radius:2px; flex-shrink:0; margin-top:.15rem; }
+  .l-text { font-size:.78rem; line-height:1.5; }
+  .l-text strong { color:var(--text); font-size:.82rem; }
+
+  .trick { background:var(--card2); border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; font-size:.78rem; }
+  .trick strong { color:var(--gold); font-family:'Playfair Display',serif; font-size:.85rem; }
+  .trick p { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+
+  .grp-row { display:flex; gap:.5rem; padding:.38rem 0; border-top:1px solid var(--border); font-size:.78rem; align-items:flex-start; }
+  .grp-row:first-child { border-top:none; }
+  .grp-name { min-width:100px; font-weight:700; color:var(--text); font-size:.8rem; }
+  .grp-detail { color:var(--muted); line-height:1.45; }
+  .grp-why { font-size:.68rem; font-family:'DM Mono',monospace; margin-top:.15rem; }
+
+  .hbox { border-left:3px solid; border-radius:0 6px 6px 0; padding:.5rem .75rem;
+    margin:.4rem 0; font-size:.78rem; line-height:1.6; }
+  .hbox strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.15rem; font-size:.85rem; }
+
+  .span2 { grid-column:1/-1; }
+  @media(max-width:620px){ .span2 { grid-column:1; } }
+
+  .sym-row { display:grid; grid-template-columns:auto 1fr; gap:.4rem .7rem; align-items:start; }
+  .sym-icon { font-size:1.2rem; padding-top:.1rem; }
+  .sym-text h4 { font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem; margin-bottom:.1rem; }
+  .sym-text p  { font-size:.73rem; color:var(--muted); line-height:1.45; }
+  .sym-divider { grid-column:1/-1; border-top:1px solid var(--border); margin:.2rem 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Cheat Sheet</h1>
+  <p>Nationalism in India · History Ch.2 · Class X CBSE · Quick Revision</p>
+</header>
+
+<div class="grid">
+
+  <!-- ── Timeline ── -->
+  <div class="panel span2 ph-evt">
+    <div class="panel-head">📅 Key Events — Chronological Timeline</div>
+    <div class="panel-body">
+      <div class="timeline-strip">
+        <div class="te"><div class="te-year">1915</div><div class="te-event"><strong>Gandhi returns</strong> from South Africa. Mentor: Gokhale. Tours India to understand the people.</div></div>
+        <div class="te"><div class="te-year">1917</div><div class="te-event"><strong>Champaran Satyagraha</strong> — indigo farmers' rights. Bihar.</div></div>
+        <div class="te"><div class="te-year">1918</div><div class="te-event"><strong>Kheda Satyagraha</strong> — revenue remission after crop failure. Gujarat.</div></div>
+        <div class="te"><div class="te-year">1919 — Apr 6</div><div class="te-event"><strong>Rowlatt Act hartal</strong> — nationwide strike against arrest-without-trial law.</div></div>
+        <div class="te"><div class="te-year">1919 — Apr 13</div><div class="te-event"><strong>Jallianwala Bagh massacre</strong> — General Dyer fires on crowd. Tagore renounces knighthood.</div></div>
+        <div class="te"><div class="te-year">1920</div><div class="te-event"><strong>Non-Cooperation Movement</strong> launched — allied with Khilafat. Boycott of British institutions begins.</div></div>
+        <div class="te"><div class="te-year">1922 — Feb</div><div class="te-event"><strong>Chauri Chaura</strong> — police station burned, 22 killed. Gandhi calls off NCM.</div></div>
+        <div class="te"><div class="te-year">1929 — Dec</div><div class="te-event"><strong>Lahore Session</strong> — Purna Swaraj declared. Jan 26, 1930 set as Independence Day.</div></div>
+        <div class="te"><div class="te-year">1930 — Mar 12</div><div class="te-event"><strong>Dandi March begins</strong> — 240 miles, 78 followers, Sabarmati to Dandi.</div></div>
+        <div class="te"><div class="te-year">1930 — Apr 5</div><div class="te-event"><strong>Salt made at Dandi</strong> — CDM launched nationwide.</div></div>
+        <div class="te"><div class="te-year">1931 — Mar</div><div class="te-event"><strong>Gandhi-Irwin Pact</strong> — CDM suspended; Gandhi attends 2nd Round Table Conference.</div></div>
+        <div class="te"><div class="te-year">1932</div><div class="te-event"><strong>Poona Pact</strong> — Ambedkar &amp; Gandhi; reserved seats for Dalits instead of separate electorate.</div></div>
+        <div class="te"><div class="te-year">1942 — Aug 8</div><div class="te-event"><strong>Quit India Movement</strong> — "Do or Die." All Congress leaders arrested. Underground resistance.</div></div>
+        <div class="te"><div class="te-year">1947 — Aug 15</div><div class="te-event"><strong>Independence</strong> — British leave India.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NCM vs CDM ── -->
+  <div class="panel span2 ph-cmp">
+    <div class="panel-head">⚖️ NCM vs CDM — Quick Comparison</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Feature</th><th class="or">Non-Cooperation (1920–22)</th><th class="bl">Civil Disobedience (1930–34)</th></tr>
+        <tr><td>Method</td><td class="or">Boycott British institutions</td><td class="bl">Break specific unjust laws</td></tr>
+        <tr><td>Key symbol</td><td>Khadi, bonfire of foreign cloth</td><td class="hl">Salt — Dandi March</td></tr>
+        <tr><td>Allied with</td><td class="hl">Khilafat Movement (Muslims)</td><td>Broader — but less Muslim participation</td></tr>
+        <tr><td>Women's role</td><td>Limited</td><td class="hl">Very prominent — first time at scale</td></tr>
+        <tr><td>Peasant base</td><td>Moderate (Awadh, Assam)</td><td class="hl">Strong (Depression hit Patidars, Jats)</td></tr>
+        <tr><td>Dalit participation</td><td>Some</td><td class="re">Low — stayed away largely</td></tr>
+        <tr><td>Why called off</td><td class="re">Chauri Chaura violence (1922)</td><td>Gandhi-Irwin Pact (1931); finally 1934</td></tr>
+        <tr><td>Main demand</td><td>Swaraj (self-rule)</td><td class="hl">Purna Swaraj (full independence)</td></tr>
+        <tr><td>Key event</td><td class="re">Chauri Chaura, Feb 1922</td><td class="hl">Dandi March, March 1930</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Leaders ── -->
+  <div class="panel ph-lead">
+    <div class="panel-head">👤 Key Leaders</div>
+    <div class="panel-body">
+      <div class="leader-row">
+        <span class="l-badge" style="background:rgba(245,200,66,.15);color:var(--gold)">Gandhi</span>
+        <div class="l-text"><strong>Mahatma Gandhi</strong> — Central figure. Satyagraha. Led NCM, CDM, Quit India. Khadi and charkha symbol. Arrived 1915.</div>
+      </div>
+      <div class="leader-row">
+        <span class="l-badge" style="background:rgba(56,189,248,.15);color:var(--blue)">Nehru</span>
+        <div class="l-text"><strong>Jawaharlal Nehru</strong> — Youth leader. Presided Lahore Session 1929. Declared Purna Swaraj. India's first PM.</div>
+      </div>
+      <div class="leader-row">
+        <span class="l-badge" style="background:rgba(239,68,68,.15);color:var(--red)">Bose</span>
+        <div class="l-text"><strong>Subhas Chandra Bose</strong> — Radical nationalist. Founded INA. "Give me blood…" Resigned from Congress 1939.</div>
+      </div>
+      <div class="leader-row">
+        <span class="l-badge" style="background:rgba(217,70,239,.15);color:var(--purple)">Ambedkar</span>
+        <div class="l-text"><strong>B.R. Ambedkar</strong> — Dalit leader. Depressed Classes Association. Poona Pact 1932 — reserved seats compromise.</div>
+      </div>
+      <div class="leader-row">
+        <span class="l-badge" style="background:rgba(34,197,94,.15);color:var(--green)">Raju</span>
+        <div class="l-text"><strong>Alluri Sitaram Raju</strong> — Tribal leader, Andhra. Guerrilla warfare against forest laws. Connected local to national.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Social Groups ── -->
+  <div class="panel ph-grp">
+    <div class="panel-head">👥 Social Groups & Participation</div>
+    <div class="panel-body">
+      <div class="grp-row">
+        <div class="grp-name" style="color:var(--orange)">🌾 Peasants</div>
+        <div class="grp-detail">Joined CDM strongly. Depression crashed prices; revenues unchanged. Patidars (Gujarat), Jats (UP).<div class="grp-why" style="color:var(--orange)">Reason: Economic desperation</div></div>
+      </div>
+      <div class="grp-row">
+        <div class="grp-name" style="color:var(--purple)">👩 Women</div>
+        <div class="grp-detail">CDM breakthrough. Made salt, picketed shops, courted arrest. Moved into public political life.<div class="grp-why" style="color:var(--purple)">NCM: limited · CDM: massive</div></div>
+      </div>
+      <div class="grp-row">
+        <div class="grp-name" style="color:var(--green)">🌲 Tribals</div>
+        <div class="grp-detail">Forest laws = enemy. Alluri Sitaram Raju's guerrilla rebellion in Andhra (Gudem Hills).<div class="grp-why" style="color:var(--green)">Reason: Forest rights threatened</div></div>
+      </div>
+      <div class="grp-row">
+        <div class="grp-name" style="color:var(--blue)">🏭 Workers</div>
+        <div class="grp-detail">Nagpur mills struck 1920. Congress cautious — didn't want to alienate industrialist donors.<div class="grp-why" style="color:var(--blue)">Tension: class vs. national unity</div></div>
+      </div>
+      <div class="grp-row">
+        <div class="grp-name" style="color:var(--indigo)">✊ Dalits</div>
+        <div class="grp-detail">Largely stayed away from CDM. Ambedkar sought separate electorate; Poona Pact — reserved seats.<div class="grp-why" style="color:var(--indigo)">Congress didn't champion Dalit cause</div></div>
+      </div>
+      <div class="grp-row">
+        <div class="grp-name" style="color:var(--gold)">☪️ Muslims</div>
+        <div class="grp-detail">United in NCM via Khilafat. Drifted away by CDM — communal tensions, separate electorates issue.<div class="grp-why" style="color:var(--gold)">NCM: united · CDM: divided</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Symbols ── -->
+  <div class="panel ph-sym">
+    <div class="panel-head">🏛️ Symbols & Ideas of Nationalism</div>
+    <div class="panel-body">
+      <div class="sym-row">
+        <div class="sym-icon">🇮🇳</div>
+        <div class="sym-text"><h4>Bharat Mata</h4><p>Image by Abanindranath Tagore — nation as mother goddess. Inspired by Bankim Chandra's writings.</p></div>
+        <div class="sym-divider"></div>
+        <div class="sym-icon">🎵</div>
+        <div class="sym-text"><h4>Vande Mataram</h4><p>Bankim Chandra's song — "Hail to the Motherland." Some Muslims objected — seen as Hindu goddess worship.</p></div>
+        <div class="sym-divider"></div>
+        <div class="sym-icon">🧵</div>
+        <div class="sym-text"><h4>Khadi & Charkha</h4><p>Gandhi's symbol of self-reliance and rejection of British industry. Daily spinning became political act.</p></div>
+        <div class="sym-divider"></div>
+        <div class="sym-icon">🗺️</div>
+        <div class="sym-text"><h4>Map of India</h4><p>Nationalist cartography — unified territory as a single nation. "Kashmir to Kanyakumari" image.</p></div>
+        <div class="sym-divider"></div>
+        <div class="sym-icon">🌸</div>
+        <div class="sym-text"><h4>Folk Heroes</h4><p>Shivaji, Rana Pratap glorified. Folk songs and imagery used to build pan-Indian identity.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Memory tricks ── -->
+  <div class="panel ph-sym span2">
+    <div class="panel-head">🎯 Exam Tips & Memory Tricks</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.5rem">
+      <div class="trick"><strong>NCM vs CDM Method</strong><p>NCM = Boycott (don't participate). CDM = Break laws (actively defy). Easy to mix up — remember: D for Defy in CDM.</p></div>
+      <div class="trick"><strong>Chauri Chaura Date</strong><p>February 5, 1922. Gorakhpur, UP. 22 policemen killed. Gandhi called off NCM immediately — his most controversial decision.</p></div>
+      <div class="trick"><strong>Dandi Numbers</strong><p>240 miles · 78 followers · March 12 to April 5, 1930 · 24 days. These numbers appear in board questions.</p></div>
+      <div class="trick"><strong>Poona Pact</strong><p>1932. Ambedkar wanted separate electorate. Gandhi fasted in prison against it. Result: reserved seats within general electorate.</p></div>
+      <div class="trick"><strong>Jan 26 is Two Things</strong><p>Independence Day (1930, declared at Lahore Session) AND Republic Day (1950). Both on same date — board exams test this!</p></div>
+      <div class="trick"><strong>Who Painted Bharat Mata?</strong><p>Abanindranath Tagore (painted). Bankim Chandra Chattopadhyay (wrote about). Different Tagores — don't confuse with Rabindranath.</p></div>
+      <div class="trick"><strong>Khilafat = Unity Tool</strong><p>Gandhi allied with Khilafat leaders (Muhammad Ali, Shaukat Ali) to unite Hindus and Muslims. NCM had strongest Hindu-Muslim unity. CDM did not.</p></div>
+      <div class="trick"><strong>Women: NCM vs CDM</strong><p>NCM = limited women's participation. CDM = first time women participated in large numbers publicly. This difference is a 2-mark board question.</p></div>
+    </div>
+  </div>
+
+  <!-- ── Key terms ── -->
+  <div class="panel ph-ncm">
+    <div class="panel-head">📖 Key Terms to Know</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--gold)"></div><div><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.72rem">Satyagraha</span> — Truth-force; non-violent resistance through moral conviction, not physical force</div></div>
+      <div class="fact"><div class="dot" style="background:var(--orange)"></div><div><span style="color:var(--orange);font-family:'DM Mono',monospace;font-size:.72rem">Purna Swaraj</span> — Complete independence (not just self-rule within British Empire)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><span style="color:var(--blue);font-family:'DM Mono',monospace;font-size:.72rem">Khilafat</span> — Islamic institution of the Caliph (Khalifa); issue linked to Ottoman defeat in WWI</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><span style="color:var(--green);font-family:'DM Mono',monospace;font-size:.72rem">Hartal</span> — Strike; total shutdown of businesses and work as protest</div></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><div><span style="color:var(--purple);font-family:'DM Mono',monospace;font-size:.72rem">Begar</span> — Forced labour extracted by landlords from peasants without payment</div></div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><div><span style="color:var(--indigo);font-family:'DM Mono',monospace;font-size:.72rem">Swaraj</span> — Self-rule; governance by Indians themselves (within or outside the Empire)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div><span style="color:var(--red);font-family:'DM Mono',monospace;font-size:.72rem">Rowlatt Act</span> — 1919 law allowing arrest without trial; called the "Black Act"</div></div>
+      <div class="fact"><div class="dot" style="background:var(--gold)"></div><div><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.72rem">Vande Mataram</span> — "Hail to the Motherland" — nationalist song by Bankim Chandra</div></div>
+    </div>
+  </div>
+
+  <!-- ── Important places ── -->
+  <div class="panel ph-cdm">
+    <div class="panel-head">📍 Important Places & Their Significance</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--orange)"></div><div><strong>Amritsar</strong> — Jallianwala Bagh massacre, 1919</div></div>
+      <div class="fact"><div class="dot" style="background:var(--orange)"></div><div><strong>Chauri Chaura (UP)</strong> — Violence, 1922; NCM called off</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong>Sabarmati Ashram</strong> — Gandhi's base; Dandi March started here</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong>Dandi, Gujarat</strong> — Salt made here; CDM launched, April 1930</div></div>
+      <div class="fact"><div class="dot" style="background:var(--gold)"></div><div><strong>Lahore</strong> — Congress session 1929; Purna Swaraj declared</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><strong>Champaran, Bihar</strong> — Indigo farmers' Satyagraha, 1917</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><strong>Kheda, Gujarat</strong> — Revenue remission Satyagraha, 1918</div></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><div><strong>Gudem Hills, Andhra</strong> — Alluri Sitaram Raju's tribal rebellion</div></div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><div><strong>Bardoli, Gujarat</strong> — Peasant Satyagraha, 1928; led by Sardar Patel</div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

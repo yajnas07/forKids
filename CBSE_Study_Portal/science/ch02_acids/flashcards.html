@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Acids, Bases & Salts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f172a; --card:#1e293b; --border:#334155; --text:#e2e8f0; --muted:#94a3b8;
+    --acid:#ef4444; --base:#3b82f6; --neutral:#10b981; --salt:#f59e0b; --purple:#a855f7;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,.06) 0%, transparent 60%);
+  }
+
+  header { text-align:center; padding:2rem 1rem 1rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:800;
+    background:linear-gradient(135deg,#ff4d4d,#f59e0b,#3b82f6);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.78rem; margin-top:.3rem; }
+
+  /* progress */
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem 1rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--acid),var(--salt));
+    transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--muted); white-space:nowrap; }
+
+  /* filter */
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem .8rem; }
+  .f-btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; padding:.3rem .9rem;
+    border-radius:99px; border:1.5px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#0f172a; border-color:transparent; }
+  .f-all.on  { background:var(--muted); }
+  .f-acid.on { background:var(--acid); }
+  .f-base.on { background:var(--base); }
+  .f-salt.on { background:var(--salt); }
+  .f-react.on{ background:var(--neutral); }
+  .f-ph.on   { background:var(--purple); }
+
+  /* card stage */
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+
+  .fc-wrap {
+    width:100%; aspect-ratio:3/2; position:relative;
+    cursor:pointer; transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,0,.2,1);
+  }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+
+  .fc-face {
+    position:absolute; inset:0; border-radius:20px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.5rem; text-align:center;
+  }
+  .fc-front {
+    background:var(--card); border:1.5px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+  .fc-back {
+    transform:rotateY(180deg);
+    background:var(--card); border:1.5px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+
+  .fc-tag {
+    font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
+    padding:.2rem .7rem; border-radius:99px; margin-bottom:.8rem; align-self:center;
+  }
+  .fc-q { font-family:'Syne',sans-serif; font-size:clamp(.9rem,2.5vw,1.15rem); font-weight:700; line-height:1.4; }
+  .fc-hint { font-size:.72rem; color:var(--muted); margin-top:.6rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint {
+    position:absolute; bottom:.8rem; font-size:.68rem;
+    font-family:'DM Mono',monospace; color:#334155;
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  .fc-ans-label { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--neutral); margin-bottom:.6rem; }
+  .fc-ans { font-size:clamp(.82rem,2.2vw,1rem); line-height:1.6; color:var(--text); }
+  .fc-ans strong { color:#fcd34d; }
+  .fc-ans em { color:#93c5fd; font-style:normal; }
+  .chem { font-family:'DM Mono',monospace; background:#0f172a; border:1px solid var(--border);
+    border-radius:8px; padding:.4rem .7rem; font-size:.8rem; color:#34d399; margin:.4rem 0; }
+
+  /* nav */
+  .nav-row { display:flex; gap:.8rem; align-items:center; padding:1rem; }
+  .nav-btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem;
+    padding:.55rem 1.4rem; border-radius:99px;
+    border:2px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .nav-btn:hover:not(:disabled) { border-color:#64748b; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-counter { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--muted); min-width:70px; text-align:center; }
+
+  /* shuffle */
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:.78rem;
+    padding:.4rem 1.1rem; border-radius:99px;
+    border:1.5px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .bot-btn:hover { border-color:var(--salt); color:var(--salt); }
+
+  /* known/unknown badges */
+  .known-badge {
+    position:absolute; top:.8rem; right:.8rem;
+    font-size:.68rem; font-family:'DM Mono',monospace;
+    padding:.15rem .5rem; border-radius:99px;
+  }
+  .known   { background:rgba(16,185,129,.15); color:#34d399; }
+  .unknown { background:rgba(239,68,68,.1); color:#f87171; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Acids, Bases &amp; Salts · 40 Cards · Tap to flip</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on"  onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-acid"    onclick="setFilter('acid',this)">⚗️ Acids</button>
+  <button class="f-btn f-base"    onclick="setFilter('base',this)">🧪 Bases</button>
+  <button class="f-btn f-ph"      onclick="setFilter('ph',this)">📊 pH</button>
+  <button class="f-btn f-react"   onclick="setFilter('react',this)">🔥 Reactions</button>
+  <button class="f-btn f-salt"    onclick="setFilter('salt',this)">🧂 Salts</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front" id="fc-front">
+      <div class="fc-tag" id="fc-tag"></div>
+      <div class="fc-q" id="fc-q"></div>
+      <div class="fc-hint" id="fc-hint"></div>
+      <div class="fc-flip-hint">tap to reveal →</div>
+    </div>
+    <div class="fc-face fc-back" id="fc-back">
+      <div class="fc-tag" id="fc-tag-b"></div>
+      <div class="fc-ans-label">✅ Answer</div>
+      <div class="fc-ans" id="fc-ans"></div>
+      <div id="fc-chem"></div>
+      <div class="known-badge" id="known-badge" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="move(-1)" disabled>← Prev</button>
+  <div class="card-counter" id="counter">1 / 40</div>
+  <button class="nav-btn" id="next-btn" onclick="move(1)">Next →</button>
+</div>
+
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown(true)">✓ Know it</button>
+  <button class="bot-btn" onclick="markKnown(false)">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const CARDS = [
+  // ── ACIDS ──
+  { cat:'acid', q:'What ions do acids produce in aqueous solution?', a:'<strong>H⁺ (Hydronium H₃O⁺) ions</strong> — the actual carrier of acidity in solution.', chem:'HCl + H₂O → H₃O⁺ + Cl⁻', hint:'Remember: bare H⁺ can\'t exist free — it combines with H₂O' },
+  { cat:'acid', q:'Name the acid present in: Lemon, Vinegar, Ant sting, Curd, Tomato', a:'Lemon → <em>Citric acid</em>\nVinegar → <em>Acetic acid</em>\nAnt sting → <em>Formic acid</em>\nCurd → <em>Lactic acid</em>\nTomato → <em>Oxalic acid</em>' },
+  { cat:'acid', q:'What is the difference between a dilute and concentrated acid?', a:'<strong>Dilute acid:</strong> less amount of acid dissolved in more water (few H⁺ ions).\n<strong>Concentrated acid:</strong> more amount of acid in less water (many H⁺ ions).\nConcentration ≠ strength.' },
+  { cat:'acid', q:'Why does dry HCl NOT change the colour of dry blue litmus?', a:'Acids show acidic character only in <strong>aqueous solution</strong>. Dry HCl cannot ionise — no H⁺ ions are produced without water, so litmus does not change colour.' },
+  { cat:'acid', q:'What happens when dilute H₂SO₄ is added to zinc granules?', a:'Hydrogen gas is evolved with fizzing.', chem:'Zn + H₂SO₄ → ZnSO₄ + H₂↑', hint:'H₂ burns with a "pop" sound near a burning splint' },
+  { cat:'acid', q:'What is acid rain? What causes it?', a:'Rain with pH <strong>below 5.6</strong> is acid rain. Caused by SO₂ and NOₓ from factories/vehicles dissolving in rain water to form H₂SO₄ and HNO₃.' },
+  { cat:'acid', q:'Name two strong acids and two weak acids with their formulas.', a:'<strong>Strong:</strong> HCl (Hydrochloric), H₂SO₄ (Sulphuric)\n<strong>Weak:</strong> CH₃COOH (Acetic/Ethanoic), H₂CO₃ (Carbonic)' },
+  { cat:'acid', q:'What is the role of water in making HCl acidic?', a:'Water enables HCl to <strong>ionise</strong> and release H⁺ ions (as H₃O⁺). Without water, HCl is a covalent molecule with no ions — not acidic.', chem:'HCl(g) → no ions\nHCl(aq) → H⁺ + Cl⁻' },
+
+  // ── BASES ──
+  { cat:'base', q:'What ions do bases produce in aqueous solution?', a:'Bases produce <strong>OH⁻ (hydroxide) ions</strong> in aqueous solution. This makes the solution basic/alkaline.', chem:'NaOH → Na⁺ + OH⁻', hint:'Bases accept H⁺ or donate OH⁻' },
+  { cat:'base', q:'What is the difference between a base and an alkali?', a:'<strong>Base:</strong> any substance releasing OH⁻ — may be insoluble.\n<strong>Alkali:</strong> a base soluble in water.\n\nAll alkalis are bases. NOT all bases are alkalis.\nEg: Cu(OH)₂ = base, NOT alkali.' },
+  { cat:'base', q:'Give the common name, chemical name and formula of slaked lime.', a:'Common name: <strong>Slaked lime</strong>\nChemical name: <em>Calcium Hydroxide</em>\nFormula: <strong>Ca(OH)₂</strong>\n\nUsed in whitewashing and neutralising acidic soil.' },
+  { cat:'base', q:'What happens when NaOH reacts with aluminium? Write equation.', a:'Hydrogen gas is released — unusual as a base reacts with a metal!', chem:'2NaOH + 2Al + 2H₂O → 2NaAlO₂ + 3H₂↑', hint:'Only amphoteric metals like Al react with bases' },
+  { cat:'base', q:'Name the base used in: (a) Antacids (b) Cleaning agents (c) Whitewashing (d) Saponification', a:'(a) Mg(OH)₂ or Al(OH)₃\n(b) NaOH or NH₄OH\n(c) Ca(OH)₂ (Slaked lime)\n(d) NaOH or KOH (for soap making)' },
+  { cat:'base', q:'What is the common name and formula of caustic soda?', a:'Common name: <strong>Caustic Soda</strong>\nChemical name: <em>Sodium Hydroxide</em>\nFormula: <strong>NaOH</strong>\n\nStrong base, highly corrosive, used in soap/paper/textile industry.' },
+
+  // ── pH ──
+  { cat:'ph', q:'What does pH stand for and what does it measure?', a:'pH = <strong>potential of Hydrogen</strong>.\nIt measures the concentration of H⁺ ions in solution.\npH = –log₁₀[H⁺]\n\nScale: 0–14 (0=strongest acid, 14=strongest base, 7=neutral).' },
+  { cat:'ph', q:'What is the pH of: Pure water, Lemon juice, Blood, NaOH solution?', a:'Pure water → <strong>pH 7</strong> (neutral)\nLemon juice → <strong>pH ~2.5</strong>\nHuman blood → <strong>pH 7.4</strong>\nNaOH solution → <strong>pH 13–14</strong>' },
+  { cat:'ph', q:'What happens to the pH of an acid when diluted with water?', a:'pH <strong>increases</strong> (moves closer to 7). Dilution reduces H⁺ concentration. pH never goes above 7 for an acid, no matter how much you dilute.' },
+  { cat:'ph', q:'Below what pH does tooth decay occur? Why?', a:'Tooth enamel dissolves when mouth pH drops <strong>below 5.5</strong>. Bacteria in mouth produce acids from sugar, lowering pH. Toothpaste (basic) neutralises this acid.' },
+  { cat:'ph', q:'What is the importance of pH in agriculture?', a:'Crops grow best at pH <strong>6–7</strong>.\n• Acidic soil → add lime/Ca(OH)₂ to neutralise\n• Basic soil → add organic matter/acid\n\npH affects nutrient availability to plants.' },
+  { cat:'ph', q:'A solution has pH = 2 and another has pH = 4. Which is more acidic and by how much?', a:'pH 2 is more acidic. Since pH is a log scale, <strong>pH 2 has 100× more H⁺ ions</strong> than pH 4.\n\nEach unit difference = 10× difference in H⁺ concentration.' },
+
+  // ── REACTIONS ──
+  { cat:'react', q:'What is a neutralisation reaction? Give one example.', a:'Acid + Base → Salt + Water. It is an <strong>exothermic</strong> reaction (heat released).', chem:'HCl + NaOH → NaCl + H₂O\n(Heat evolved)', hint:'Universal indicator turns GREEN at neutralisation' },
+  { cat:'react', q:'What gas is produced when acid reacts with carbonate? How is it tested?', a:'<strong>Carbon dioxide (CO₂)</strong> is produced. It is tested by passing through lime water — it turns <em>milky</em>.', chem:'Na₂CO₃ + 2HCl → 2NaCl + H₂O + CO₂↑\nCO₂ + Ca(OH)₂ → CaCO₃↓ + H₂O' },
+  { cat:'react', q:'What is observed when CuO reacts with dilute H₂SO₄? Write equation.', a:'Black copper oxide dissolves to form a <strong>blue solution</strong> of copper sulphate.', chem:'CuO + H₂SO₄ → CuSO₄ + H₂O\n(Black → Blue)' },
+  { cat:'react', q:'What happens when CO₂ is first passed through and then in excess through lime water?', a:'First: lime water turns <strong>milky</strong> (CaCO₃ precipitate).\nExcess CO₂: milkiness <strong>disappears</strong> — CaCO₃ converts to soluble Ca(HCO₃)₂.', chem:'CaCO₃ + CO₂ + H₂O → Ca(HCO₃)₂ (soluble)' },
+  { cat:'react', q:'Why is HNO₃ not used in the reaction of acids with metals in lab?', a:'HNO₃ is a strong <strong>oxidising agent</strong>. It oxidises the H₂ gas as soon as it is produced, so hydrogen is NOT released. Other products like NO/NO₂ are formed instead.' },
+  { cat:'react', q:'What is the reaction between Na₂CO₃ and HCl? Identify the type of reaction.', a:'Acid + Metal Carbonate → Salt + Water + CO₂', chem:'Na₂CO₃ + 2HCl → 2NaCl + H₂O + CO₂↑', hint:'CO₂ turns lime water milky — standard lab test' },
+
+  // ── SALTS ──
+  { cat:'salt', q:'Give the chemical name and formula of: (a) Baking soda (b) Washing soda (c) Common salt (d) Plaster of Paris', a:'(a) Sodium Hydrogen Carbonate — <strong>NaHCO₃</strong>\n(b) Sodium Carbonate decahydrate — <strong>Na₂CO₃·10H₂O</strong>\n(c) Sodium Chloride — <strong>NaCl</strong>\n(d) Calcium Sulphate hemihydrate — <strong>CaSO₄·½H₂O</strong>' },
+  { cat:'salt', q:'What is water of crystallisation? Give an example.', a:'The <strong>fixed number of water molecules</strong> present per formula unit of a crystalline salt.\n\nExample: CuSO₄·<strong>5H₂O</strong> (Blue vitriol) — 5 water molecules give it its blue colour. Heating turns it white.', chem:'CuSO₄·5H₂O → CuSO₄ + 5H₂O' },
+  { cat:'salt', q:'What is bleaching powder? How is it made?', a:'<strong>Calcium Oxychloride</strong>, formula: Ca(OCl)Cl. Made by passing Cl₂ over dry slaked lime.', chem:'Ca(OH)₂ + Cl₂ → Ca(OCl)Cl + H₂O', hint:'Used for disinfecting water and bleaching cotton' },
+  { cat:'salt', q:'What is the Chlor-Alkali process? Name the products at each electrode.', a:'Electrolysis of concentrated NaCl (brine).\n• <strong>Anode:</strong> Cl₂ gas\n• <strong>Cathode:</strong> H₂ gas\n• <strong>Solution:</strong> NaOH', chem:'2NaCl + 2H₂O → Cl₂ + H₂ + 2NaOH' },
+  { cat:'salt', q:'What is the pH of: NaCl solution, Na₂CO₃ solution, NH₄Cl solution?', a:'NaCl → <strong>pH 7</strong> (strong acid + strong base)\nNa₂CO₃ → <strong>pH > 7</strong> (strong base + weak acid)\nNH₄Cl → <strong>pH < 7</strong> (weak base + strong acid)' },
+  { cat:'salt', q:'What happens when Plaster of Paris (POP) is mixed with water?', a:'POP absorbs water and sets into a <strong>hard solid</strong> (Gypsum).', chem:'CaSO₄·½H₂O + 1½H₂O → CaSO₄·2H₂O\n(POP)                      (Gypsum)', hint:'This setting property makes POP useful for casts and moulds' },
+  { cat:'salt', q:'What are the uses of: (a) NaHCO₃ (b) Na₂CO₃ (c) NaOH (d) Bleaching powder?', a:'(a) NaHCO₃: baking, antacid, fire extinguisher\n(b) Na₂CO₃: glass/soap/paper industry, water softening\n(c) NaOH: soap, paper, textile, de-greasing\n(d) Bleaching powder: water disinfection, bleaching cotton' },
+  { cat:'salt', q:'Name the product when: Washing soda is heated', a:'On heating, washing soda loses its water of crystallisation:', chem:'Na₂CO₃·10H₂O → Na₂CO₃ + 10H₂O\n(Washing soda → Anhydrous sodium carbonate)', hint:'This is called efflorescence — loss of water to atmosphere' },
+  { cat:'salt', q:'Why does a dry CuSO₄ crystal turn blue when water is added?', a:'Anhydrous CuSO₄ is white. When water is added, <strong>5 water molecules</strong> attach to each formula unit, forming CuSO₄·5H₂O — the blue colour is due to these water molecules (hydration).', chem:'CuSO₄ + 5H₂O → CuSO₄·5H₂O\n(White)             (Blue)' },
+  { cat:'salt', q:'What is brine? What important products are made from it?', a:'Brine is a <strong>concentrated solution of NaCl</strong> in water.\n\nElectrolysis (Chlor-Alkali process) gives:\n• Cl₂ → bleaching powder, PVC, HCl\n• H₂ → fuel, ammonia synthesis\n• NaOH → soap, detergents, paper' },
+];
+
+let deck = [...CARDS];
+let idx = 0;
+let filter = 'all';
+let known = {};
+let isFlipped = false;
+
+function filtered() {
+  return filter === 'all' ? deck : deck.filter(c => c.cat === filter);
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  idx = 0;
+  isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+function updateCard() {
+  const cards = filtered();
+  if (!cards.length) return;
+  const c = cards[idx % cards.length];
+  const total = cards.length;
+  const cur = (idx % total) + 1;
+
+  // tag colours
+  const tagStyle = {
+    acid:'background:rgba(239,68,68,.15);color:#f87171',
+    base:'background:rgba(59,130,246,.15);color:#60a5fa',
+    ph:'background:rgba(168,85,247,.15);color:#c084fc',
+    react:'background:rgba(16,185,129,.15);color:#34d399',
+    salt:'background:rgba(245,158,11,.15);color:#fbbf24'
+  };
+  const tagLabel = {acid:'⚗️ Acids',base:'🧪 Bases',ph:'📊 pH',react:'🔥 Reactions',salt:'🧂 Salts'};
+
+  document.getElementById('fc-tag').style.cssText = tagStyle[c.cat];
+  document.getElementById('fc-tag').textContent = tagLabel[c.cat];
+  document.getElementById('fc-tag-b').style.cssText = tagStyle[c.cat];
+  document.getElementById('fc-tag-b').textContent = tagLabel[c.cat];
+  document.getElementById('fc-q').textContent = c.q;
+  document.getElementById('fc-hint').textContent = c.hint ? '💡 '+c.hint : '';
+  document.getElementById('fc-ans').innerHTML = (c.a||'').replace(/\n/g,'<br>');
+  const chemEl = document.getElementById('fc-chem');
+  chemEl.innerHTML = c.chem ? `<div class="chem">${c.chem.replace(/\n/g,'<br>')}</div>` : '';
+
+  // known badge
+  const kb = document.getElementById('known-badge');
+  const cardId = deck.indexOf(c);
+  if (known[cardId] === true)       { kb.style.display='block'; kb.className='known-badge known';   kb.textContent='✓ Known'; }
+  else if (known[cardId] === false) { kb.style.display='block'; kb.className='known-badge unknown'; kb.textContent='Still learning'; }
+  else kb.style.display='none';
+
+  // counter & progress
+  document.getElementById('counter').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-text').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-fill').style.width = `${(cur/total)*100}%`;
+
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx >= total-1;
+}
+
+function flip() {
+  isFlipped = !isFlipped;
+  document.getElementById('fc').classList.toggle('flipped', isFlipped);
+}
+
+function move(dir) {
+  const total = filtered().length;
+  idx = Math.max(0, Math.min(total-1, idx+dir));
+  isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+function markKnown(val) {
+  const cards = filtered();
+  const c = cards[idx % cards.length];
+  const cardId = deck.indexOf(c);
+  known[cardId] = val;
+  updateCard();
+  if (val) setTimeout(() => move(1), 400);
+}
+
+function shuffle() {
+  for (let i = deck.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]] = [deck[j],deck[i]];
+  }
+  idx = 0; isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+function resetDeck() {
+  deck = [...CARDS]; known = {}; idx = 0; isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  updateCard();
+}
+
+// keyboard
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') move(1);
+  else if (e.key==='ArrowLeft') move(-1);
+  else if (e.key===' ') { e.preventDefault(); flip(); }
+});
+
+updateCard();
+</script>
+</body>
+</html>

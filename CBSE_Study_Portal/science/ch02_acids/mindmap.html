@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Acids, Bases & Salts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080f1e; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#ff4d4d,#f59e0b,#3b82f6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+/* tooltip */
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 240px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <div>
+    <h1>Acids, Bases &amp; Salts</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+// ── NODE DATA ──
+const CENTER = { id:'c', label:'Acids, Bases\n& Salts', x:0, y:0, r:58, color:'#1e40af', stroke:'#3b82f6', textColor:'#bfdbfe', fontSize:13 };
+
+const BRANCHES = [
+  {
+    id:'acid', label:'Acids', x:-320, y:-180, r:42, color:'#7f1d1d', stroke:'#ef4444', textColor:'#fca5a5',
+    info:'Substances that release H⁺ (H₃O⁺) ions in aqueous solution. pH < 7. Sour taste. Turn blue litmus red.',
+    children:[
+      { id:'a1', label:'Strong Acids', x:-520, y:-300, r:34, color:'#991b1b', stroke:'#f87171', textColor:'#fecaca',
+        info:'Completely ionise in water.\nHCl → H⁺ + Cl⁻\nH₂SO₄ → 2H⁺ + SO₄²⁻\nHNO₃ → H⁺ + NO₃⁻' },
+      { id:'a2', label:'Weak Acids', x:-520, y:-170, r:34, color:'#991b1b', stroke:'#f87171', textColor:'#fecaca',
+        info:'Partially ionise in water.\nCH₃COOH ⇌ CH₃COO⁻ + H⁺\nH₂CO₃ ⇌ H⁺ + HCO₃⁻\nCitric acid, lactic acid' },
+      { id:'a3', label:'Natural Acids', x:-350, y:-340, r:34, color:'#991b1b', stroke:'#f87171', textColor:'#fecaca',
+        info:'Lemon → Citric acid\nVinegar → Acetic acid\nCurd → Lactic acid\nAnt sting → Formic acid\nTomato → Oxalic acid' },
+      { id:'a4', label:'Properties', x:-160, y:-340, r:34, color:'#991b1b', stroke:'#f87171', textColor:'#fecaca',
+        info:'• Sour taste\n• Conduct electricity\n• React with metals → H₂↑\n• React with carbonates → CO₂↑\n• Turn blue litmus red\n• pH < 7' },
+    ]
+  },
+  {
+    id:'base', label:'Bases', x:320, y:-180, r:42, color:'#1e3a5f', stroke:'#3b82f6', textColor:'#93c5fd',
+    info:'Substances that release OH⁻ ions in aqueous solution. pH > 7. Bitter taste. Turn red litmus blue.',
+    children:[
+      { id:'b1', label:'Strong Bases', x:480, y:-320, r:34, color:'#1e3a5f', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Completely dissociate in water.\nNaOH → Na⁺ + OH⁻\nKOH → K⁺ + OH⁻\nCa(OH)₂ → Ca²⁺ + 2OH⁻' },
+      { id:'b2', label:'Alkalis', x:520, y:-180, r:34, color:'#1e3a5f', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Bases soluble in water.\nAll alkalis are bases.\nNOT all bases are alkalis.\nCu(OH)₂ = base, NOT alkali' },
+      { id:'b3', label:'Properties', x:460, y:-50, r:34, color:'#1e3a5f', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'• Bitter taste\n• Soapy/slippery feel\n• Conduct electricity\n• Turn red litmus blue\n• React with acids → neutralisation\n• pH > 7' },
+    ]
+  },
+  {
+    id:'ph', label:'pH Scale', x:0, y:-280, r:42, color:'#064e3b', stroke:'#10b981', textColor:'#6ee7b7',
+    info:'Measures H⁺ concentration.\n0–6 = Acidic\n7 = Neutral\n8–14 = Basic\npH = –log[H⁺]',
+    children:[
+      { id:'p1', label:'Acidic\npH 0–6', x:-160, y:-400, r:32, color:'#064e3b', stroke:'#34d399', textColor:'#a7f3d0',
+        info:'pH 1 — Gastric acid\npH 2.5 — Vinegar\npH 3 — Lemon juice\npH 6 — Cow\'s milk' },
+      { id:'p2', label:'Neutral\npH 7', x:0, y:-430, r:32, color:'#064e3b', stroke:'#34d399', textColor:'#a7f3d0',
+        info:'pH 7 — Pure water\npH 7 — NaCl solution\nEqual H⁺ and OH⁻ ions' },
+      { id:'p3', label:'Basic\npH 8–14', x:160, y:-400, r:32, color:'#064e3b', stroke:'#34d399', textColor:'#a7f3d0',
+        info:'pH 7.4 — Human blood\npH 10 — Milk of magnesia\npH 11 — Ammonia\npH 13 — Bleach/NaOH' },
+    ]
+  },
+  {
+    id:'react', label:'Reactions', x:-320, y:180, r:42, color:'#78350f', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'Key reactions of acids and bases forming salts and other products.',
+    children:[
+      { id:'r1', label:'Neutralisation', x:-520, y:100, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Acid + Base → Salt + Water\nHCl + NaOH → NaCl + H₂O\nExothermic reaction\nHeat is released' },
+      { id:'r2', label:'Metal + Acid', x:-560, y:220, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Metal + Acid → Salt + H₂↑\nZn + H₂SO₄ → ZnSO₄ + H₂↑\nH₂ burns with pop sound' },
+      { id:'r3', label:'Carbonate\n+ Acid', x:-430, y:320, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Carbonate + Acid → Salt + H₂O + CO₂↑\nNa₂CO₃ + 2HCl → 2NaCl + H₂O + CO₂\nLimewater turns milky' },
+      { id:'r4', label:'Metal Oxide\n+ Acid', x:-240, y:360, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Metal Oxide + Acid → Salt + Water\nCuO + H₂SO₄ → CuSO₄ + H₂O\nBlack CuO → blue solution' },
+    ]
+  },
+  {
+    id:'salt', label:'Salts', x:320, y:180, r:42, color:'#4c1d95', stroke:'#a855f7', textColor:'#d8b4fe',
+    info:'Ionic compounds formed by neutralisation of acid and base. pH depends on parent acid/base.',
+    children:[
+      { id:'s1', label:'Important\nSalts', x:500, y:100, r:34, color:'#4c1d95', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'NaCl — Common salt\nNa₂CO₃·10H₂O — Washing soda\nNaHCO₃ — Baking soda\nCaSO₄·½H₂O — Plaster of Paris\nCa(OCl)Cl — Bleaching powder' },
+      { id:'s2', label:'Chlor-Alkali\nProcess', x:540, y:230, r:34, color:'#4c1d95', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'Electrolysis of brine (NaCl):\n→ Cl₂ at anode\n→ H₂ at cathode\n→ NaOH in solution' },
+      { id:'s3', label:'Water of\nCrystallisation', x:430, y:340, r:34, color:'#4c1d95', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'Fixed water in crystal lattice.\nCuSO₄·5H₂O (Blue vitriol)\nBlue → White on heating\nNa₂CO₃·10H₂O (Washing soda)' },
+      { id:'s4', label:'pH of Salts', x:260, y:370, r:34, color:'#4c1d95', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'Strong acid + Strong base → pH 7 (NaCl)\nStrong base + Weak acid → pH > 7 (Na₂CO₃)\nWeak base + Strong acid → pH < 7 (NH₄Cl)' },
+    ]
+  },
+  {
+    id:'ind', label:'Indicators', x:0, y:260, r:42, color:'#1e293b', stroke:'#64748b', textColor:'#cbd5e1',
+    info:'Substances that change colour in acidic or basic solutions to identify their nature.',
+    children:[
+      { id:'i1', label:'Litmus', x:-160, y:380, r:32, color:'#1e293b', stroke:'#94a3b8', textColor:'#e2e8f0',
+        info:'Natural indicator (lichen)\nRed in acid\nBlue in base\nPurple/violet when neutral' },
+      { id:'i2', label:'Universal\nIndicator', x:0, y:420, r:32, color:'#1e293b', stroke:'#94a3b8', textColor:'#e2e8f0',
+        info:'Mixture of indicators\nGives full colour range\nRed→Orange→Yellow→Green→Blue→Violet\nCorresponds to pH 0–14' },
+      { id:'i3', label:'Other\nIndicators', x:160, y:380, r:32, color:'#1e293b', stroke:'#94a3b8', textColor:'#e2e8f0',
+        info:'Phenolphthalein:\nColourless in acid\nPink in base\n\nMethyl orange:\nRed in acid\nYellow in base' },
+    ]
+  }
+];
+
+// build flat node list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// pan/zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const {nx,ny} = toCanvas(0,0);
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/,' ')}</strong>${(found.info||'').replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+// touch
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2; draw(); }
+
+// ── DRAW ──
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // background grid
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.025)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    // glow
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    // border
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    // label
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>
